@@ -7,7 +7,7 @@ from lawg.base.room import BaseRoom
 from lawg.syncio.project import Project
 from lawg.syncio.rest import Rest
 
-from lawg.schemas import ProjectCreateSchema
+from lawg.schemas import APISuccessSchema, ProjectCreateSchema, ProjectSchema
 from lawg.typings import STR_DICT, UNDEFINED, Undefined
 
 
@@ -31,19 +31,22 @@ class Client(BaseClient):
     # --- PROJECTS --- #
 
     def create_project(self, project_name: str, project_namespace: str) -> Project:
-        schema = ProjectCreateSchema()
-        data = schema.load(
-            {
-                "name": project_name,
-                "namespace": project_namespace,
-            }
-        )
+        req_schema = ProjectCreateSchema()
+        req_data = req_schema.load({"name": project_name, "namespace": project_namespace})
 
         resp = self.rest.request(
             path="/projects",
             method="POST",
-            body=data,
+            body=req_data,
         )
+
+        resp_schema = APISuccessSchema()
+        resp_data = resp_schema.load(resp)
+
+        project_schema = ProjectSchema()
+        project_data = project_schema.load(resp_data["data"])
+
+        return Project(self, namespace=project_data["namespace"])
 
     def fetch_project(self, project_namespace: str) -> BaseProject:
         return super().fetch_project(project_namespace)
@@ -117,11 +120,14 @@ class Client(BaseClient):
     get_logs = fetch_logs
     patch_log = edit_log
 
+
 if __name__ == "__main__":
     import os
 
     token = os.getenv("LAWG_DEV_API_TOKEN")
     assert token is not None
+
+    print(token)
 
     c = Client(token)
 

@@ -36,7 +36,7 @@ class BaseRest(ABC, t.Generic[T]):
 
     @property
     def headers(self) -> dict[str, str]:
-        return {"User-Agent": self.USER_AGENT, "Authorization": f"Bearer {self.client.token}"}
+        return {"User-Agent": self.USER_AGENT, "Authorization": self.client.token}
 
     @abstractmethod
     def request(self, *, path: str, method: str, body: STR_DICT | None = None) -> STR_DICT:

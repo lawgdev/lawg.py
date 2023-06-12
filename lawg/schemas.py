@@ -178,3 +178,29 @@ class APIErrorSchema(Schema):
 class APISuccessSchema(Schema):
     success = fields.Boolean(required=True, validate=validate.Equal(True))
     data = fields.Dict(required=True)
+
+
+# ----- API RESPONSE SCHEMAS ----- #
+
+
+class RoomSchema(Schema):
+    id = fields.Str(required=True, validate=PikaId("room"))
+    project_id = fields.Str(required=True, validate=PikaId("project"))
+    name = RoomNameSchema(required=True)
+    description = RoomDescriptionSchema(required=True, allow_none=True)
+    emoji = EmojiSchema(required=True, allow_none=True)
+
+class MemberSchema(Schema):
+    id = fields.Str(required=True, validate=PikaId("user"))
+    username = fields.Str(required=True)
+    icon = fields.Str(required=True, allow_none=True)
+
+
+class ProjectSchema(Schema):
+    id = fields.Str(required=True, validate=PikaId("project"))
+    namespace = ProjectNamespaceSchema(required=True)
+    name = ProjectNameSchema(required=True)
+    flags = fields.Int(required=True)
+    icon = fields.Str(required=True, allow_none=True)
+    rooms = fields.List(fields.Nested(RoomSchema()), required=True)
+    members = fields.List(fields.Nested(MemberSchema()), required=True)
