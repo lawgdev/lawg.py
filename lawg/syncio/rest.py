@@ -12,7 +12,7 @@ if t.TYPE_CHECKING:
 
 
 class Rest(BaseRest[httpx.Client]):
-    """The SyncIO REST manager."""
+    """The syncio rest manager."""
 
     def __init__(self, client: Client) -> None:
         super().__init__(client)
@@ -21,5 +21,5 @@ class Rest(BaseRest[httpx.Client]):
 
     def request(self, *, path: str, method: str, body: STR_DICT | None = None) -> STR_DICT:
         resp = self.http_client.request(method, f"{self.API_V1}{path}", json=body)
-        resp.raise_for_status()
+        self.validate(resp)
         return resp.json()

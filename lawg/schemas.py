@@ -4,6 +4,8 @@ import functools
 from marshmallow import Schema, ValidationError, fields, validate
 from marshmallow_union import Union
 
+from lawg.typings import ErrorCode
+
 
 class PikaId(validate.Validator):
     """
@@ -158,3 +160,21 @@ class LogDeleteSchema(Schema):
     namespace = ProjectNamespaceSchema(required=True)
     room_name = RoomNameSchema(required=True)
     log_id = fields.Str(required=True, validate=PikaId("log"))
+
+
+# ----- API VALIDATION SCHEMAS ----- #
+
+
+class ErrorSchema(Schema):
+    code = fields.Str(required=True)
+    message = fields.Str(required=True)
+
+
+class APIErrorSchema(Schema):
+    success = fields.Boolean(required=True, validate=validate.Equal(False))
+    error = fields.Nested(ErrorSchema())
+
+
+class APISuccessSchema(Schema):
+    success = fields.Boolean(required=True, validate=validate.Equal(True))
+    data = fields.Dict(required=True)

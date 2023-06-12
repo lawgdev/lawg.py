@@ -1,14 +1,25 @@
 from __future__ import annotations
 
 import os
-
 import typing as t
 from abc import ABC, abstractmethod
 
+import marshmallow
+import httpx
+
+from lawg.exceptions import (
+    LawgHTTPException,
+    LawgConflict,
+    LawgBadRequest,
+    LawgUnauthorized,
+    LawgNotFound,
+    LawgInternalServerError,
+    LawgForbidden,
+)
+from lawg.schemas import APIErrorSchema
 from lawg.typings import T
 
 if t.TYPE_CHECKING:
-    import httpx
     from lawg.base.client import BaseClient
     from lawg.typings import STR_DICT
 
@@ -40,3 +51,33 @@ class BaseRest(ABC, t.Generic[T]):
         Returns:
             dict: response body of request.
         """
+
+    def validate(self, response: httpx.Response) -> None:
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError:
+            data = response.json()
+            schema = APIErrorSchema()
+
+            try:
+                schema.load(data)
+            except marshmallow.ValidationError:
+                raise LawgHTTPException()
+
+            error_code: str = data["error"]["code"]
+            error_message: str = data["error"]["message"]
+
+            if error_code == "conflict":
+                raise LawgConflict(message=error_message, status_code=response.status_code)
+            elif error_code == "bad_request":
+                raise LawgBadRequest(message=error_message, status_code=response.status_code)
+            elif error_code == "unauthorized":
+                raise LawgUnauthorized(message=error_message, status_code=response.status_code)
+            elif error_code == "not_found":
+                raise LawgNotFound(message=error_message, status_code=response.status_code)
+            elif error_code == "internal_server_error":
+                raise LawgInternalServerError(message=error_message, status_code=response.status_code)
+            elif error_code == "forbidden":
+                raise LawgForbidden(message=error_message, status_code=response.status_code)
+            else:
+                raise LawgHTTPException(message=error_message, status_code=response.status_code)
