@@ -101,17 +101,18 @@ class RoomCreateSchema(Schema):
     emoji = EmojiSchema(required=False, allow_none=True)
 
 
-class RoomDeleteSchema(Schema):
-    namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
-
-
 class RoomPatchSchema(Schema):
-    namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
     name = RoomNameSchema(required=False, allow_none=True)
     description = RoomDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
+
+    namespace = ProjectNamespaceSchema(required=True)
+    room_name = RoomNameSchema(required=True)
+
+
+class RoomDeleteSchema(Schema):
+    namespace = ProjectNamespaceSchema(required=True)
+    room_name = RoomNameSchema(required=True)
 
 
 # --- LOGS --- #
@@ -129,15 +130,10 @@ class LogCreateSchema:
     color = ColorSchema(required=False, allow_none=True)
 
 
-class LogDeleteSchema(Schema):
-    log_id = fields.Str(required=True, validate=PikaId("log"))
-    room_name = RoomNameSchema(required=True)
-
-
 class LogGetSchema(Schema):
-    log_id = fields.Str(required=True, validate=PikaId("log"))
     namespace = ProjectNamespaceSchema(required=True)
     room_name = RoomNameSchema(required=True)
+    log_id = fields.Str(required=True, validate=PikaId("log"))
 
 
 class LogGetMultipleSchema(Schema):
@@ -148,10 +144,16 @@ class LogGetMultipleSchema(Schema):
 
 
 class LogPatchSchema(Schema):
-    log_id = fields.Str(required=True, validate=PikaId("log"))
     namespace = ProjectNamespaceSchema(required=True)
     room_name = RoomNameSchema(required=True)
-    title = LogTitleSchema(required=True)
+    log_id = fields.Str(required=True, validate=PikaId("log"))
+    title = LogTitleSchema(required=False)
     description = LogDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
     color = ColorSchema(required=False, allow_none=True)
+
+
+class LogDeleteSchema(Schema):
+    namespace = ProjectNamespaceSchema(required=True)
+    room_name = RoomNameSchema(required=True)
+    log_id = fields.Str(required=True, validate=PikaId("log"))

@@ -1,6 +1,6 @@
 import typing as t
 
-from abc import ABC
+from abc import ABC, abstractmethod
 
 
 if t.TYPE_CHECKING:
@@ -20,6 +20,7 @@ class BaseProject(ABC):
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} namespace={self.namespace!r}>"
 
+    @abstractmethod
     def create(
         self,
         name: str,

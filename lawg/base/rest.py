@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 
 import typing as t
 from abc import ABC, abstractmethod
@@ -13,7 +14,7 @@ if t.TYPE_CHECKING:
 class BaseRest(ABC):
     USER_AGENT = "lawg.py; (+https://github.com/lawg/lawg.py)"
     HOSTNAME = "https://lawg.dev"
-    API = "https://api.lawg.dev"
+    API = os.getenv("LAWG_DEV_API", "https://api.lawg.dev")
     API_V1 = f"{API}/v1"
 
     def __init__(self, client: BaseClient) -> None:
