@@ -97,7 +97,7 @@ RoomDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(m
 class RoomCreateSchema(Schema):
     namespace = ProjectNamespaceSchema(required=True)
     name = RoomNameSchema(required=True)
-    description = RoomDescriptionSchema(required=True)
+    description = RoomDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
 
 

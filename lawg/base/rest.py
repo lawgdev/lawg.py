@@ -17,11 +17,11 @@ class BaseRest(ABC):
     API_V1 = f"{API}/v1"
 
     def __init__(self, client: BaseClient) -> None:
-        self._client: BaseClient = client
+        self.client: BaseClient = client
 
     @property
     def headers(self) -> dict[str, str]:
-        return {"User-Agent": self.USER_AGENT, "Authorization": f"Bearer {self._client.token}"}
+        return {"User-Agent": self.USER_AGENT, "Authorization": f"Bearer {self.client.token}"}
 
     @abstractmethod
     def request(self, *, path: str, method: str, body: STR_DICT | None = None) -> STR_DICT:

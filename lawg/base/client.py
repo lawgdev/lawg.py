@@ -16,60 +16,7 @@ class BaseClient(ABC):
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} token={self.token!r}>"
 
-    @abstractmethod
-    def create(
-        self,
-        name: str,
-        namespace: str,
-    ) -> BaseLog:
-        """
-        Create a log.
-
-        Args:
-            name (str): name of log.
-            namespace (str): namespace of log.
-        """
-
-    @abstractmethod
-    def edit(
-        self,
-        name: str,
-        namespace: str,
-    ) -> BaseLog:
-        """
-        Edit a log.
-
-        Args:
-            name (str): name of log, what is being changed.
-            namespace (str): namespace of log.
-        """
-
-    @abstractmethod
-    def delete(
-        self,
-        namespace: str,
-    ) -> BaseLog:
-        """
-        Delete a log.
-
-        Args:
-            namespace (str): id of event.
-        """
-
-    @abstractmethod
-    def fetch(
-        self,
-        namespace: str,
-    ) -> BaseLog:
-        """
-        Fetch a log.
-
-        Args:
-            namespace (str): namespace of log.
-        """
-
-    patch = edit
-    get = fetch
+    # other class handlers
 
     @abstractmethod
     def project(self, namespace: str) -> BaseProject:
@@ -88,4 +35,95 @@ class BaseClient(ABC):
         Args:
             namespace (str): namespace of project.
             room_name (str): name of room.
+        """
+
+    # project
+
+    @abstractmethod
+    def create_project(
+        self,
+        name: str,
+        namespace: str,
+    ) -> BaseLog:
+        """
+        Create a project.
+
+        Args:
+            name (str): name of project.
+            namespace (str): namespace of project.
+        """
+
+    @abstractmethod
+    def edit_project(
+        self,
+        name: str,
+        namespace: str,
+    ) -> BaseLog:
+        """
+        Edit a project.
+
+        Args:
+            name (str): name of project, what is being changed.
+            namespace (str): namespace of project.
+        """
+
+    @abstractmethod
+    def delete_project(
+        self,
+        namespace: str,
+    ) -> BaseLog:
+        """
+        Delete a project.
+
+        Args:
+            namespace (str): namespace of project.
+        """
+
+    @abstractmethod
+    def fetch_project(
+        self,
+        namespace: str,
+    ) -> BaseLog:
+        """
+        Fetch a project.
+
+        Args:
+            namespace (str): namespace of log.
+        """
+
+    patch_project = edit_project
+    get_project = fetch_project
+
+    # room
+
+    @abstractmethod
+    def create_room(
+        self,
+        name: str,
+        namespace: str,
+        description: str | None = None,
+    ) -> BaseLog:
+        """
+        Create a room.
+
+        Args:
+            name (str): name of room.
+            namespace (str): namespace of project.
+            description (str | None, optional): description of room. Defaults to None.
+        """
+
+    @abstractmethod
+    def edit_room(
+        self,
+        name: str,
+        namespace: str,
+        description: str | None = None,
+    ) -> BaseLog:
+        """
+        Edit a room.
+
+        Args:
+            name (str): name of room, what is being changed.
+            namespace (str): namespace of project.
+            description (str | None, optional): description of room. Defaults to None.
         """
