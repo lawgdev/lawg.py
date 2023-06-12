@@ -4,17 +4,14 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
-from lawg.typings import UNDEFINED
+from lawg.typings import UNDEFINED, P, R, L
 
 if t.TYPE_CHECKING:
-    from lawg.base.log import BaseLog
     from lawg.base.rest import BaseRest
-    from lawg.base.project import BaseProject
-    from lawg.base.room import BaseRoom
     from lawg.typings import Undefined
 
 
-class BaseClient(ABC):
+class BaseClient(ABC, t.Generic[P, R, L]):
     """
     The base client for lawg.
     """
@@ -30,7 +27,7 @@ class BaseClient(ABC):
     # --- MANAGERS --- #
 
     @abstractmethod
-    def project(self, project_namespace: str) -> BaseProject:
+    def project(self, project_namespace: str) -> P:
         """
         Get a project.
 
@@ -39,7 +36,7 @@ class BaseClient(ABC):
         """
 
     @abstractmethod
-    def room(self, project_namespace: str, room_name: str) -> BaseRoom:
+    def room(self, project_namespace: str, room_name: str) -> R:
         """
         Get a room.
 
@@ -55,7 +52,7 @@ class BaseClient(ABC):
         self,
         project_name: str,
         project_namespace: str,
-    ) -> BaseProject:
+    ) -> P:
         """
         Create a project.
 
@@ -68,7 +65,7 @@ class BaseClient(ABC):
     def fetch_project(
         self,
         project_namespace: str,
-    ) -> BaseProject:
+    ) -> P:
         """
         Fetch a project.
 
@@ -81,7 +78,7 @@ class BaseClient(ABC):
         self,
         project_name: str,
         project_namespace: str,
-    ) -> BaseProject:
+    ) -> P:
         """
         Edit a project.
 
@@ -94,7 +91,7 @@ class BaseClient(ABC):
     def delete_project(
         self,
         project_namespace: str,
-    ) -> BaseProject:
+    ) -> P:
         """
         Delete a project.
 
@@ -113,7 +110,7 @@ class BaseClient(ABC):
         project_namespace: str,
         room_name: str,
         description: str | None = None,
-    ) -> BaseRoom:
+    ) -> R:
         """
         Create a room.
 
@@ -131,7 +128,7 @@ class BaseClient(ABC):
         name: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-    ) -> BaseRoom:
+    ) -> R:
         """
         Edit a room.
 
@@ -148,7 +145,7 @@ class BaseClient(ABC):
         self,
         project_namespace: str,
         room_name: str,
-    ) -> BaseRoom:
+    ) -> R:
         """
         Delete a room.
 
@@ -170,7 +167,7 @@ class BaseClient(ABC):
         description: str | None = None,
         emoji: str | None = None,
         color: str | None = None,
-    ) -> BaseLog:
+    ) -> L:
         """
         Create a log.
 
@@ -189,7 +186,7 @@ class BaseClient(ABC):
         project_namespace: str,
         room_name: str,
         log_id: str,
-    ) -> BaseLog:
+    ) -> L:
         """
         Fetch a log.
 
@@ -206,7 +203,7 @@ class BaseClient(ABC):
         room_name: str,
         limit: int | None = None,
         offset: int | None = None,
-    ) -> list[BaseLog]:
+    ) -> list[L]:
         """
         Fetch multiple logs.
 
@@ -227,7 +224,7 @@ class BaseClient(ABC):
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
         color: str | None | Undefined = UNDEFINED,
-    ) -> BaseLog:
+    ) -> L:
         """
         Edit a log.
 
@@ -247,7 +244,7 @@ class BaseClient(ABC):
         project_namespace: str,
         room_name: str,
         log_id: str,
-    ) -> BaseLog:
+    ) -> L:
         """
         Delete a log.
 

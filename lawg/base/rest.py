@@ -17,14 +17,14 @@ from lawg.exceptions import (
     LawgForbidden,
 )
 from lawg.schemas import APIErrorSchema
-from lawg.typings import T
+from lawg.typings import C
 
 if t.TYPE_CHECKING:
     from lawg.base.client import BaseClient
     from lawg.typings import STR_DICT
 
 
-class BaseRest(ABC, t.Generic[T]):
+class BaseRest(ABC, t.Generic[C]):
     USER_AGENT = "lawg.py; (+https://github.com/lawg/lawg.py)"
     HOSTNAME = "https://lawg.dev"
     API = os.getenv("LAWG_DEV_API", "https://api.lawg.dev")
@@ -32,7 +32,7 @@ class BaseRest(ABC, t.Generic[T]):
 
     def __init__(self, client: BaseClient) -> None:
         self.client: BaseClient = client
-        self.http_client: T
+        self.http_client: C
 
     @property
     def headers(self) -> dict[str, str]:

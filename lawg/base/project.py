@@ -4,7 +4,7 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
-from lawg.typings import UNDEFINED
+from lawg.typings import UNDEFINED, C, R, L
 
 if t.TYPE_CHECKING:
     from lawg.base.log import BaseLog
@@ -13,13 +13,14 @@ if t.TYPE_CHECKING:
     from lawg.typings import Undefined
 
 
-class BaseProject(ABC):
+class BaseProject(ABC, t.Generic[C, R, L]):
     """
     A manager for a project.
     """
+
     def __init__(
         self,
-        client: BaseClient,
+        client: C,
         namespace: str,
     ) -> None:
         super().__init__()
@@ -32,7 +33,7 @@ class BaseProject(ABC):
     # --- MANAGERS --- #
 
     @abstractmethod
-    def room(self, room_name: str) -> BaseRoom:
+    def room(self, room_name: str) -> R:
         """
         Get a room.
 
@@ -47,7 +48,7 @@ class BaseProject(ABC):
         self,
         room_name: str,
         description: str | None = None,
-    ) -> BaseRoom:
+    ) -> R:
         """
         Create a room.
 
@@ -63,7 +64,7 @@ class BaseProject(ABC):
         name: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-    ) -> BaseRoom:
+    ) -> R:
         """
         Edit a room.
 
@@ -78,13 +79,15 @@ class BaseProject(ABC):
     def delete_room(
         self,
         room_name: str,
-    ) -> BaseRoom:
+    ) -> R:
         """
         Delete a room.
 
         Args:
             room_name (str): name of room.
         """
+
+    patch_room = edit_room
 
     # --- LOGS --- #
 
@@ -96,7 +99,7 @@ class BaseProject(ABC):
         description: str | None = None,
         emoji: str | None = None,
         color: str | None = None,
-    ) -> BaseLog:
+    ) -> L:
         """
         Create a log.
 
@@ -113,7 +116,7 @@ class BaseProject(ABC):
         self,
         room_name: str,
         log_id: str,
-    ) -> BaseLog:
+    ) -> L:
         """
         Fetch a log.
 
@@ -128,7 +131,7 @@ class BaseProject(ABC):
         room_name: str,
         limit: int | None = None,
         offset: int | None = None,
-    ) -> list[BaseLog]:
+    ) -> list[L]:
         """
         Fetch multiple logs.
 
@@ -147,7 +150,7 @@ class BaseProject(ABC):
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
         color: str | None | Undefined = UNDEFINED,
-    ) -> BaseLog:
+    ) -> L:
         """
         Edit a log.
 
@@ -165,7 +168,7 @@ class BaseProject(ABC):
         self,
         room_name: str,
         log_id: str,
-    ) -> BaseLog:
+    ) -> L:
         """
         Delete a log.
 

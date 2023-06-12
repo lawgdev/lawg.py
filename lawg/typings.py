@@ -5,7 +5,10 @@ STR_DICT: t.TypeAlias = "dict[str, t.Any]"
 Undefined = t.NewType("Undefined", object)
 UNDEFINED = Undefined(object)
 
-T = t.TypeVar("T")
+C = t.TypeVar("C")
+P = t.TypeVar("P")
+R = t.TypeVar("R")
+L = t.TypeVar("L")
 
 ErrorCode: t.TypeAlias = (
     str
