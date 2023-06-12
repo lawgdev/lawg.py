@@ -2,17 +2,21 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
+from lawg.typings import UNDEFINED
 
-from lawg.base.log import BaseLog
-from lawg.base.rest import BaseRest
-from lawg.base.project import BaseProject
-from lawg.base.room import BaseRoom
-
-Undefined = t.NewType("Undefined", object)
-UNDEFINED = Undefined(object)
+if t.TYPE_CHECKING:
+    from lawg.base.log import BaseLog
+    from lawg.base.rest import BaseRest
+    from lawg.base.project import BaseProject
+    from lawg.base.room import BaseRoom
+    from lawg.typings import Undefined
 
 
 class BaseClient(ABC):
+    """
+    A client for lawg.
+    """
+
     def __init__(self, token: str) -> None:
         super().__init__()
         self.token: str = token
@@ -112,8 +116,8 @@ class BaseClient(ABC):
         Create a room.
 
         Args:
-            room_name (str): name of the room.
             project_namespace (str): namespace of project.
+            room_name (str): name of the room.
             description (str | None, optional): description of room. Defaults to None.
         """
 
