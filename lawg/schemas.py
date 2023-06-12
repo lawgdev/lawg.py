@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import functools
-import typing as t
 from marshmallow import Schema, ValidationError, fields, validate
 from marshmallow_union import Union
 

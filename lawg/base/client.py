@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing as t
 
 from abc import ABC, abstractmethod
@@ -14,7 +16,7 @@ if t.TYPE_CHECKING:
 
 class BaseClient(ABC):
     """
-    A client for lawg.
+    The base client for lawg.
     """
 
     def __init__(self, token: str) -> None:
@@ -154,6 +156,8 @@ class BaseClient(ABC):
             project_namespace (str): namespace of project.
             room_name (str): name of room.
         """
+
+    patch_room = edit_room
 
     # --- LOGS --- #
 
