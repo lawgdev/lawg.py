@@ -4,16 +4,16 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
-from lawg.typings import UNDEFINED, C, R, L
+from lawg.typings import UNDEFINED, C, F, L
 
 if t.TYPE_CHECKING:
     from lawg.base.log import BaseLog
     from lawg.base.client import BaseClient
-    from lawg.base.room import BaseRoom
+    from lawg.base.feed import BaseFeed
     from lawg.typings import Undefined
 
 
-class BaseProject(ABC, t.Generic[C, R, L]):
+class BaseProject(ABC, t.Generic[C, F, L]):
     """
     A manager for a project.
     """
@@ -33,68 +33,68 @@ class BaseProject(ABC, t.Generic[C, R, L]):
     # --- MANAGERS --- #
 
     @abstractmethod
-    def room(self, room_name: str) -> R:
+    def feed(self, feed_name: str) -> F:
         """
-        Get a room.
+        Get a feed.
 
         Args:
-            room_name (str): name of room.
+            feed_name (str): name of feed.
         """
 
-    # --- ROOMS --- #
+    # --- FEEDS --- #
 
     @abstractmethod
-    def create_room(
+    def create_feed(
         self,
-        room_name: str,
+        feed_name: str,
         description: str | None = None,
-    ) -> R:
+    ) -> F:
         """
-        Create a room.
+        Create a feed.
 
         Args:
-            room_name (str): name of the room.
-            description (str | None, optional): description of room. Defaults to None.
+            feed_name (str): name of the feed.
+            description (str | None, optional): description of feed. Defaults to None.
         """
 
     @abstractmethod
-    def edit_room(
+    def edit_feed(
         self,
-        room_name: str,
+        feed_name: str,
         name: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-    ) -> R:
+    ) -> F:
         """
-        Edit a room.
+        Edit a feed.
 
         Args:
-            room_name (str): name of room
-            name (str | None, optional): new name of room. Defaults to keeping the existing value.
-            description (str | None, optional): new description of room. Defaults to keeping the existing value.
-            emoji (str | None, optional): new emoji of room. Defaults to keeping the existing value.
+            feed_name (str): name of feed
+            name (str | None, optional): new name of feed. Defaults to keeping the existing value.
+            description (str | None, optional): new description of feed. Defaults to keeping the existing value.
+            emoji (str | None, optional): new emoji of feed. Defaults to keeping the existing value.
         """
 
     @abstractmethod
-    def delete_room(
+    def delete_feed(
         self,
-        room_name: str,
+        feed_name: str,
     ) -> None:
         """
-        Delete a room.
+        Delete a feed.
 
         Args:
-            room_name (str): name of room.
+            feed_name (str): name of feed.
         """
 
-    patch_room = edit_room
+    patch_feed = edit_feed
 
     # --- LOGS --- #
 
     @abstractmethod
     def create_log(
         self,
-        room_name: str,
+        feed_name: str,
         title: str,
         description: str | None = None,
         emoji: str | None = None,
@@ -104,7 +104,7 @@ class BaseProject(ABC, t.Generic[C, R, L]):
         Create a log.
 
         Args:
-            room_name (str): name of room.
+            feed_name (str): name of feed.
             title (str): title of log.
             description (str | None, optional): description of log. Defaults to None.
             emoji (str | None, optional): emoji of log. Defaults to None.
@@ -114,21 +114,21 @@ class BaseProject(ABC, t.Generic[C, R, L]):
     @abstractmethod
     def fetch_log(
         self,
-        room_name: str,
+        feed_name: str,
         log_id: str,
     ) -> L:
         """
         Fetch a log.
 
         Args:
-            room_name (str): name of room.
+            feed_name (str): name of feed.
             log_id (str): id of log.
         """
 
     @abstractmethod
     def fetch_logs(
         self,
-        room_name: str,
+        feed_name: str,
         limit: int | None = None,
         offset: int | None = None,
     ) -> list[L]:
@@ -136,7 +136,7 @@ class BaseProject(ABC, t.Generic[C, R, L]):
         Fetch multiple logs.
 
         Args:
-            room_name (str): name of room.
+            feed_name (str): name of feed.
             limit (int | None, optional): limit of logs. Defaults to None.
             offset (int | None, optional): offset of logs. Defaults to None.
         """
@@ -144,7 +144,7 @@ class BaseProject(ABC, t.Generic[C, R, L]):
     @abstractmethod
     def edit_log(
         self,
-        room_name: str,
+        feed_name: str,
         log_id: str,
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
@@ -155,7 +155,7 @@ class BaseProject(ABC, t.Generic[C, R, L]):
         Edit a log.
 
         Args:
-            room_name (str): name of room.
+            feed_name (str): name of feed.
             log_id (str): id of log.
             title (str | None, optional): new title of log. Defaults to keeping the existing value.
             description (str | None, optional): new description of log. Defaults to keeping the existing value.
@@ -166,14 +166,14 @@ class BaseProject(ABC, t.Generic[C, R, L]):
     @abstractmethod
     def delete_log(
         self,
-        room_name: str,
+        feed_name: str,
         log_id: str,
     ) -> L:
         """
         Delete a log.
 
         Args:
-            room_name (str): name of room.
+            feed_name (str): name of feed.
             log_id (str): id of log.
         """
 

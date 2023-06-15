@@ -80,34 +80,34 @@ class ProjectAcceptInviteSchema(Schema):
     namespace = ProjectNamespaceSchema(required=True)
 
 
-# --- ROOMS --- #
+# --- FEEDS --- #
 
-RoomNameSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=24))
-RoomDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=128))
-
-
-class RoomSlugSchema(Schema):
-    """Used for creating rooms."""
-
-    namespace = ProjectNamespaceSchema(required=True)
+FeedNameSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=24))
+FeedDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=128))
 
 
-class RoomWithNameSlugSchema(Schema):
-    """Used for patching, and deleting rooms."""
+class FeedSlugSchema(Schema):
+    """Used for creating feeds."""
 
     namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
 
 
-class RoomCreateBodySchema(Schema):
-    name = RoomNameSchema(required=True)
-    description = RoomDescriptionSchema(required=False, allow_none=True)
+class FeedWithNameSlugSchema(Schema):
+    """Used for patching, and deleting feeds."""
+
+    namespace = ProjectNamespaceSchema(required=True)
+    feed_name = FeedNameSchema(required=True)
+
+
+class FeedCreateBodySchema(Schema):
+    name = FeedNameSchema(required=True)
+    description = FeedDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
 
 
-class RoomPatchBodySchema(Schema):
-    name = RoomNameSchema(required=False, allow_none=True)
-    description = RoomDescriptionSchema(required=False, allow_none=True)
+class FeedPatchBodySchema(Schema):
+    name = FeedNameSchema(required=False, allow_none=True)
+    description = FeedDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
 
 
@@ -123,7 +123,7 @@ class LogSlugSchema(Schema):
     """
 
     namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
+    feed_name = FeedNameSchema(required=True)
 
 
 class LogWithIdSlugSchema(Schema):
@@ -132,7 +132,7 @@ class LogWithIdSlugSchema(Schema):
     """
 
     namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
+    feed_name = FeedNameSchema(required=True)
     log_id = fields.Str(required=True, validate=PikaId("log"))
 
 
@@ -176,11 +176,11 @@ class APISuccessSchema(Schema):
 # ----- API RESPONSE SCHEMAS ----- #
 
 
-class RoomSchema(Schema):
-    id = fields.Str(required=True, validate=PikaId("room"))
+class FeedSchema(Schema):
+    id = fields.Str(required=True, validate=PikaId("feed"))
     project_id = fields.Str(required=True, validate=PikaId("project"))
-    name = RoomNameSchema(required=True)
-    description = RoomDescriptionSchema(required=True, allow_none=True)
+    name = FeedNameSchema(required=True)
+    description = FeedDescriptionSchema(required=True, allow_none=True)
     emoji = EmojiSchema(required=True, allow_none=True)
 
 
@@ -196,5 +196,5 @@ class ProjectSchema(Schema):
     name = ProjectNameSchema(required=True)
     flags = fields.Int(required=True)
     icon = fields.Str(required=True, allow_none=True)
-    rooms = fields.List(fields.Nested(RoomSchema()), required=True)
+    feeds = fields.List(fields.Nested(FeedSchema()), required=True)
     members = fields.List(fields.Nested(MemberSchema()), required=True)

@@ -9,7 +9,7 @@ UNDEFINED = Undefined(object)
 
 C = t.TypeVar("C")  # C for client
 P = t.TypeVar("P")  # P for project
-R = t.TypeVar("R")  # R for room
+F = t.TypeVar("F")  # F for feed
 L = t.TypeVar("L")  # L for log
 
 H = t.TypeVar("H", httpx.Client, httpx.AsyncClient)  # H for httpx client

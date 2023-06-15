@@ -9,13 +9,13 @@ from lawg.typings import UNDEFINED
 if t.TYPE_CHECKING:
     from lawg.base.log import BaseLog
     from lawg.base.client import BaseClient
-    from lawg.base.room import BaseRoom
+    from lawg.base.feed import BaseFeed
     from lawg.typings import Undefined
 
 
-class BaseRoom(ABC):
+class BaseFeed(ABC):
     """
-    A manager for a room.
+    A manager for a feed.
     """
 
     def __init__(self, client: BaseClient, project_namespace: str, name: str) -> None:

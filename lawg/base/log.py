@@ -15,16 +15,16 @@ class BaseLog(ABC):
     A manager for a log.
     """
 
-    def __init__(self, project_namespace: str, room_name: str, id: str) -> None:
+    def __init__(self, project_namespace: str, feed_name: str, id: str) -> None:
         super().__init__()
         self.project_namespace = project_namespace
-        self.room_name = room_name
+        self.feed_name = feed_name
         self.id = id
         # --- extras --- #
         self.is_deleted = False
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} id={self.id!r} room_name={self.room_name!r} project_namespace={self.project_namespace!r}>"
+        return f"<{self.__class__.__name__} id={self.id!r} feed_name={self.feed_name!r} project_namespace={self.project_namespace!r}>"
 
     @abstractmethod
     def edit(

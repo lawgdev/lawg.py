@@ -1,11 +1,11 @@
 from __future__ import annotations
 from lawg.base.log import BaseLog
 
-from lawg.base.room import BaseRoom
+from lawg.base.feed import BaseFeed
 from lawg.typings import UNDEFINED, Undefined
 
 
-class Room(BaseRoom):
+class Feed(BaseFeed):
     def create_log(
         self, title: str, description: str | None = None, emoji: str | None = None, color: str | None = None
     ) -> BaseLog:

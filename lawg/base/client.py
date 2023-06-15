@@ -6,22 +6,20 @@ from abc import ABC, abstractmethod
 from lawg.schemas import (
     APISuccessSchema,
     ProjectBodySchema,
-    ProjectGetSchema,
     ProjectSchema,
-    RoomCreateBodySchema,
-    RoomDeleteSchema,
-    RoomPatchBodySchema,
-    RoomSchema,
+    FeedCreateBodySchema,
+    FeedPatchBodySchema,
+    FeedSchema,
 )
 
-from lawg.typings import STR_DICT, UNDEFINED, P, R, L
+from lawg.typings import STR_DICT, UNDEFINED, P, F, L
 
 if t.TYPE_CHECKING:
     from lawg.base.rest import BaseRest
     from lawg.typings import Undefined
 
 
-class BaseClient(ABC, t.Generic[P, R, L]):
+class BaseClient(ABC, t.Generic[P, F, L]):
     """
     The base client for lawg.
     """
@@ -46,13 +44,13 @@ class BaseClient(ABC, t.Generic[P, R, L]):
         """
 
     @abstractmethod
-    def room(self, project_namespace: str, room_name: str) -> R:
+    def feed(self, project_namespace: str, feed_name: str) -> F:
         """
-        Get a room.
+        Get a feed.
 
         Args:
             project_namespace (str): namespace of project.
-            room_name (str): name of room.
+            feed_name (str): name of feed.
         """
 
     # --- PROJECTS --- #
@@ -112,59 +110,59 @@ class BaseClient(ABC, t.Generic[P, R, L]):
     patch_project = edit_project
     get_project = fetch_project
 
-    # --- ROOMS --- #
+    # --- FEEDS --- #
 
     @abstractmethod
-    def create_room(
+    def create_feed(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         description: str | None = None,
-    ) -> R:
+    ) -> F:
         """
-        Create a room.
+        Create a feed.
 
         Args:
             project_namespace (str): namespace of project.
-            room_name (str): name of the room.
-            description (str | None, optional): description of room. Defaults to None.
+            feed_name (str): name of the feed.
+            description (str | None, optional): description of feed. Defaults to None.
         """
 
     @abstractmethod
-    def edit_room(
+    def edit_feed(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         name: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-    ) -> R:
+    ) -> F:
         """
-        Edit a room.
+        Edit a feed.
 
         Args:
             project_namespace (str): namespace of project.
-            room_name (str): name of room
-            name (str | None, optional): new name of room. Defaults to keeping the existing value.
-            description (str | None, optional): new description of room. Defaults to keeping the existing value.
-            emoji (str | None, optional): new emoji of room. Defaults to keeping the existing value.
+            feed_name (str): name of feed
+            name (str | None, optional): new name of feed. Defaults to keeping the existing value.
+            description (str | None, optional): new description of feed. Defaults to keeping the existing value.
+            emoji (str | None, optional): new emoji of feed. Defaults to keeping the existing value.
         """
 
     @abstractmethod
-    def delete_room(
+    def delete_feed(
         self,
         project_namespace: str,
-        room_name: str,
-    ) -> R:
+        feed_name: str,
+    ) -> F:
         """
-        Delete a room.
+        Delete a feed.
 
         Args:
             project_namespace (str): namespace of project.
-            room_name (str): name of room.
+            feed_name (str): name of feed.
         """
 
-    patch_room = edit_room
+    patch_feed = edit_feed
 
     # --- LOGS --- #
 
@@ -172,7 +170,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
     def create_log(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         title: str,
         description: str | None = None,
         emoji: str | None = None,
@@ -183,7 +181,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
 
         Args:
             project_namespace (str): namespace of project.
-            room_name (str): name of room.
+            feed_name (str): name of feed.
             title (str): title of log.
             description (str | None, optional): description of log. Defaults to None.
             emoji (str | None, optional): emoji of log. Defaults to None.
@@ -194,7 +192,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
     def fetch_log(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         log_id: str,
     ) -> L:
         """
@@ -202,7 +200,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
 
         Args:
             project_namespace (str): namespace of project.
-            room_name (str): name of room.
+            feed_name (str): name of feed.
             log_id (str): id of log.
         """
 
@@ -210,7 +208,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
     def fetch_logs(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         limit: int | None = None,
         offset: int | None = None,
     ) -> list[L]:
@@ -219,7 +217,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
 
         Args:
             project_namespace (str): namespace of project.
-            room_name (str): name of room.
+            feed_name (str): name of feed.
             limit (int | None, optional): limit of logs. Defaults to None.
             offset (int | None, optional): offset of logs. Defaults to None.
         """
@@ -228,7 +226,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
     def edit_log(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         log_id: str,
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
@@ -240,7 +238,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
 
         Args:
             project_namespace (str): namespace of project.
-            room_name (str): name of room.
+            feed_name (str): name of feed.
             log_id (str): id of log.
             title (str | None, optional): new title of log. Defaults to keeping the existing value.
             description (str | None, optional): new description of log. Defaults to keeping the existing value.
@@ -252,7 +250,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
     def delete_log(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         log_id: str,
     ) -> L:
         """
@@ -260,7 +258,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
 
         Args:
             project_namespace (str): namespace of project.
-            room_name (str): name of room.
+            feed_name (str): name of feed.
             log_id (str): id of log.
         """
 
@@ -268,7 +266,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
     get_logs = fetch_logs
     patch_log = edit_log
 
-    # --- ROOMS --- #
+    # --- FEEDS --- #
 
     def _validate_project_response(self, response_data: STR_DICT) -> STR_DICT:
         resp_schema = APISuccessSchema()
@@ -291,47 +289,47 @@ class BaseClient(ABC, t.Generic[P, R, L]):
     _validate_edit_request = _validate_create_request
     _validate_delete_request = _validate_fetch_request
 
-    def _validate_room_response(self, response_data: STR_DICT) -> STR_DICT:
+    def _validate_feed_response(self, response_data: STR_DICT) -> STR_DICT:
         resp_schema = APISuccessSchema()
         resp_data: STR_DICT = resp_schema.load(response_data)  # type: ignore
 
-        room_schema = RoomSchema()
-        room_data: STR_DICT = room_schema.load(resp_data["data"])  # type: ignore
-        return room_data
+        feed_schema = FeedSchema()
+        feed_data: STR_DICT = feed_schema.load(resp_data["data"])  # type: ignore
+        return feed_data
 
-    def _validate_room_create_request(
-        self, project_namespace: str, room_name: str, description: str | None = None, emoji: str | None = None
+    def _validate_feed_create_request(
+        self, project_namespace: str, feed_name: str, description: str | None = None, emoji: str | None = None
     ) -> None:
-        req_schema = RoomCreateBodySchema()
+        req_schema = FeedCreateBodySchema()
         req_schema.load(
             {
                 "namespace": project_namespace,
-                "name": room_name,
+                "name": feed_name,
                 "description": description,
                 "emoji": emoji,
             }
         )
         return None
 
-    def _validate_room_edit_request(
+    def _validate_feed_edit_request(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         name: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
     ) -> None:
-        req_schema = RoomPatchBodySchema()
+        req_schema = FeedPatchBodySchema()
         req_schema.load(
             {
                 "namespace": project_namespace,
-                "name": room_name,
+                "name": feed_name,
                 "new_name": name,
                 "description": description,
                 "emoji": emoji,
             }
         )
 
-    def _validate_room_delete_request(self, project_namespace: str, room_name: str) -> None:
-        req_schema = RoomDeleteSchema()
-        req_schema.load({"namespace": project_namespace, "name": room_name})
+    def _validate_feed_delete_request(self, project_namespace: str, feed_name: str) -> None:
+        req_schema = FeedDeleteSchema()
+        req_schema.load({"namespace": project_namespace, "name": feed_name})

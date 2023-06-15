@@ -7,43 +7,43 @@ from lawg.typings import UNDEFINED
 
 if t.TYPE_CHECKING:
     from lawg.syncio.client import Client
-    from lawg.syncio.room import Room
+    from lawg.syncio.feed import Feed
     from lawg.syncio.log import Log
     from lawg.typings import Undefined
 
 
-class Project(BaseProject["Client", "Room", "Log"]):
+class Project(BaseProject["Client", "Feed", "Log"]):
     # --- MANAGERS --- #
 
-    def room(self, room_name: str):
-        return self.client.room(project_namespace=self.namespace, room_name=room_name)
+    def feed(self, feed_name: str):
+        return self.client.feed(project_namespace=self.namespace, feed_name=feed_name)
 
-    # --- ROOMS --- #
+    # --- FEEDS --- #
 
-    def create_room(self, room_name: str, description: str | None = None):
-        return self.client.create_room(project_namespace=self.namespace, room_name=room_name, description=description)
+    def create_feed(self, feed_name: str, description: str | None = None):
+        return self.client.create_feed(project_namespace=self.namespace, feed_name=feed_name, description=description)
 
-    def edit_room(
+    def edit_feed(
         self,
-        room_name: str,
+        feed_name: str,
         name: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
-    ) -> Room:
-        return self.client.edit_room(
-            project_namespace=self.namespace, room_name=room_name, name=name, description=description, emoji=emoji
+    ) -> Feed:
+        return self.client.edit_feed(
+            project_namespace=self.namespace, feed_name=feed_name, name=name, description=description, emoji=emoji
         )
 
-    def delete_room(self, room_name: str):
-        return self.client.delete_room(project_namespace=self.namespace, room_name=room_name)
+    def delete_feed(self, feed_name: str):
+        return self.client.delete_feed(project_namespace=self.namespace, feed_name=feed_name)
 
-    patch_room = edit_room
+    patch_feed = edit_feed
 
     # --- LOGS --- #
 
     def create_log(
         self,
-        room_name: str,
+        feed_name: str,
         title: str,
         description: str | None = None,
         emoji: str | None = None,
@@ -51,24 +51,24 @@ class Project(BaseProject["Client", "Room", "Log"]):
     ) -> Log:
         return self.client.create_log(
             project_namespace=self.namespace,
-            room_name=room_name,
+            feed_name=feed_name,
             title=title,
             description=description,
             emoji=emoji,
             color=color,
         )
 
-    def fetch_log(self, room_name: str, log_id: str) -> Log:
-        return self.client.fetch_log(project_namespace=self.namespace, room_name=room_name, log_id=log_id)
+    def fetch_log(self, feed_name: str, log_id: str) -> Log:
+        return self.client.fetch_log(project_namespace=self.namespace, feed_name=feed_name, log_id=log_id)
 
-    def fetch_logs(self, room_name: str, limit: int | None = None, offset: int | None = None) -> list[Log]:
+    def fetch_logs(self, feed_name: str, limit: int | None = None, offset: int | None = None) -> list[Log]:
         return self.client.fetch_logs(
-            project_namespace=self.namespace, room_name=room_name, limit=limit, offset=offset
+            project_namespace=self.namespace, feed_name=feed_name, limit=limit, offset=offset
         )
 
     def edit_log(
         self,
-        room_name: str,
+        feed_name: str,
         log_id: str,
         title: str | Undefined | None = ...,
         description: str | Undefined | None = ...,
@@ -77,7 +77,7 @@ class Project(BaseProject["Client", "Room", "Log"]):
     ) -> Log:
         return self.client.edit_log(
             project_namespace=self.namespace,
-            room_name=room_name,
+            feed_name=feed_name,
             log_id=log_id,
             title=title,
             description=description,
@@ -85,10 +85,10 @@ class Project(BaseProject["Client", "Room", "Log"]):
             color=color,
         )
 
-    def delete_log(self, room_name: str, log_id: str) -> Log:
+    def delete_log(self, feed_name: str, log_id: str) -> Log:
         return self.client.delete_log(
             project_namespace=self.namespace,
-            room_name=room_name,
+            feed_name=feed_name,
             log_id=log_id,
         )
 

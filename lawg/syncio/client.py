@@ -2,17 +2,17 @@ from __future__ import annotations
 
 from lawg.base.client import BaseClient
 from lawg.base.log import BaseLog
-from lawg.base.room import BaseRoom
+from lawg.base.feed import BaseFeed
 from lawg.syncio.project import Project
 from lawg.syncio.rest import Rest
 
 from lawg.schemas import APISuccessSchema, ProjectBodySchema, ProjectSchema
-from lawg.syncio.room import Room
+from lawg.syncio.feed import Feed
 from lawg.syncio.log import Log
 from lawg.typings import STR_DICT, UNDEFINED, Undefined
 
 
-class Client(BaseClient[Project, Room, Log]):
+class Client(BaseClient[Project, Feed, Log]):
     """
     The syncio client for lawg.
     """
@@ -26,8 +26,8 @@ class Client(BaseClient[Project, Room, Log]):
     def project(self, project_namespace: str):
         return super().project(project_namespace)
 
-    def room(self, project_namespace: str, room_name: str):
-        return super().room(project_namespace, room_name)
+    def feed(self, project_namespace: str, feed_name: str):
+        return super().feed(project_namespace, feed_name)
 
     # --- PROJECTS --- #
 
@@ -71,37 +71,37 @@ class Client(BaseClient[Project, Room, Log]):
     patch_project = edit_project
     get_project = fetch_project
 
-    # --- ROOMS --- #
+    # --- FEEDS --- #
 
-    def create_room(
+    def create_feed(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         description: str | None = None,
         emoji: str | None = None,
     ):
-        self._validate_room_create_request(project_namespace=project_namespace, room_name=room_name, emoji=emoji)
+        self._validate_feed_create_request(project_namespace=project_namespace, feed_name=feed_name, emoji=emoji)
 
         req_data = self.rest.request(
-            path=f"/projects/{project_namespace}/rooms",
+            path=f"/projects/{project_namespace}/feeds",
             method="POST",
-            body={"name": room_name, "description": description, "emoji": emoji},
+            body={"name": feed_name, "description": description, "emoji": emoji},
         )
 
-        room_data = self._validate_room_response(req_data)
-        return Room(self, project_namespace=project_namespace, name=room_data["name"])
+        feed_data = self._validate_feed_response(req_data)
+        return Feed(self, project_namespace=project_namespace, name=feed_data["name"])
 
-    def edit_room(
+    def edit_feed(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         name: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
-        self._validate_room_edit_request(
+        self._validate_feed_edit_request(
             project_namespace=project_namespace,
-            room_name=room_name,
+            feed_name=feed_name,
             name=name,
             description=description,
             emoji=emoji,
@@ -109,56 +109,56 @@ class Client(BaseClient[Project, Room, Log]):
 
         req_data = self.rest.construct_body({"name": name, "description": description, "emoji": emoji})
         resp_data = self.rest.request(
-            path=f"/projects/{project_namespace}/rooms/{room_name}",
+            path=f"/projects/{project_namespace}/feeds/{feed_name}",
             method="PATCH",
             body=req_data,
         )
 
-        room_data = self._validate_room_response(req_data)
-        return Room(self, project_namespace=project_namespace, name=room_data["name"])
+        feed_data = self._validate_feed_response(req_data)
+        return Feed(self, project_namespace=project_namespace, name=feed_data["name"])
 
-    def delete_room(self, project_namespace: str, room_name: str) -> None:
-        self._validate_room_delete_request(project_namespace=project_namespace, room_name=room_name)
+    def delete_feed(self, project_namespace: str, feed_name: str) -> None:
+        self._validate_feed_delete_request(project_namespace=project_namespace, feed_name=feed_name)
         self.rest.request(
-            path=f"/projects/{project_namespace}/rooms/{room_name}",
+            path=f"/projects/{project_namespace}/feeds/{feed_name}",
             method="DELETE",
         )
 
-    patch_room = edit_room
+    patch_feed = edit_feed
 
     # --- LOGS --- #
 
     def create_log(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         title: str,
         description: str | None = None,
         emoji: str | None = None,
         color: str | None = None,
     ):
-        return super().create_log(project_namespace, room_name, title, description, emoji, color)
+        return super().create_log(project_namespace, feed_name, title, description, emoji, color)
 
-    def fetch_log(self, project_namespace: str, room_name: str, log_id: str):
-        return super().fetch_log(project_namespace, room_name, log_id)
+    def fetch_log(self, project_namespace: str, feed_name: str, log_id: str):
+        return super().fetch_log(project_namespace, feed_name, log_id)
 
-    def fetch_logs(self, project_namespace: str, room_name: str, limit: int | None = None, offset: int | None = None):
-        return super().fetch_logs(project_namespace, room_name, limit, offset)
+    def fetch_logs(self, project_namespace: str, feed_name: str, limit: int | None = None, offset: int | None = None):
+        return super().fetch_logs(project_namespace, feed_name, limit, offset)
 
     def edit_log(
         self,
         project_namespace: str,
-        room_name: str,
+        feed_name: str,
         log_id: str,
         title: str | Undefined | None = ...,
         description: str | Undefined | None = ...,
         emoji: str | Undefined | None = ...,
         color: str | Undefined | None = ...,
     ):
-        return super().edit_log(project_namespace, room_name, log_id, title, description, emoji, color)
+        return super().edit_log(project_namespace, feed_name, log_id, title, description, emoji, color)
 
-    def delete_log(self, project_namespace: str, room_name: str, log_id: str):
-        return super().delete_log(project_namespace, room_name, log_id)
+    def delete_log(self, project_namespace: str, feed_name: str, log_id: str):
+        return super().delete_log(project_namespace, feed_name, log_id)
 
     get_log = fetch_log
     get_logs = fetch_logs
@@ -175,11 +175,11 @@ if __name__ == "__main__":
 
     project_namespace = "test"
     project_name = "test"
-    room_name = "123123"
+    feed_name = "123123"
 
     proj = c.create_project(project_namespace, project_name)
-    room = c.create_room(project_namespace, room_name)
+    feed = c.create_feed(project_namespace, feed_name)
 
-    print(room)
+    print(feed)
 
     # c.delete_project(project_namespace)
