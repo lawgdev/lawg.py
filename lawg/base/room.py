@@ -25,7 +25,7 @@ class BaseRoom(ABC):
         self.name = name
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} name={self!r} project_namespace={self.project_namespace!r}>"
+        return f"<{self.__class__.__name__} name={self.name!r} project_namespace={self.project_namespace!r}>"
 
     # --- LOGS --- #
 

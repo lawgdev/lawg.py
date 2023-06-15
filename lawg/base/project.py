@@ -79,7 +79,7 @@ class BaseProject(ABC, t.Generic[C, R, L]):
     def delete_room(
         self,
         room_name: str,
-    ) -> R:
+    ) -> None:
         """
         Delete a room.
 

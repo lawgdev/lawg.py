@@ -33,6 +33,8 @@ class PikaId(validate.Validator):
         return value
 
 
+# TODO: edit these schemas to split slugs and req.body
+
 # ----- REQUEST VALIDATION SCHEMAS ----- #
 
 # unfortunately marshmallow doesn't have a fields.Emoji() comparable to zod's string().emoji() :(
@@ -99,18 +101,19 @@ RoomDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(m
 
 class RoomCreateSchema(Schema):
     namespace = ProjectNamespaceSchema(required=True)
+
     name = RoomNameSchema(required=True)
     description = RoomDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
 
 
 class RoomPatchSchema(Schema):
+    namespace = ProjectNamespaceSchema(required=True)
+    room_name = RoomNameSchema(required=True)
+
     name = RoomNameSchema(required=False, allow_none=True)
     description = RoomDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
-
-    namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
 
 
 class RoomDeleteSchema(Schema):
@@ -189,6 +192,7 @@ class RoomSchema(Schema):
     name = RoomNameSchema(required=True)
     description = RoomDescriptionSchema(required=True, allow_none=True)
     emoji = EmojiSchema(required=True, allow_none=True)
+
 
 class MemberSchema(Schema):
     id = fields.Str(required=True, validate=PikaId("user"))

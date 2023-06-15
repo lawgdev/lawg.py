@@ -21,7 +21,7 @@ class BaseLog(ABC):
         self.room_name = room_name
         self.id = id
         # --- extras --- #
-        self.deleted = False
+        self.is_deleted = False
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} id={self.id!r} room_name={self.room_name!r} project_namespace={self.project_namespace!r}>"

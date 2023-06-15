@@ -17,14 +17,14 @@ from lawg.exceptions import (
     LawgForbidden,
 )
 from lawg.schemas import APIErrorSchema
-from lawg.typings import C
+from lawg.typings import H, UNDEFINED
 
 if t.TYPE_CHECKING:
     from lawg.base.client import BaseClient
     from lawg.typings import STR_DICT
 
 
-class BaseRest(ABC, t.Generic[C]):
+class BaseRest(ABC, t.Generic[H]):
     USER_AGENT = "lawg.py; (+https://github.com/lawg/lawg.py)"
     HOSTNAME = "https://lawg.dev"
     API = os.getenv("LAWG_DEV_API", "https://api.lawg.dev")
@@ -32,7 +32,7 @@ class BaseRest(ABC, t.Generic[C]):
 
     def __init__(self, client: BaseClient) -> None:
         self.client: BaseClient = client
-        self.http_client: C
+        self.http_client: H
 
     @property
     def headers(self) -> dict[str, str]:
@@ -53,6 +53,12 @@ class BaseRest(ABC, t.Generic[C]):
         """
 
     def validate(self, response: httpx.Response) -> None:
+        """
+        Validate a response from the API.
+
+        Args:
+            response (httpx.Response): response from API.
+        """
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError:
@@ -81,3 +87,21 @@ class BaseRest(ABC, t.Generic[C]):
                 raise LawgForbidden(message=error_message, status_code=response.status_code)
             else:
                 raise LawgHTTPException(message=error_message, status_code=response.status_code)
+
+    def construct_body(self, body: STR_DICT) -> STR_DICT:
+        """
+        Finalize the body of a request by removing undefined values.
+
+        Args:
+            body (dict[str, Any]): body of request.
+        """
+
+        new_body: STR_DICT = {}
+
+        for key, value in body.items():
+            if value is UNDEFINED:
+                continue
+
+            new_body[key] = value
+
+        return new_body

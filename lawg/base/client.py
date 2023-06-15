@@ -3,7 +3,16 @@ from __future__ import annotations
 import typing as t
 
 from abc import ABC, abstractmethod
-from lawg.schemas import APISuccessSchema, ProjectCreateSchema, ProjectGetSchema, ProjectSchema
+from lawg.schemas import (
+    APISuccessSchema,
+    ProjectCreateSchema,
+    ProjectGetSchema,
+    ProjectSchema,
+    RoomCreateSchema,
+    RoomDeleteSchema,
+    RoomPatchSchema,
+    RoomSchema,
+)
 
 from lawg.typings import STR_DICT, UNDEFINED, P, R, L
 
@@ -270,7 +279,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
 
         return project_data
 
-    def _validate_create_request(self, project_name: str, project_namespace: str) -> STR_DICT:
+    def _validate_create_request(self, project_namespace: str, project_name: str) -> STR_DICT:
         req_schema = ProjectCreateSchema()
         req_data: STR_DICT = req_schema.load({"name": project_name, "namespace": project_namespace})  # type: ignore
         return req_data
@@ -281,3 +290,48 @@ class BaseClient(ABC, t.Generic[P, R, L]):
 
     _validate_edit_request = _validate_create_request
     _validate_delete_request = _validate_fetch_request
+
+    def _validate_room_response(self, response_data: STR_DICT) -> STR_DICT:
+        resp_schema = APISuccessSchema()
+        resp_data: STR_DICT = resp_schema.load(response_data)  # type: ignore
+
+        room_schema = RoomSchema()
+        room_data: STR_DICT = room_schema.load(resp_data["data"])  # type: ignore
+        return room_data
+
+    def _validate_room_create_request(
+        self, project_namespace: str, room_name: str, description: str | None = None, emoji: str | None = None
+    ) -> None:
+        req_schema = RoomCreateSchema()
+        req_schema.load(
+            {
+                "namespace": project_namespace,
+                "name": room_name,
+                "description": description,
+                "emoji": emoji,
+            }
+        )
+        return None
+
+    def _validate_room_edit_request(
+        self,
+        project_namespace: str,
+        room_name: str,
+        name: str | None | Undefined = UNDEFINED,
+        description: str | None | Undefined = UNDEFINED,
+        emoji: str | None | Undefined = UNDEFINED,
+    ) -> None:
+        req_schema = RoomPatchSchema()
+        req_schema.load(
+            {
+                "namespace": project_namespace,
+                "name": room_name,
+                "new_name": name,
+                "description": description,
+                "emoji": emoji,
+            }
+        )
+
+    def _validate_room_delete_request(self, project_namespace: str, room_name: str) -> None:
+        req_schema = RoomDeleteSchema()
+        req_schema.load({"namespace": project_namespace, "name": room_name})

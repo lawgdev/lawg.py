@@ -34,7 +34,7 @@ class Project(BaseProject["Client", "Room", "Log"]):
             project_namespace=self.namespace, room_name=room_name, name=name, description=description, emoji=emoji
         )
 
-    def delete_room(self, room_name: str) -> Room:
+    def delete_room(self, room_name: str):
         return self.client.delete_room(project_namespace=self.namespace, room_name=room_name)
 
     patch_room = edit_room
