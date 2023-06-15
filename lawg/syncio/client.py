@@ -32,47 +32,40 @@ class Client(BaseClient[Project, Room, Log]):
     # --- PROJECTS --- #
 
     def create_project(self, project_name: str, project_namespace: str):
-        req_schema = ProjectCreateSchema()
-        req_data = req_schema.load({"name": project_name, "namespace": project_namespace})
-
+        req_data = self._validate_create_request(project_name=project_name, project_namespace=project_namespace)
         resp = self.rest.request(
             path="/projects",
             method="POST",
             body=req_data,
         )
-
-        resp_schema = APISuccessSchema()
-        resp_data = resp_schema.load(resp)
-
-        project_schema = ProjectSchema()
-        project_data = project_schema.load(resp_data["data"])
-
+        project_data = self._validate_project_response(resp)
         return Project(self, namespace=project_data["namespace"])
 
-    # TODO: DRY
-
     def fetch_project(self, project_namespace: str):
-        req_schema = ProjectGetSchema()
-        req_schema.load({"namespace": project_namespace})
-
-        resp = self.rest.request(
+        self._validate_fetch_request(project_namespace=project_namespace)
+        resp_data = self.rest.request(
             path=f"/projects/{project_namespace}",
             method="GET",
         )
-
-        resp_schema = APISuccessSchema()
-        resp_data = resp_schema.load(resp)
-        
-        project_schema = ProjectSchema()
-        project_data = project_schema.load(resp_data["data"])
-
+        project_data = self._validate_project_response(resp_data)
         return Project(self, namespace=project_data["namespace"])
 
     def edit_project(self, project_name: str, project_namespace: str):
-        return super().edit_project(project_name, project_namespace)
+        req_data = self._validate_edit_request(project_name=project_name, project_namespace=project_namespace)
+        resp_data = self.rest.request(
+            path=f"/projects/{project_namespace}",
+            method="PATCH",
+            body=req_data,
+        )
+        project_data = self._validate_project_response(resp_data)
+        return Project(self, namespace=project_data["namespace"])
 
-    def delete_project(self, project_namespace: str):
-        return super().delete_project(project_namespace)
+    def delete_project(self, project_namespace: str) -> None:
+        self._validate_delete_request(project_namespace=project_namespace)
+        self.rest.request(
+            path=f"/projects/{project_namespace}",
+            method="DELETE",
+        )
 
     patch_project = edit_project
     get_project = fetch_project
@@ -143,6 +136,6 @@ if __name__ == "__main__":
     assert token is not None
 
     c = Client(token)
-    proj = c.fetch_project("test")
+    proj = c.create_project("test", "test")
 
     print(proj)

@@ -3,8 +3,9 @@ from __future__ import annotations
 import typing as t
 
 from abc import ABC, abstractmethod
+from lawg.schemas import APISuccessSchema, ProjectCreateSchema, ProjectGetSchema, ProjectSchema
 
-from lawg.typings import UNDEFINED, P, R, L
+from lawg.typings import STR_DICT, UNDEFINED, P, R, L
 
 if t.TYPE_CHECKING:
     from lawg.base.rest import BaseRest
@@ -257,3 +258,26 @@ class BaseClient(ABC, t.Generic[P, R, L]):
     get_log = fetch_log
     get_logs = fetch_logs
     patch_log = edit_log
+
+    # --- ROOMS --- #
+
+    def _validate_project_response(self, response_data: STR_DICT) -> STR_DICT:
+        resp_schema = APISuccessSchema()
+        resp_data: STR_DICT = resp_schema.load(response_data)  # type: ignore
+
+        project_schema = ProjectSchema()
+        project_data: STR_DICT = project_schema.load(resp_data["data"])  # type: ignore
+
+        return project_data
+
+    def _validate_create_request(self, project_name: str, project_namespace: str) -> STR_DICT:
+        req_schema = ProjectCreateSchema()
+        req_data: STR_DICT = req_schema.load({"name": project_name, "namespace": project_namespace})  # type: ignore
+        return req_data
+
+    def _validate_fetch_request(self, project_namespace: str) -> None:
+        req_schema = ProjectGetSchema()
+        req_schema.load({"namespace": project_namespace})
+
+    _validate_edit_request = _validate_create_request
+    _validate_delete_request = _validate_fetch_request

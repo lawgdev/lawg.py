@@ -15,13 +15,13 @@ if t.TYPE_CHECKING:
 class Project(BaseProject["Client", "Room", "Log"]):
     # --- MANAGERS --- #
 
-    def room(self, room_name: str) -> Room:
-        self.client.room(project_namespace=self.namespace, room_name=room_name)
+    def room(self, room_name: str):
+        return self.client.room(project_namespace=self.namespace, room_name=room_name)
 
     # --- ROOMS --- #
 
-    def create_room(self, room_name: str, description: str | None = None) -> Room:
-        self.client.create_room(project_namespace=self.namespace, room_name=room_name, description=description)
+    def create_room(self, room_name: str, description: str | None = None):
+        return self.client.create_room(project_namespace=self.namespace, room_name=room_name, description=description)
 
     def edit_room(
         self,

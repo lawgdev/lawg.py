@@ -62,7 +62,7 @@ class BaseRest(ABC, t.Generic[C]):
             try:
                 schema.load(data)
             except marshmallow.ValidationError:
-                raise LawgHTTPException()
+                raise LawgHTTPException(status_code=response.status_code)
 
             error_code: str = data["error"]["code"]
             error_message: str = data["error"]["message"]
