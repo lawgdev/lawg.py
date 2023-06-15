@@ -6,7 +6,7 @@ from lawg.base.room import BaseRoom
 from lawg.syncio.project import Project
 from lawg.syncio.rest import Rest
 
-from lawg.schemas import APISuccessSchema, ProjectCreateSchema, ProjectGetSchema, ProjectSchema
+from lawg.schemas import APISuccessSchema, ProjectBodySchema, ProjectSchema
 from lawg.syncio.room import Room
 from lawg.syncio.log import Log
 from lawg.typings import STR_DICT, UNDEFINED, Undefined
@@ -33,6 +33,7 @@ class Client(BaseClient[Project, Room, Log]):
 
     def create_project(self, project_namespace: str, project_name: str):
         req_data = self._validate_create_request(project_namespace=project_namespace, project_name=project_name)
+
         resp = self.rest.request(
             path="/projects",
             method="POST",

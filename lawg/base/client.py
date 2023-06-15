@@ -5,12 +5,12 @@ import typing as t
 from abc import ABC, abstractmethod
 from lawg.schemas import (
     APISuccessSchema,
-    ProjectCreateSchema,
+    ProjectBodySchema,
     ProjectGetSchema,
     ProjectSchema,
-    RoomCreateSchema,
+    RoomCreateBodySchema,
     RoomDeleteSchema,
-    RoomPatchSchema,
+    RoomPatchBodySchema,
     RoomSchema,
 )
 
@@ -280,7 +280,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
         return project_data
 
     def _validate_create_request(self, project_namespace: str, project_name: str) -> STR_DICT:
-        req_schema = ProjectCreateSchema()
+        req_schema = ProjectBodySchema()
         req_data: STR_DICT = req_schema.load({"name": project_name, "namespace": project_namespace})  # type: ignore
         return req_data
 
@@ -302,7 +302,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
     def _validate_room_create_request(
         self, project_namespace: str, room_name: str, description: str | None = None, emoji: str | None = None
     ) -> None:
-        req_schema = RoomCreateSchema()
+        req_schema = RoomCreateBodySchema()
         req_schema.load(
             {
                 "namespace": project_namespace,
@@ -321,7 +321,7 @@ class BaseClient(ABC, t.Generic[P, R, L]):
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
     ) -> None:
-        req_schema = RoomPatchSchema()
+        req_schema = RoomPatchBodySchema()
         req_schema.load(
             {
                 "namespace": project_namespace,

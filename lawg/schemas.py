@@ -56,35 +56,22 @@ ProjectNamespaceSchema = functools.partial(
 ProjectUsernameSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=32))
 
 
-class ProjectCreateSchema(Schema):
+class ProjectSlugSchema(Schema):
+    namespace = ProjectNamespaceSchema(required=True)
+
+
+class ProjectBodySchema(Schema):
     name = ProjectNameSchema(required=True)
-    namespace = ProjectNamespaceSchema(required=True)
-
-
-class ProjectGetSchema(Schema):
-    namespace = ProjectNamespaceSchema(required=True)
-
-
-class ProjectPatchSchema(Schema):
-    name = ProjectNameSchema(required=True)
-    namespace = ProjectNamespaceSchema(required=True)
-
-
-class ProjectDeleteSchema(Schema):
     namespace = ProjectNamespaceSchema(required=True)
 
 
 class ProjectUpgradeSchema(Schema):
-    # TODO - WAITING ON CODY
-    ...
+    """TODO"""
 
 
-class ProjectInviteMemberSchema(Schema):
-    username = ProjectUsernameSchema(required=True)
-    namespace = ProjectNamespaceSchema(required=True)
+class ProjectMemberSchema(Schema):
+    """Used for both adding and removing members."""
 
-
-class ProjectRemoveMemberSchema(Schema):
     namespace = ProjectNamespaceSchema(required=True)
     username = ProjectUsernameSchema(required=True)
 
@@ -99,26 +86,29 @@ RoomNameSchema = functools.partial(fields.Str, validate=validate.Length(min=1, m
 RoomDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=128))
 
 
-class RoomCreateSchema(Schema):
+class RoomSlugSchema(Schema):
+    """Used for creating rooms."""
+
     namespace = ProjectNamespaceSchema(required=True)
 
+
+class RoomWithNameSlugSchema(Schema):
+    """Used for patching, and deleting rooms."""
+
+    namespace = ProjectNamespaceSchema(required=True)
+    room_name = RoomNameSchema(required=True)
+
+
+class RoomCreateBodySchema(Schema):
     name = RoomNameSchema(required=True)
     description = RoomDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
 
 
-class RoomPatchSchema(Schema):
-    namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
-
+class RoomPatchBodySchema(Schema):
     name = RoomNameSchema(required=False, allow_none=True)
     description = RoomDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
-
-
-class RoomDeleteSchema(Schema):
-    namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
 
 
 # --- LOGS --- #
@@ -127,42 +117,42 @@ LogTitleSchema = functools.partial(fields.Str, validate=validate.Length(min=1, m
 LogDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=4096))
 
 
-class LogCreateSchema:
+class LogSlugSchema(Schema):
+    """
+    Used for creating and getting multiple logs.
+    """
+
     namespace = ProjectNamespaceSchema(required=True)
     room_name = RoomNameSchema(required=True)
+
+
+class LogWithIdSlugSchema(Schema):
+    """
+    Used for getting, patching, and deleting logs.
+    """
+
+    namespace = ProjectNamespaceSchema(required=True)
+    room_name = RoomNameSchema(required=True)
+    log_id = fields.Str(required=True, validate=PikaId("log"))
+
+
+class LogCreateBodySchema:
     title = LogTitleSchema(required=True)
     description = LogDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
     color = ColorSchema(required=False, allow_none=True)
 
 
-class LogGetSchema(Schema):
-    namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
-    log_id = fields.Str(required=True, validate=PikaId("log"))
-
-
-class LogGetMultipleSchema(Schema):
-    namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
+class LogGetMultipleBodySchema(Schema):
     limit = fields.Integer(required=False, default=25, validate=validate.Range(min=1, max=100))
     offset = fields.Integer(required=False, default=0, validate=validate.Range(min=0))
 
 
-class LogPatchSchema(Schema):
-    namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
-    log_id = fields.Str(required=True, validate=PikaId("log"))
+class LogPatchBodySchema(Schema):
     title = LogTitleSchema(required=False)
     description = LogDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
     color = ColorSchema(required=False, allow_none=True)
-
-
-class LogDeleteSchema(Schema):
-    namespace = ProjectNamespaceSchema(required=True)
-    room_name = RoomNameSchema(required=True)
-    log_id = fields.Str(required=True, validate=PikaId("log"))
 
 
 # ----- API VALIDATION SCHEMAS ----- #
