@@ -20,10 +20,6 @@ class Rest(BaseRest[httpx.Client]):
         self.http_client.headers.update(self.headers)
 
     def request(self, *, path: str, method: str, body: STR_DICT | None = None) -> STR_DICT:
-        resp = self.http_client.request(method, f"{self.API_V1}{path}", json=body)
-        self.validate(resp)
-        
-        if resp.status_code == 204:
-            return {}
-        
-        return resp.json()
+        url, body = self.prepare_request(path=path, body=body)
+        resp = self.http_client.request(method=method, url=url, json=body)
+        return self.prepare_response(resp)

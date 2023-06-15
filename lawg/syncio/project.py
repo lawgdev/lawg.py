@@ -70,10 +70,10 @@ class Project(BaseProject["Client", "Feed", "Log"]):
         self,
         feed_name: str,
         log_id: str,
-        title: str | Undefined | None = ...,
-        description: str | Undefined | None = ...,
-        emoji: str | Undefined | None = ...,
-        color: str | Undefined | None = ...,
+        title: str | Undefined | None = UNDEFINED,
+        description: str | Undefined | None = UNDEFINED,
+        emoji: str | Undefined | None = UNDEFINED,
+        color: str | Undefined | None = UNDEFINED,
     ) -> Log:
         return self.client.edit_log(
             project_namespace=self.namespace,

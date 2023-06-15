@@ -198,3 +198,13 @@ class ProjectSchema(Schema):
     icon = fields.Str(required=True, allow_none=True)
     feeds = fields.List(fields.Nested(FeedSchema()), required=True)
     members = fields.List(fields.Nested(MemberSchema()), required=True)
+
+
+class LogSchema(Schema):
+    id = fields.Str(required=True, validate=PikaId("log"))
+    project_id = fields.Str(required=True, validate=PikaId("project"))
+    feed_id = fields.Str(required=True, validate=PikaId("feed"))
+    title = LogTitleSchema(required=True)
+    description = LogDescriptionSchema(required=True, allow_none=True)
+    emoji = EmojiSchema(required=True, allow_none=True)
+    hex = ColorSchema(required=True, allow_none=True)

@@ -52,7 +52,44 @@ class BaseRest(ABC, t.Generic[H]):
             dict: response body of request.
         """
 
-    def validate(self, response: httpx.Response) -> None:
+    def prepare_body(self, body: STR_DICT) -> STR_DICT:
+        """
+        Finalize the body of a request by removing undefined values.
+
+        Args:
+            body (dict[str, Any]): body of request.
+        """
+
+        new_body: STR_DICT = {}
+
+        for key, value in body.items():
+            if value is UNDEFINED:
+                continue
+
+            new_body[key] = value
+
+        return new_body
+
+    def prepare_request(self, *, path: str, body: STR_DICT | None = None) -> tuple[str, STR_DICT | None]:
+        """
+        Prepare a request to the API by calculating the url and finalizing the body.
+
+        Args:
+            path (str): path of request.
+            body (dict[str, Any] | None, optional): body of request. Defaults to None.
+
+        Returns:
+            tuple[str, dict[str, Any] | None]: url and body of request.
+        """
+
+        if body:
+            body = self.prepare_body(body)
+
+        url = f"{self.API_V1}/{path}"
+
+        return url, body
+
+    def validate_response(self, response: httpx.Response) -> None:
         """
         Validate a response from the API.
 
@@ -64,7 +101,7 @@ class BaseRest(ABC, t.Generic[H]):
         except httpx.HTTPStatusError as exc:
             data = response.json()
             schema = APIErrorSchema()
-            
+
             try:
                 schema.load(data)
             except marshmallow.ValidationError as exc:
@@ -94,20 +131,13 @@ class BaseRest(ABC, t.Generic[H]):
             else:
                 raise LawgHTTPException(message=error_message, status_code=response.status_code) from exc
 
-    def construct_body(self, body: STR_DICT) -> STR_DICT:
+    def prepare_response(self, response: httpx.Response) -> STR_DICT:
         """
-        Finalize the body of a request by removing undefined values.
-
-        Args:
-            body (dict[str, Any]): body of request.
+        Prepare a response from the API by validating it and returning the body.
         """
+        self.validate_response(response)
 
-        new_body: STR_DICT = {}
+        if response.status_code == 204:
+            return {}
 
-        for key, value in body.items():
-            if value is UNDEFINED:
-                continue
-
-            new_body[key] = value
-
-        return new_body
+        return response.json()

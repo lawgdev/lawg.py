@@ -29,7 +29,9 @@ class Client(BaseClient["Project", "Feed", "Log"]):
     # --- PROJECTS --- #
 
     def create_project(self, project_namespace: str, project_name: str):
-        req_data = self._validate_create_request(project_namespace=project_namespace, project_name=project_name)
+        req_data = self._validate_project_create_request(
+            project_namespace=project_namespace, project_name=project_name
+        )
 
         resp = self.rest.request(
             path="/projects",
@@ -40,7 +42,7 @@ class Client(BaseClient["Project", "Feed", "Log"]):
         return Project(self, namespace=project_data["namespace"])
 
     def fetch_project(self, project_namespace: str):
-        self._validate_fetch_request(project_namespace=project_namespace)
+        self._validate_project_fetch_request(project_namespace=project_namespace)
         resp_data = self.rest.request(
             path=f"/projects/{project_namespace}",
             method="GET",
@@ -105,7 +107,7 @@ class Client(BaseClient["Project", "Feed", "Log"]):
             description=description,
             emoji=emoji,
         )
-        req_data = self.rest.construct_body(req_data)
+        req_data = self.rest.prepare_body(req_data)
 
         resp_data = self.rest.request(
             path=f"/projects/{project_namespace}/{feed_name}",
@@ -136,28 +138,101 @@ class Client(BaseClient["Project", "Feed", "Log"]):
         emoji: str | None = None,
         color: str | None = None,
     ):
-        return super().create_log(project_namespace, feed_name, title, description, emoji, color)
+        req_data = self._validate_log_create_request(
+            project_namespace=project_namespace,
+            feed_name=feed_name,
+            title=title,
+            description=description,
+            emoji=emoji,
+            color=color,
+        )
+
+        resp_data = self.rest.request(
+            path=f"/projects/{project_namespace}/{feed_name}/logs",
+            method="POST",
+            body=req_data,
+        )
+
+        log_data = self._validate_log_response(resp_data)
+        return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
 
     def fetch_log(self, project_namespace: str, feed_name: str, log_id: str):
-        return super().fetch_log(project_namespace, feed_name, log_id)
+        self._validate_log_fetch_request(
+            project_namespace=project_namespace,
+            feed_name=feed_name,
+            log_id=log_id,
+        )
 
-    def fetch_logs(self, project_namespace: str, feed_name: str, limit: int | None = None, offset: int | None = None):
-        return super().fetch_logs(project_namespace, feed_name, limit, offset)
+        resp_data = self.rest.request(
+            path=f"/projects/{project_namespace}/{feed_name}/logs/{log_id}",
+            method="GET",
+        )
+
+        log_data = self._validate_log_response(resp_data)
+        return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
+
+    def fetch_logs(
+        self,
+        project_namespace: str,
+        feed_name: str,
+        limit: int | None = None,
+        offset: int | None = None,
+    ):
+        req_data = self._validate_log_fetches_request(
+            project_namespace=project_namespace,
+            feed_name=feed_name,
+            limit=limit,
+            offset=offset,
+        )
+
+        resp_data = self.rest.request(
+            path=f"/projects/{project_namespace}/{feed_name}/logs",
+            method="GET",
+            body=req_data,
+        )
+
+        # TODO: finish
 
     def edit_log(
         self,
         project_namespace: str,
         feed_name: str,
         log_id: str,
-        title: str | Undefined | None = ...,
-        description: str | Undefined | None = ...,
-        emoji: str | Undefined | None = ...,
-        color: str | Undefined | None = ...,
+        title: str | Undefined | None = UNDEFINED,
+        description: str | Undefined | None = UNDEFINED,
+        emoji: str | Undefined | None = UNDEFINED,
+        color: str | Undefined | None = UNDEFINED,
     ):
-        return super().edit_log(project_namespace, feed_name, log_id, title, description, emoji, color)
+        req_data = self._validate_log_edit_request(
+            project_namespace=project_namespace,
+            feed_name=feed_name,
+            log_id=log_id,
+            title=title,
+            description=description,
+            emoji=emoji,
+            color=color,
+        )
+
+        resp_data = self.rest.request(
+            path=f"/projects/{project_namespace}/{feed_name}/logs/{log_id}",
+            method="PATCH",
+            body=req_data,
+        )
+
+        log_data = self._validate_log_response(resp_data)
+        return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
 
     def delete_log(self, project_namespace: str, feed_name: str, log_id: str):
-        return super().delete_log(project_namespace, feed_name, log_id)
+        self._validate_log_delete_request(
+            project_namespace=project_namespace,
+            feed_name=feed_name,
+            log_id=log_id,
+        )
+
+        self.rest.request(
+            path=f"/projects/{project_namespace}/{feed_name}/logs/{log_id}",
+            method="DELETE",
+        )
 
     get_log = fetch_log
     get_logs = fetch_logs

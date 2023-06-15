@@ -7,16 +7,17 @@ from abc import ABC, abstractmethod
 from lawg.typings import UNDEFINED
 
 if t.TYPE_CHECKING:
-    from lawg.typings import Undefined
+    from lawg.typings import Undefined, C
 
 
-class BaseLog(ABC):
+class BaseLog(ABC, t.Generic["C"]):
     """
     A manager for a log.
     """
 
-    def __init__(self, project_namespace: str, feed_name: str, id: str) -> None:
+    def __init__(self, client: C, project_namespace: str, feed_name: str, id: str) -> None:
         super().__init__()
+        self.client = client
         self.project_namespace = project_namespace
         self.feed_name = feed_name
         self.id = id

@@ -7,6 +7,12 @@ from lawg.schemas import (
     APISuccessSchema,
     FeedSlugSchema,
     FeedWithNameSlugSchema,
+    LogCreateBodySchema,
+    LogGetMultipleBodySchema,
+    LogPatchBodySchema,
+    LogSchema,
+    LogSlugSchema,
+    LogWithIdSlugSchema,
     ProjectBodySchema,
     ProjectSchema,
     FeedCreateBodySchema,
@@ -156,7 +162,7 @@ class BaseClient(ABC, t.Generic[P, F, L]):
         self,
         project_namespace: str,
         feed_name: str,
-    ) -> F:
+    ) -> None:
         """
         Delete a feed.
 
@@ -255,7 +261,7 @@ class BaseClient(ABC, t.Generic[P, F, L]):
         project_namespace: str,
         feed_name: str,
         log_id: str,
-    ) -> L:
+    ) -> None:
         """
         Delete a log.
 
@@ -280,17 +286,17 @@ class BaseClient(ABC, t.Generic[P, F, L]):
 
         return project_data
 
-    def _validate_create_request(self, project_namespace: str, project_name: str) -> STR_DICT:
+    def _validate_project_create_request(self, project_namespace: str, project_name: str) -> STR_DICT:
         req_schema = ProjectBodySchema()
         req_data: STR_DICT = req_schema.load({"name": project_name, "namespace": project_namespace})  # type: ignore
         return req_data
 
-    def _validate_fetch_request(self, project_namespace: str) -> None:
+    def _validate_project_fetch_request(self, project_namespace: str) -> None:
         req_schema = ProjectSlugSchema()
         req_schema.load({"namespace": project_namespace})
 
-    _validate_edit_request = _validate_create_request
-    _validate_delete_request = _validate_fetch_request
+    _validate_edit_request = _validate_project_create_request
+    _validate_delete_request = _validate_project_fetch_request
 
     # --- FEED VALIDATION --- #
 
@@ -303,7 +309,7 @@ class BaseClient(ABC, t.Generic[P, F, L]):
         return feed_data
 
     def _validate_feed_create_request(
-        self, project_namespace: str, feed_name: str, description: str | None = None, emoji: str | None = None
+        self, project_namespace: str, feed_name: str, description: str | None, emoji: str | None
     ) -> STR_DICT:
         slug_schema = FeedSlugSchema()
         slug_schema.load({"namespace": project_namespace})
@@ -317,9 +323,9 @@ class BaseClient(ABC, t.Generic[P, F, L]):
         self,
         project_namespace: str,
         feed_name: str,
-        name: str | None | Undefined = UNDEFINED,
-        description: str | None | Undefined = UNDEFINED,
-        emoji: str | None | Undefined = UNDEFINED,
+        name: str | None | Undefined,
+        description: str | None | Undefined,
+        emoji: str | None | Undefined,
     ) -> STR_DICT:
         slug_schema = FeedWithNameSlugSchema()
         slug_schema.load({"namespace": project_namespace, "feed_name": feed_name})
@@ -332,3 +338,68 @@ class BaseClient(ABC, t.Generic[P, F, L]):
     def _validate_feed_delete_request(self, project_namespace: str, feed_name: str) -> None:
         slug_schema = FeedWithNameSlugSchema()
         slug_schema.load({"namespace": project_namespace, "feed_name": feed_name})
+
+    # --- FEED VALIDATION --- #
+
+    def _validate_log_response(self, response_data: STR_DICT) -> STR_DICT:
+        resp_schema = APISuccessSchema()
+        resp_data: STR_DICT = resp_schema.load(response_data)  # type: ignore
+
+        log_schema = LogSchema()
+        log_data: STR_DICT = log_schema.load(resp_data["data"])  # type: ignore
+        return log_data
+
+    def _validate_log_create_request(
+        self,
+        project_namespace: str,
+        feed_name: str,
+        title: str,
+        description: str | None,
+        emoji: str | None,
+        color: str | None,
+    ) -> STR_DICT:
+        slug_schema = LogSlugSchema()
+        slug_schema.load({"namespace": project_namespace, "feed_name": feed_name})
+
+        req_schema = LogCreateBodySchema()
+        req_data: STR_DICT = req_schema.load(  # type: ignore
+            {"title": title, "description": description, "emoji": emoji, "color": color}  # type: ignore
+        )
+
+        return req_data
+
+    def _validate_log_fetch_request(self, project_namespace: str, feed_name: str, log_id: str) -> None:
+        slug_schema = LogWithIdSlugSchema()
+        slug_schema.load({"namespace": project_namespace, "feed_name": feed_name, "log_id": log_id})
+
+    def _validate_log_fetches_request(
+        self, project_namespace: str, feed_name: str, limit: int | None, offset: int | None
+    ) -> STR_DICT:
+        slug_schema = LogSlugSchema()
+        slug_schema.load({"namespace": project_namespace, "feed_name": feed_name})
+
+        req_schema = LogGetMultipleBodySchema()
+        req_data: STR_DICT = req_schema.load({"limit": limit, "offset": offset})  # type: ignore
+        return req_data
+
+    def _validate_log_edit_request(
+        self,
+        project_namespace: str,
+        feed_name: str,
+        log_id: str,
+        title: str | None | Undefined,
+        description: str | None | Undefined,
+        emoji: str | None | Undefined,
+        color: str | None | Undefined,
+    ) -> STR_DICT:
+        slug_schema = LogWithIdSlugSchema()
+        slug_schema.load({"namespace": project_namespace, "feed_name": feed_name, "log_id": log_id})
+
+        req_schema = LogPatchBodySchema()
+        req_data: STR_DICT = req_schema.load(  # type: ignore
+            {"title": title, "description": description, "emoji": emoji, "color": color}  # type: ignore
+        )
+
+        return req_data
+
+    _validate_log_delete_request = _validate_log_fetch_request

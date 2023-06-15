@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from lawg.base.log import BaseLog
 from lawg.typings import UNDEFINED, Undefined
 
+from lawg.base.log import BaseLog
+from lawg.syncio.client import Client
 
-class Log(BaseLog):
+
+class Log(BaseLog["Client"]):
     def edit(
         self,
         title: str | Undefined | None = UNDEFINED,
