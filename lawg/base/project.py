@@ -7,9 +7,6 @@ from abc import ABC, abstractmethod
 from lawg.typings import UNDEFINED, C, F, L
 
 if t.TYPE_CHECKING:
-    from lawg.base.log import BaseLog
-    from lawg.base.client import BaseClient
-    from lawg.base.feed import BaseFeed
     from lawg.typings import Undefined
 
 

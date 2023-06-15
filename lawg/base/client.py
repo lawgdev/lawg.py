@@ -5,11 +5,14 @@ import typing as t
 from abc import ABC, abstractmethod
 from lawg.schemas import (
     APISuccessSchema,
+    FeedSlugSchema,
+    FeedWithNameSlugSchema,
     ProjectBodySchema,
     ProjectSchema,
     FeedCreateBodySchema,
     FeedPatchBodySchema,
     FeedSchema,
+    ProjectSlugSchema,
 )
 
 from lawg.typings import STR_DICT, UNDEFINED, P, F, L
@@ -266,7 +269,7 @@ class BaseClient(ABC, t.Generic[P, F, L]):
     get_logs = fetch_logs
     patch_log = edit_log
 
-    # --- FEEDS --- #
+    # --- PROJECT VALIDATION --- #
 
     def _validate_project_response(self, response_data: STR_DICT) -> STR_DICT:
         resp_schema = APISuccessSchema()
@@ -283,11 +286,13 @@ class BaseClient(ABC, t.Generic[P, F, L]):
         return req_data
 
     def _validate_fetch_request(self, project_namespace: str) -> None:
-        req_schema = ProjectGetSchema()
+        req_schema = ProjectSlugSchema()
         req_schema.load({"namespace": project_namespace})
 
     _validate_edit_request = _validate_create_request
     _validate_delete_request = _validate_fetch_request
+
+    # --- FEED VALIDATION --- #
 
     def _validate_feed_response(self, response_data: STR_DICT) -> STR_DICT:
         resp_schema = APISuccessSchema()
@@ -299,17 +304,14 @@ class BaseClient(ABC, t.Generic[P, F, L]):
 
     def _validate_feed_create_request(
         self, project_namespace: str, feed_name: str, description: str | None = None, emoji: str | None = None
-    ) -> None:
+    ) -> STR_DICT:
+        slug_schema = FeedSlugSchema()
+        slug_schema.load({"namespace": project_namespace})
+
         req_schema = FeedCreateBodySchema()
-        req_schema.load(
-            {
-                "namespace": project_namespace,
-                "name": feed_name,
-                "description": description,
-                "emoji": emoji,
-            }
-        )
-        return None
+        req_data: STR_DICT = req_schema.load({"name": feed_name, "description": description, "emoji": emoji})  # type: ignore
+
+        return req_data
 
     def _validate_feed_edit_request(
         self,
@@ -318,18 +320,15 @@ class BaseClient(ABC, t.Generic[P, F, L]):
         name: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-    ) -> None:
+    ) -> STR_DICT:
+        slug_schema = FeedWithNameSlugSchema()
+        slug_schema.load({"namespace": project_namespace, "feed_name": feed_name})
+
         req_schema = FeedPatchBodySchema()
-        req_schema.load(
-            {
-                "namespace": project_namespace,
-                "name": feed_name,
-                "new_name": name,
-                "description": description,
-                "emoji": emoji,
-            }
-        )
+        req_data: STR_DICT = req_schema.load({"name": name, "description": description, "emoji": emoji})  # type: ignore
+
+        return req_data
 
     def _validate_feed_delete_request(self, project_namespace: str, feed_name: str) -> None:
-        req_schema = FeedDeleteSchema()
-        req_schema.load({"namespace": project_namespace, "name": feed_name})
+        slug_schema = FeedWithNameSlugSchema()
+        slug_schema.load({"namespace": project_namespace, "feed_name": feed_name})

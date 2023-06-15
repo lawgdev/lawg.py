@@ -7,18 +7,15 @@ from abc import ABC, abstractmethod
 from lawg.typings import UNDEFINED
 
 if t.TYPE_CHECKING:
-    from lawg.base.log import BaseLog
-    from lawg.base.client import BaseClient
-    from lawg.base.feed import BaseFeed
-    from lawg.typings import Undefined
+    from lawg.typings import Undefined, C, L
 
 
-class BaseFeed(ABC):
+class BaseFeed(ABC, t.Generic[C, L]):
     """
     A manager for a feed.
     """
 
-    def __init__(self, client: BaseClient, project_namespace: str, name: str) -> None:
+    def __init__(self, client: C, project_namespace: str, name: str) -> None:
         super().__init__()
         self.client = client
         self.project_namespace = project_namespace
@@ -36,7 +33,7 @@ class BaseFeed(ABC):
         description: str | None = None,
         emoji: str | None = None,
         color: str | None = None,
-    ) -> BaseLog:
+    ) -> L:
         """
         Create a log.
 
@@ -51,7 +48,7 @@ class BaseFeed(ABC):
     def fetch_log(
         self,
         log_id: str,
-    ) -> BaseLog:
+    ) -> L:
         """
         Fetch a log.
 
@@ -64,7 +61,7 @@ class BaseFeed(ABC):
         self,
         limit: int | None = None,
         offset: int | None = None,
-    ) -> list[BaseLog]:
+    ) -> list[L]:
         """
         Fetch multiple logs.
 
@@ -81,7 +78,7 @@ class BaseFeed(ABC):
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
         color: str | None | Undefined = UNDEFINED,
-    ) -> BaseLog:
+    ) -> L:
         """
         Edit a log.
 
@@ -97,7 +94,7 @@ class BaseFeed(ABC):
     def delete_log(
         self,
         log_id: str,
-    ) -> BaseLog:
+    ) -> L:
         """
         Delete a log.
 

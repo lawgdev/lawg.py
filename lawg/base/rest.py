@@ -61,32 +61,38 @@ class BaseRest(ABC, t.Generic[H]):
         """
         try:
             response.raise_for_status()
-        except httpx.HTTPStatusError:
+        except httpx.HTTPStatusError as exc:
             data = response.json()
             schema = APIErrorSchema()
-
+            
             try:
                 schema.load(data)
-            except marshmallow.ValidationError:
-                raise LawgHTTPException(status_code=response.status_code)
+            except marshmallow.ValidationError as exc:
+                # error follows httpx error format, meaning it never got a proper json reply from api
+                # in this case, 404 can be handled pretty easily but im not sure about much else.
+
+                if response.status_code == 404:
+                    raise LawgNotFound(message=data["message"], status_code=response.status_code) from exc
+
+                raise LawgHTTPException(status_code=response.status_code) from exc
 
             error_code: str = data["error"]["code"]
             error_message: str = data["error"]["message"]
 
             if error_code == "conflict":
-                raise LawgConflict(message=error_message, status_code=response.status_code)
+                raise LawgConflict(message=error_message, status_code=response.status_code) from exc
             elif error_code == "bad_request":
-                raise LawgBadRequest(message=error_message, status_code=response.status_code)
+                raise LawgBadRequest(message=error_message, status_code=response.status_code) from exc
             elif error_code == "unauthorized":
-                raise LawgUnauthorized(message=error_message, status_code=response.status_code)
+                raise LawgUnauthorized(message=error_message, status_code=response.status_code) from exc
             elif error_code == "not_found":
-                raise LawgNotFound(message=error_message, status_code=response.status_code)
+                raise LawgNotFound(message=error_message, status_code=response.status_code) from exc
             elif error_code == "internal_server_error":
-                raise LawgInternalServerError(message=error_message, status_code=response.status_code)
+                raise LawgInternalServerError(message=error_message, status_code=response.status_code) from exc
             elif error_code == "forbidden":
-                raise LawgForbidden(message=error_message, status_code=response.status_code)
+                raise LawgForbidden(message=error_message, status_code=response.status_code) from exc
             else:
-                raise LawgHTTPException(message=error_message, status_code=response.status_code)
+                raise LawgHTTPException(message=error_message, status_code=response.status_code) from exc
 
     def construct_body(self, body: STR_DICT) -> STR_DICT:
         """

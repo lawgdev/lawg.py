@@ -57,10 +57,14 @@ ProjectUsernameSchema = functools.partial(fields.Str, validate=validate.Length(m
 
 
 class ProjectSlugSchema(Schema):
+    """Used for getting and deleting projects and accepting invites."""
+
     namespace = ProjectNamespaceSchema(required=True)
 
 
 class ProjectBodySchema(Schema):
+    """Used for creating and patching projects."""
+
     name = ProjectNameSchema(required=True)
     namespace = ProjectNamespaceSchema(required=True)
 
@@ -74,10 +78,6 @@ class ProjectMemberSchema(Schema):
 
     namespace = ProjectNamespaceSchema(required=True)
     username = ProjectUsernameSchema(required=True)
-
-
-class ProjectAcceptInviteSchema(Schema):
-    namespace = ProjectNamespaceSchema(required=True)
 
 
 # --- FEEDS --- #
