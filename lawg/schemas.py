@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import functools
-from marshmallow import Schema, ValidationError, fields, validate
+from marshmallow import EXCLUDE, Schema, ValidationError, fields, validate
 from marshmallow_union import Union
-
-from lawg.typings import ErrorCode
 
 
 class PikaId(validate.Validator):
@@ -183,11 +181,17 @@ class FeedSchema(Schema):
     description = FeedDescriptionSchema(required=True, allow_none=True)
     emoji = EmojiSchema(required=True, allow_none=True)
 
+    class Meta:
+        unknown = EXCLUDE
+
 
 class MemberSchema(Schema):
     id = fields.Str(required=True, validate=PikaId("user"))
     username = fields.Str(required=True)
     icon = fields.Str(required=True, allow_none=True)
+
+    class Meta:
+        unknown = EXCLUDE
 
 
 class ProjectSchema(Schema):
@@ -199,6 +203,9 @@ class ProjectSchema(Schema):
     feeds = fields.List(fields.Nested(FeedSchema()), required=True)
     members = fields.List(fields.Nested(MemberSchema()), required=True)
 
+    class Meta:
+        unknown = EXCLUDE
+
 
 class LogSchema(Schema):
     id = fields.Str(required=True, validate=PikaId("log"))
@@ -208,3 +215,6 @@ class LogSchema(Schema):
     description = LogDescriptionSchema(required=True, allow_none=True)
     emoji = EmojiSchema(required=True, allow_none=True)
     hex = ColorSchema(required=True, allow_none=True)
+
+    class Meta:
+        unknown = EXCLUDE

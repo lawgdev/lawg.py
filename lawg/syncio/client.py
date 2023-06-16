@@ -311,7 +311,7 @@ if __name__ == "__main__":
     project_name = "test"
     feed_name = "123123"
 
-    # c.delete_project(project_namespace)
+    c.delete_project(project_namespace)
     proj = c.create_project(project_namespace, project_name)
     feed = c.create_feed(project_namespace, feed_name)
     print(c.edit_feed(project_namespace, feed.name, name="new_name", description="new_desc", emoji="💀"))
