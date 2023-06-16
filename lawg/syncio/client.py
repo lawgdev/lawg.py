@@ -311,7 +311,6 @@ if __name__ == "__main__":
     project_name = "test"
     feed_name = "123123"
 
-    client.delete_project(project_namespace)
     project = client.create_project(project_namespace, project_name)
     
     feed = project.create_feed(feed_name)

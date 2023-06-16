@@ -23,6 +23,7 @@ class Project(BaseProject["Client", "Feed", "Log"]):
 
     def edit(self, name: str):
         self.client.edit_project(project_namespace=self.namespace, project_name=name)
+        self.name = name
 
     def delete(self):
         if self.is_deleted:

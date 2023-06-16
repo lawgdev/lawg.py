@@ -28,13 +28,16 @@ class Feed(BaseFeed["Client", "Log"]):
             description (str, None, Undefined, optional): The new description of the feed. Defaults to keeping the previous value.
             emoji (str, None, Undefined, optional): The new emoji of the feed. Defaults to keeping the previous value.
         """
-        return self.client.edit_feed(
+        self.client.edit_feed(
             project_namespace=self.project_namespace,
             feed_name=self.name,
             name=name,
             description=description,
             emoji=emoji,
         )
+
+        if isinstance(name, str):
+            self.name = name
 
     def delete(self):
         """
