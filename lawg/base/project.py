@@ -15,6 +15,8 @@ class BaseProject(ABC, t.Generic[C, F, L]):
     A manager for a project.
     """
 
+    __slots__ = ("client", "namespace", "is_deleted")
+
     def __init__(
         self,
         client: C,

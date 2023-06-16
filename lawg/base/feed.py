@@ -3,7 +3,6 @@ from __future__ import annotations
 import typing as t
 
 from abc import ABC, abstractmethod
-from lawg.exceptions import LawgAlreadyDeleted
 
 from lawg.typings import UNDEFINED, C, L
 
@@ -15,6 +14,7 @@ class BaseFeed(ABC, t.Generic[C, L]):
     """
     A manager for a feed.
     """
+    __slots__ = ("client", "project_namespace", "name", "is_deleted")
 
     def __init__(self, client: C, project_namespace: str, name: str) -> None:
         super().__init__()

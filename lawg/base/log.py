@@ -15,6 +15,8 @@ class BaseLog(ABC, t.Generic[C]):
     A manager for a log.
     """
 
+    __slots__ = ("client", "project_namespace", "feed_name", "id", "is_deleted")
+
     def __init__(self, client: C, project_namespace: str, feed_name: str, id: str) -> None:
         super().__init__()
         self.client = client

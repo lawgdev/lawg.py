@@ -61,6 +61,8 @@ class BaseRest(ABC, t.Generic[H]):
     API_EDIT_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs/{{log_id}}"
     API_DELETE_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs/{{log_id}}"
 
+    __slots__ = ("client", "http_client")
+
     def __init__(self, client: BaseClient) -> None:
         self.client: BaseClient = client
         self.http_client: H
