@@ -20,7 +20,6 @@ R = t.TypeVar("R")  # R for rest
 
 H = t.TypeVar("H", httpx.Client, httpx.AsyncClient)  # H for httpx client
 
-
 ErrorCode: t.TypeAlias = (
     str
     | t.Literal[

@@ -191,7 +191,11 @@ class BaseRest(ABC, t.Generic[H]):
             else:
                 raise LawgHTTPException(message=error_message, status_code=response.status_code) from exc
 
-    def prepare_response(self, response: httpx.Response, response_schema: Schema | None) -> STR_DICT:
+    def prepare_response(
+        self,
+        response: httpx.Response,
+        response_schema: Schema | None,
+    ) -> STR_DICT:
         """
         Prepare a response from the API by validating it and returning the body.
         """
@@ -202,6 +206,6 @@ class BaseRest(ABC, t.Generic[H]):
 
         resp_data = response.json()
         api_data: STR_DICT = APISuccessSchema().load(resp_data)  # type: ignore
-        schema_data: STR_DICT = response_schema.load(api_data["data"])  # type: ignore
+        schema_data = response_schema.load(api_data["data"])
 
-        return schema_data
+        return schema_data  # type: ignore

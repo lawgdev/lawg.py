@@ -61,7 +61,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             body_with_schema=DataWithSchema(body, ProjectBodySchema()),
             response_schema=ProjectSchema(),
         )
-        return Project(self, namespace=project_data["namespace"])
+        return self._construct_project(project_data)
 
     def fetch_project(self, project_namespace: str):
         slugs = {
@@ -73,7 +73,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, ProjectSlugSchema()),
             response_schema=ProjectSchema(),
         )
-        return Project(self, namespace=project_data["namespace"])
+        return self._construct_project(project_data)
 
     def edit_project(self, project_namespace: str, project_name: str):
         body = {
@@ -86,7 +86,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             body_with_schema=DataWithSchema(body, ProjectBodySchema()),
             response_schema=ProjectSchema(),
         )
-        return Project(self, namespace=project_data["namespace"])
+        return self._construct_project(project_data)
 
     def delete_project(self, project_namespace: str) -> None:
         slugs = {
@@ -118,7 +118,6 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             "description": description,
             "emoji": emoji,
         }
-
         feed_data = self.rest.request(
             url=self.rest.API_CREATE_FEED,
             method="POST",
@@ -126,8 +125,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, FeedSlugSchema()),
             response_schema=FeedSchema(),
         )
-
-        return Feed(self, project_namespace=project_namespace, name=feed_data["name"])
+        return self._construct_feed(project_namespace, feed_data)
 
     def edit_feed(
         self,
@@ -141,13 +139,11 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             "namespace": project_namespace,
             "feed_name": feed_name,
         }
-
         data = {
             "name": name,
             "description": description,
             "emoji": emoji,
         }
-
         feed_data = self.rest.request(
             url=self.rest.API_EDIT_FEED,
             method="PATCH",
@@ -155,8 +151,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, FeedWithNameSlugSchema()),
             response_schema=FeedSchema(),
         )
-
-        return Feed(self, project_namespace=project_namespace, name=feed_data["name"])
+        return self._construct_feed(project_namespace, feed_data)
 
     def delete_feed(self, project_namespace: str, feed_name: str) -> None:
         slugs = {
@@ -192,7 +187,6 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             "emoji": emoji,
             "color": color,
         }
-
         log_data = self.rest.request(
             url=self.rest.API_CREATE_LOG,
             method="POST",
@@ -200,8 +194,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, LogSlugSchema()),
             response_schema=LogSchema(),
         )
-
-        return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
+        return self._construct_log(project_namespace, feed_name, log_data)
 
     def fetch_log(self, project_namespace: str, feed_name: str, log_id: str):
         slugs = {
@@ -215,7 +208,8 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
             response_schema=LogSchema(),
         )
-        return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
+
+        return self._construct_log(project_namespace, feed_name, log_data)
 
     def fetch_logs(
         self,
@@ -232,18 +226,16 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             "limit": limit,
             "offset": offset,
         }
-        resp_data: list[STR_DICT] = self.rest.request(
+        # this is definitely not best practice, but this is the only route with
+        # a list return type and it's okay with this :p
+        logs_data: list[STR_DICT] = self.rest.request(
             url=self.rest.API_GET_LOGS,
             method="GET",
             body_with_schema=DataWithSchema(data, LogGetMultipleBodySchema()),
             slugs_with_schema=DataWithSchema(slugs, LogSlugSchema()),
             response_schema=LogSchema(many=True),
         )  # type: ignore
-
-        return [
-            Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
-            for log_data in resp_data
-        ]
+        return self._construct_logs(project_namespace, feed_name, logs_data)
 
     def edit_log(
         self,
@@ -294,6 +286,18 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
 
     # --- MANAGER CONSTRUCTORS --- #
 
+    def _construct_project(self, project_data: STR_DICT) -> Project:
+        namespace = project_data["namespace"]
+        return Project(self, namespace=namespace)
+
+    def _construct_feed(self, project_namespace: str, feed_data: STR_DICT) -> Feed:
+        name = feed_data["name"]
+        return Feed(self, project_namespace=project_namespace, name=name)
+
+    def _construct_log(self, project_namespace: str, feed_name: str, log_data: STR_DICT) -> Log:
+        id = log_data["id"]
+        return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=id)
+
 
 if __name__ == "__main__":
     import os
@@ -307,7 +311,7 @@ if __name__ == "__main__":
     project_name = "test"
     feed_name = "123123"
 
-    c.delete_project(project_namespace)
+    # c.delete_project(project_namespace)
     proj = c.create_project(project_namespace, project_name)
     feed = c.create_feed(project_namespace, feed_name)
     print(c.edit_feed(project_namespace, feed.name, name="new_name", description="new_desc", emoji="💀"))

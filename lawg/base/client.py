@@ -22,7 +22,7 @@ from lawg.schemas import (
     ProjectSlugSchema,
 )
 
-from lawg.typings import UNDEFINED, P, F, L, R
+from lawg.typings import STR_DICT, UNDEFINED, P, F, L, R
 
 if t.TYPE_CHECKING:
     from lawg.base.rest import BaseRest
@@ -279,20 +279,23 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
 
     # --- MANAGER CONSTRUCTORS --- #
 
-    # @abstractmethod
-    # def construct_project(self, project_data: STR_DICT) -> P:
-    #     """
-    #     Construct a project from API response data.
-    #     """
+    @abstractmethod
+    def _construct_project(self, project_data: STR_DICT) -> P:
+        """
+        Construct a project from API response data.
+        """
 
-    # @abstractmethod
-    # def construct_feed(self, feed_data: STR_DICT) -> F:
-    #     """
-    #     Construct a feed from API response data.
-    #     """
+    @abstractmethod
+    def _construct_feed(self, project_namespace: str, feed_data: STR_DICT) -> F:
+        """
+        Construct a feed from API response data.
+        """
 
-    # @abstractmethod
-    # def construct_log(self, log_data: STR_DICT) -> L:
-    #     """
-    #     Construct a log from API response data.
-    #     """
+    @abstractmethod
+    def _construct_log(self, project_namespace: str, feed_name: str, log_data: STR_DICT) -> L:
+        """
+        Construct a log from API response data.
+        """
+
+    def _construct_logs(self, project_namespace: str, feed_name: str, logs_data: list[STR_DICT]) -> list[L]:
+        return [self._construct_log(project_namespace, feed_name, log_data) for log_data in logs_data]
