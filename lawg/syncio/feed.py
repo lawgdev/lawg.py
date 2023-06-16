@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import typing as t
+
 from lawg.base.feed import BaseFeed
 from lawg.typings import UNDEFINED, Undefined
-from lawg.syncio.client import Client
-from lawg.syncio.log import Log
+
+if t.TYPE_CHECKING:
+    from lawg.syncio.client import Client
+    from lawg.syncio.log import Log
 
 
 class Feed(BaseFeed["Client", "Log"]):

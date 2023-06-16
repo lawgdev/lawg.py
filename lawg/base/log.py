@@ -4,13 +4,13 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
-from lawg.typings import UNDEFINED
+from lawg.typings import UNDEFINED, C
 
 if t.TYPE_CHECKING:
-    from lawg.typings import Undefined, C
+    from lawg.typings import Undefined
 
 
-class BaseLog(ABC, t.Generic["C"]):
+class BaseLog(ABC, t.Generic[C]):
     """
     A manager for a log.
     """

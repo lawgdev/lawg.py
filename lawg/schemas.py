@@ -136,7 +136,7 @@ class LogWithIdSlugSchema(Schema):
     log_id = fields.Str(required=True, validate=PikaId("log"))
 
 
-class LogCreateBodySchema:
+class LogCreateBodySchema(Schema):
     title = LogTitleSchema(required=True)
     description = LogDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)

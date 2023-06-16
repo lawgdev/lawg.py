@@ -1,22 +1,44 @@
 from __future__ import annotations
 
-from lawg.base.client import BaseClient
-from lawg.syncio.project import Project
-from lawg.syncio.rest import Rest
+import typing as t
 
+from lawg.base.client import BaseClient
+from lawg.syncio.rest import Rest
+from lawg.typings import STR_DICT, UNDEFINED, DataWithSchema
+from lawg.syncio.project import Project
 from lawg.syncio.feed import Feed
 from lawg.syncio.log import Log
-from lawg.typings import UNDEFINED, Undefined
+
+from lawg.schemas import (
+    FeedCreateBodySchema,
+    FeedPatchBodySchema,
+    FeedSchema,
+    FeedSlugSchema,
+    FeedWithNameSlugSchema,
+    LogCreateBodySchema,
+    LogGetMultipleBodySchema,
+    LogPatchBodySchema,
+    LogSchema,
+    LogSlugSchema,
+    LogWithIdSlugSchema,
+    ProjectBodySchema,
+    ProjectSchema,
+    ProjectSlugSchema,
+)
 
 
-class Client(BaseClient["Project", "Feed", "Log"]):
+if t.TYPE_CHECKING:
+    from lawg.typings import Undefined
+
+
+class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
     """
     The syncio client for lawg.
     """
 
     def __init__(self, token: str) -> None:
         super().__init__(token)
-        self.rest: Rest = Rest(self)
+        self.rest = Rest(self)
 
     # --- MANAGERS --- #
 
@@ -29,42 +51,51 @@ class Client(BaseClient["Project", "Feed", "Log"]):
     # --- PROJECTS --- #
 
     def create_project(self, project_namespace: str, project_name: str):
-        req_data = self._validate_project_create_request(
-            project_namespace=project_namespace, project_name=project_name
-        )
-
-        resp = self.rest.request(
-            path="/projects",
+        body = {
+            "namespace": project_namespace,
+            "name": project_name,
+        }
+        project_data = self.rest.request(
+            url=self.rest.API_CREATE_PROJECT,
             method="POST",
-            body=req_data,
+            body_with_schema=DataWithSchema(body, ProjectBodySchema()),
+            response_schema=ProjectSchema(),
         )
-        project_data = self._validate_project_response(resp)
         return Project(self, namespace=project_data["namespace"])
 
     def fetch_project(self, project_namespace: str):
-        self._validate_project_fetch_request(project_namespace=project_namespace)
-        resp_data = self.rest.request(
-            path=f"/projects/{project_namespace}",
+        slugs = {
+            "namespace": project_namespace,
+        }
+        project_data = self.rest.request(
+            url=self.rest.API_GET_PROJECT,
             method="GET",
+            slugs_with_schema=DataWithSchema(slugs, ProjectSlugSchema()),
+            response_schema=ProjectSchema(),
         )
-        project_data = self._validate_project_response(resp_data)
         return Project(self, namespace=project_data["namespace"])
 
     def edit_project(self, project_namespace: str, project_name: str):
-        req_data = self._validate_edit_request(project_namespace=project_namespace, project_name=project_name)
-        resp_data = self.rest.request(
-            path=f"/projects/{project_namespace}",
+        body = {
+            "namespace": project_namespace,
+            "name": project_name,
+        }
+        project_data = self.rest.request(
+            url=self.rest.API_EDIT_PROJECT,
             method="PATCH",
-            body=req_data,
+            body_with_schema=DataWithSchema(body, ProjectBodySchema()),
+            response_schema=ProjectSchema(),
         )
-        project_data = self._validate_project_response(resp_data)
         return Project(self, namespace=project_data["namespace"])
 
     def delete_project(self, project_namespace: str) -> None:
-        self._validate_delete_request(project_namespace=project_namespace)
+        slugs = {
+            "namespace": project_namespace,
+        }
         self.rest.request(
-            path=f"/projects/{project_namespace}",
+            url=self.rest.API_DELETE_PROJECT,
             method="DELETE",
+            slugs_with_schema=DataWithSchema(slugs, ProjectSlugSchema()),
         )
 
     patch_project = edit_project
@@ -79,17 +110,23 @@ class Client(BaseClient["Project", "Feed", "Log"]):
         description: str | None = None,
         emoji: str | None = None,
     ):
-        req_data = self._validate_feed_create_request(
-            project_namespace=project_namespace, feed_name=feed_name, description=description, emoji=emoji
-        )
+        slugs = {
+            "namespace": project_namespace,
+        }
+        data = {
+            "name": feed_name,
+            "description": description,
+            "emoji": emoji,
+        }
 
-        resp_data = self.rest.request(
-            path=f"/projects/{project_namespace}/feeds",
+        feed_data = self.rest.request(
+            url=self.rest.API_CREATE_FEED,
             method="POST",
-            body=req_data,
+            body_with_schema=DataWithSchema(data, FeedCreateBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, FeedSlugSchema()),
+            response_schema=FeedSchema(),
         )
 
-        feed_data = self._validate_feed_response(resp_data)
         return Feed(self, project_namespace=project_namespace, name=feed_data["name"])
 
     def edit_feed(
@@ -100,29 +137,36 @@ class Client(BaseClient["Project", "Feed", "Log"]):
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
-        req_data = self._validate_feed_edit_request(
-            project_namespace=project_namespace,
-            feed_name=feed_name,
-            name=name,
-            description=description,
-            emoji=emoji,
-        )
-        req_data = self.rest.prepare_body(req_data)
+        slugs = {
+            "namespace": project_namespace,
+            "feed_name": feed_name,
+        }
 
-        resp_data = self.rest.request(
-            path=f"/projects/{project_namespace}/{feed_name}",
+        data = {
+            "name": name,
+            "description": description,
+            "emoji": emoji,
+        }
+
+        feed_data = self.rest.request(
+            url=self.rest.API_EDIT_FEED,
             method="PATCH",
-            body=req_data,
+            body_with_schema=DataWithSchema(data, FeedPatchBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, FeedWithNameSlugSchema()),
+            response_schema=FeedSchema(),
         )
 
-        feed_data = self._validate_feed_response(resp_data)
         return Feed(self, project_namespace=project_namespace, name=feed_data["name"])
 
     def delete_feed(self, project_namespace: str, feed_name: str) -> None:
-        self._validate_feed_delete_request(project_namespace=project_namespace, feed_name=feed_name)
+        slugs = {
+            "namespace": project_namespace,
+            "feed_name": feed_name,
+        }
         self.rest.request(
-            path=f"/projects/{project_namespace}/{feed_name}",
+            url=self.rest.API_DELETE_FEED,
             method="DELETE",
+            slugs_with_schema=DataWithSchema(slugs, FeedWithNameSlugSchema()),
         )
 
     patch_feed = edit_feed
@@ -138,37 +182,39 @@ class Client(BaseClient["Project", "Feed", "Log"]):
         emoji: str | None = None,
         color: str | None = None,
     ):
-        req_data = self._validate_log_create_request(
-            project_namespace=project_namespace,
-            feed_name=feed_name,
-            title=title,
-            description=description,
-            emoji=emoji,
-            color=color,
-        )
+        slugs = {
+            "namespace": project_namespace,
+            "feed_name": feed_name,
+        }
+        data = {
+            "title": title,
+            "description": description,
+            "emoji": emoji,
+            "color": color,
+        }
 
-        resp_data = self.rest.request(
-            path=f"/projects/{project_namespace}/{feed_name}/logs",
+        log_data = self.rest.request(
+            url=self.rest.API_CREATE_LOG,
             method="POST",
-            body=req_data,
+            body_with_schema=DataWithSchema(data, LogCreateBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, LogSlugSchema()),
+            response_schema=LogSchema(),
         )
 
-        log_data = self._validate_log_response(resp_data)
         return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
 
     def fetch_log(self, project_namespace: str, feed_name: str, log_id: str):
-        self._validate_log_fetch_request(
-            project_namespace=project_namespace,
-            feed_name=feed_name,
-            log_id=log_id,
-        )
-
-        resp_data = self.rest.request(
-            path=f"/projects/{project_namespace}/{feed_name}/logs/{log_id}",
+        slugs = {
+            "namespace": project_namespace,
+            "feed_name": feed_name,
+            "log_id": log_id,
+        }
+        log_data = self.rest.request(
+            url=self.rest.API_GET_LOG,
             method="GET",
+            slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
+            response_schema=LogSchema(),
         )
-
-        log_data = self._validate_log_response(resp_data)
         return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
 
     def fetch_logs(
@@ -178,20 +224,26 @@ class Client(BaseClient["Project", "Feed", "Log"]):
         limit: int | None = None,
         offset: int | None = None,
     ):
-        req_data = self._validate_log_fetches_request(
-            project_namespace=project_namespace,
-            feed_name=feed_name,
-            limit=limit,
-            offset=offset,
-        )
-
-        resp_data = self.rest.request(
-            path=f"/projects/{project_namespace}/{feed_name}/logs",
+        slugs = {
+            "namespace": project_namespace,
+            "feed_name": feed_name,
+        }
+        data = {
+            "limit": limit,
+            "offset": offset,
+        }
+        resp_data: list[STR_DICT] = self.rest.request(
+            url=self.rest.API_GET_LOGS,
             method="GET",
-            body=req_data,
-        )
+            body_with_schema=DataWithSchema(data, LogGetMultipleBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, LogSlugSchema()),
+            response_schema=LogSchema(many=True),
+        )  # type: ignore
 
-        # TODO: finish
+        return [
+            Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
+            for log_data in resp_data
+        ]
 
     def edit_log(
         self,
@@ -203,40 +255,44 @@ class Client(BaseClient["Project", "Feed", "Log"]):
         emoji: str | Undefined | None = UNDEFINED,
         color: str | Undefined | None = UNDEFINED,
     ):
-        req_data = self._validate_log_edit_request(
-            project_namespace=project_namespace,
-            feed_name=feed_name,
-            log_id=log_id,
-            title=title,
-            description=description,
-            emoji=emoji,
-            color=color,
-        )
-
-        resp_data = self.rest.request(
-            path=f"/projects/{project_namespace}/{feed_name}/logs/{log_id}",
+        slugs = {
+            "namespace": project_namespace,
+            "feed_name": feed_name,
+            "log_id": log_id,
+        }
+        data = {
+            "title": title,
+            "description": description,
+            "emoji": emoji,
+            "color": color,
+        }
+        log_data = self.rest.request(
+            url=self.rest.API_EDIT_LOG,
             method="PATCH",
-            body=req_data,
+            body_with_schema=DataWithSchema(data, LogPatchBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
+            response_schema=LogSchema(),
         )
-
-        log_data = self._validate_log_response(resp_data)
         return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
 
     def delete_log(self, project_namespace: str, feed_name: str, log_id: str):
-        self._validate_log_delete_request(
-            project_namespace=project_namespace,
-            feed_name=feed_name,
-            log_id=log_id,
-        )
+        slugs = {
+            "namespace": project_namespace,
+            "feed_name": feed_name,
+            "log_id": log_id,
+        }
 
         self.rest.request(
-            path=f"/projects/{project_namespace}/{feed_name}/logs/{log_id}",
+            url=self.rest.API_DELETE_LOG,
             method="DELETE",
+            slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
         )
 
     get_log = fetch_log
     get_logs = fetch_logs
     patch_log = edit_log
+
+    # --- MANAGER CONSTRUCTORS --- #
 
 
 if __name__ == "__main__":
@@ -251,8 +307,7 @@ if __name__ == "__main__":
     project_name = "test"
     feed_name = "123123"
 
-    # proj = c.create_project(project_namespace, project_name)
-    # feed = c.create_feed(project_namespace, feed_name)
-    # print(c.edit_feed(project_namespace, feed.name, name="new_name", description="new_desc", emoji="💀"))
-
-    # c.delete_project(project_namespace)
+    c.delete_project(project_namespace)
+    proj = c.create_project(project_namespace, project_name)
+    feed = c.create_feed(project_namespace, feed_name)
+    print(c.edit_feed(project_namespace, feed.name, name="new_name", description="new_desc", emoji="💀"))

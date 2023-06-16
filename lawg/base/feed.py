@@ -4,10 +4,10 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
-from lawg.typings import UNDEFINED
+from lawg.typings import UNDEFINED, C, L
 
 if t.TYPE_CHECKING:
-    from lawg.typings import Undefined, C, L
+    from lawg.typings import Undefined
 
 
 class BaseFeed(ABC, t.Generic[C, L]):

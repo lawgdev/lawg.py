@@ -16,19 +16,49 @@ from lawg.exceptions import (
     LawgInternalServerError,
     LawgForbidden,
 )
-from lawg.schemas import APIErrorSchema
-from lawg.typings import H, UNDEFINED
+from lawg.schemas import APIErrorSchema, APISuccessSchema
+from lawg.typings import H, UNDEFINED, DataWithSchema
 
 if t.TYPE_CHECKING:
     from lawg.base.client import BaseClient
     from lawg.typings import STR_DICT
+    from marshmallow import Schema
 
 
 class BaseRest(ABC, t.Generic[H]):
     USER_AGENT = "lawg.py; (+https://github.com/lawg/lawg.py)"
     HOSTNAME = "https://lawg.dev"
+
     API = os.getenv("LAWG_DEV_API", "https://api.lawg.dev")
     API_V1 = f"{API}/v1"
+    API_V1_PROJECTS = f"{API_V1}/projects"
+
+    # https://github.com/lawgdev/api/blob/main/src/routes/projects.ts#LL19C18-L19C18
+
+    # --- PROJECTS --- #
+    API_CREATE_PROJECT = API_V1_PROJECTS
+    API_GET_PROJECT = f"{API_V1_PROJECTS}/{{namespace}}"
+    API_EDIT_PROJECT = f"{API_V1_PROJECTS}/{{namespace}}"
+    API_DELETE_PROJECT = f"{API_V1_PROJECTS}/{{namespace}}"
+
+    # --- INVITATIONS --- #
+    API_INVITE_MEMBER = f"{API_V1_PROJECTS}/{{namespace}}/invites/{{username}}"
+    API_REVOKE_INVITE = f"{API_V1_PROJECTS}/{{namespace}}/invites/{{username}}"
+
+    # --- MEMBERS --- #
+    API_MEMBERS = f"{API_V1_PROJECTS}/{{namespace}}/members/{{username}}"
+
+    # --- FEEDS --- #
+    API_CREATE_FEED = f"{API_V1_PROJECTS}/{{namespace}}/feeds"
+    API_EDIT_FEED = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}"
+    API_DELETE_FEED = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}"
+
+    # --- LOGS --- #
+    API_CREATE_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs"
+    API_GET_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs/{{log_id}}"
+    API_GET_LOGS = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs"
+    API_EDIT_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs/{{log_id}}"
+    API_DELETE_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs/{{log_id}}"
 
     def __init__(self, client: BaseClient) -> None:
         self.client: BaseClient = client
@@ -39,7 +69,15 @@ class BaseRest(ABC, t.Generic[H]):
         return {"User-Agent": self.USER_AGENT, "Authorization": self.client.token}
 
     @abstractmethod
-    def request(self, *, path: str, method: str, body: STR_DICT | None = None) -> STR_DICT:
+    def request(
+        self,
+        *,
+        url: str,
+        method: str,
+        body: DataWithSchema | None = None,
+        slugs: DataWithSchema | None = None,
+        response_schema: Schema,
+    ) -> STR_DICT:
         """
         Make a request to the API.
 
@@ -52,41 +90,59 @@ class BaseRest(ABC, t.Generic[H]):
             dict: response body of request.
         """
 
-    def prepare_body(self, body: STR_DICT) -> STR_DICT:
+    def prepare_body(self, body: DataWithSchema | None) -> STR_DICT | None:
         """
         Finalize the body of a request by removing undefined values.
 
         Args:
-            body (dict[str, Any]): body of request.
+            body: body data and body schema of request.
         """
+        if body is None:
+            return None
 
+        original_body: STR_DICT = body.schema.load(body.data)  # type: ignore
         new_body: STR_DICT = {}
 
-        for key, value in body.items():
+        for key, value in original_body.items():
             if value is UNDEFINED:
                 continue
-
             new_body[key] = value
 
         return new_body
 
-    def prepare_request(self, *, path: str, body: STR_DICT | None = None) -> tuple[str, STR_DICT | None]:
+    def prepare_url(self, url: str, slugs_with_schema: DataWithSchema | None) -> str:
         """
-        Prepare a request to the API by calculating the url and finalizing the body.
+        Finalize the url of a request by adding slugs based on the schema.
 
         Args:
-            path (str): path of request.
+            url (str): url of request.
+            slug_schema (Schema | None): schema of slugs.
+        """
+
+        if slugs_with_schema:
+            schema = slugs_with_schema.schema
+            data = slugs_with_schema.data
+
+            slugs: STR_DICT = schema.load(data)  # type: ignore
+            url = url.format(**slugs)
+
+        return url
+
+    def prepare_request(
+        self, url: str, body_with_schema: DataWithSchema | None, slugs_with_schema: DataWithSchema | None
+    ) -> tuple[str, STR_DICT | None]:
+        """
+        Prepare a request to the API by adding slugs to the url and finalizing the body.
+
+        Args:
+            url (str): url of request.
             body (dict[str, Any] | None, optional): body of request. Defaults to None.
 
         Returns:
             tuple[str, dict[str, Any] | None]: url and body of request.
         """
-
-        if body:
-            body = self.prepare_body(body)
-
-        url = f"{self.API_V1}/{path}"
-
+        body = self.prepare_body(body_with_schema)
+        url = self.prepare_url(url, slugs_with_schema)
         return url, body
 
     def validate_response(self, response: httpx.Response) -> None:
@@ -131,13 +187,17 @@ class BaseRest(ABC, t.Generic[H]):
             else:
                 raise LawgHTTPException(message=error_message, status_code=response.status_code) from exc
 
-    def prepare_response(self, response: httpx.Response) -> STR_DICT:
+    def prepare_response(self, response: httpx.Response, response_schema: Schema | None) -> STR_DICT:
         """
         Prepare a response from the API by validating it and returning the body.
         """
         self.validate_response(response)
 
-        if response.status_code == 204:
+        if response.status_code == 204 or not response_schema:
             return {}
 
-        return response.json()
+        resp_data = response.json()
+        api_data: STR_DICT = APISuccessSchema().load(resp_data)  # type: ignore
+        schema_data: STR_DICT = response_schema.load(api_data["data"])  # type: ignore
+
+        return schema_data

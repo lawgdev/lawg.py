@@ -1,9 +1,13 @@
 from __future__ import annotations
 
-from lawg.typings import UNDEFINED, Undefined
+import typing as t
 
+from lawg.typings import UNDEFINED, Undefined
 from lawg.base.log import BaseLog
-from lawg.syncio.client import Client
+
+
+if t.TYPE_CHECKING:
+    from lawg.syncio.client import Client
 
 
 class Log(BaseLog["Client"]):
