@@ -27,6 +27,8 @@ class BaseLog(ABC, t.Generic[C]):
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} id={self.id!r} feed_name={self.feed_name!r} project_namespace={self.project_namespace!r}>"
 
+    # --- LOG --- #
+
     @abstractmethod
     def edit(
         self,

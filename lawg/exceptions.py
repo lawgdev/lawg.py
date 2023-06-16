@@ -49,7 +49,10 @@ class LawgForbidden(LawgHTTPException):
 class LawgAlreadyDeleted(LawgException):
     """Exception raised when a log is already deleted and the user tries again."""
 
-    message = "This log has already been deleted."
+    message = "The {type} has already been deleted."
+
+    def __init__(self, type: str = "log") -> None:
+        super().__init__(self.message.format(type=type))
 
 
 class LawgEmptyBody(LawgException):

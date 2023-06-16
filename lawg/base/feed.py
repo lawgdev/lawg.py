@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing as t
 
 from abc import ABC, abstractmethod
+from lawg.exceptions import LawgAlreadyDeleted
 
 from lawg.typings import UNDEFINED, C, L
 
@@ -20,9 +21,35 @@ class BaseFeed(ABC, t.Generic[C, L]):
         self.client = client
         self.project_namespace = project_namespace
         self.name = name
+        # --- extras --- #
+        self.is_deleted = False
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} name={self.name!r} project_namespace={self.project_namespace!r}>"
+
+    # --- FEED --- #
+
+    @abstractmethod
+    def edit(
+        self,
+        name: str | None | Undefined = UNDEFINED,
+        description: str | None | Undefined = UNDEFINED,
+        emoji: str | None | Undefined = UNDEFINED,
+    ) -> None:
+        """
+        Edit the feed.
+
+        Args:
+            name (str | None | Undefined, optional): name of feed. Defaults to keeping the previous value.
+            description (str | None | Undefined, optional): description of feed. Defaults to keeping the previous value.
+            emoji (str | None | Undefined, optional): emoji of feed. Defaults to keeping the previous value.
+        """
+
+    @abstractmethod
+    def delete(self) -> None:
+        """
+        Delete the feed.
+        """
 
     # --- LOGS --- #
 

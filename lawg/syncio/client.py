@@ -305,13 +305,19 @@ if __name__ == "__main__":
     token = os.getenv("LAWG_DEV_API_TOKEN")
     assert token is not None
 
-    c = Client(token)
+    client = Client(token)
 
     project_namespace = "test"
     project_name = "test"
     feed_name = "123123"
 
-    c.delete_project(project_namespace)
-    proj = c.create_project(project_namespace, project_name)
-    feed = c.create_feed(project_namespace, feed_name)
-    print(c.edit_feed(project_namespace, feed.name, name="new_name", description="new_desc", emoji="💀"))
+    client.delete_project(project_namespace)
+    project = client.create_project(project_namespace, project_name)
+    
+    feed = project.create_feed(feed_name)
+    feed.edit(name="new_name", description="new_desc", emoji="💀")
+
+    log = feed.create_log(title="title", description="desc", emoji="👍", color="red")
+    log.edit(title="new_title", description="new_desc", emoji="👎", color="blue")
+
+    print(log)

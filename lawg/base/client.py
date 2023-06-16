@@ -4,23 +4,6 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
-from lawg.schemas import (
-    APISuccessSchema,
-    FeedSlugSchema,
-    FeedWithNameSlugSchema,
-    LogCreateBodySchema,
-    LogGetMultipleBodySchema,
-    LogPatchBodySchema,
-    LogSchema,
-    LogSlugSchema,
-    LogWithIdSlugSchema,
-    ProjectBodySchema,
-    ProjectSchema,
-    FeedCreateBodySchema,
-    FeedPatchBodySchema,
-    FeedSchema,
-    ProjectSlugSchema,
-)
 
 from lawg.typings import STR_DICT, UNDEFINED, P, F, L, R
 

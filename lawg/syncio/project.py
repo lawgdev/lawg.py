@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing as t
 
 from lawg.base.project import BaseProject
+from lawg.exceptions import LawgAlreadyDeleted
 from lawg.typings import UNDEFINED
 
 if t.TYPE_CHECKING:
@@ -17,6 +18,18 @@ class Project(BaseProject["Client", "Feed", "Log"]):
 
     def feed(self, feed_name: str):
         return self.client.feed(project_namespace=self.namespace, feed_name=feed_name)
+
+    # --- PROJECT --- #
+
+    def edit(self, name: str):
+        self.client.edit_project(project_namespace=self.namespace, project_name=name)
+
+    def delete(self):
+        if self.is_deleted:
+            raise LawgAlreadyDeleted("project")
+
+        self.client.delete_project(project_namespace=self.namespace)
+        self.is_deleted = True
 
     # --- FEEDS --- #
 

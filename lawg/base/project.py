@@ -23,6 +23,9 @@ class BaseProject(ABC, t.Generic[C, F, L]):
         super().__init__()
         self.client = client
         self.namespace = namespace
+        # --- extras --- #
+        self.is_deleted = False
+
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} namespace={self.namespace!r}>"
@@ -36,6 +39,28 @@ class BaseProject(ABC, t.Generic[C, F, L]):
 
         Args:
             feed_name (str): name of feed.
+        """
+
+    # --- PROJECT --- #
+
+    @abstractmethod
+    def edit(
+        self,
+        name: str,
+        namespace: str,
+    ) -> None:
+        """
+        Edit a project.
+
+        Args:
+            name (str): name of project, what is being changed.
+            namespace (str): namespace of project.
+        """
+
+    @abstractmethod
+    def delete(self) -> None:
+        """
+        Delete a project.
         """
 
     # --- FEEDS --- #
