@@ -8,6 +8,7 @@ import marshmallow
 import httpx
 
 from lawg.exceptions import (
+    LawgEmptyBody,
     LawgHTTPException,
     LawgConflict,
     LawgBadRequest,
@@ -107,6 +108,9 @@ class BaseRest(ABC, t.Generic[H]):
             if value is UNDEFINED:
                 continue
             new_body[key] = value
+
+        if not new_body:
+            raise LawgEmptyBody()
 
         return new_body
 

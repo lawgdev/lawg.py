@@ -14,26 +14,43 @@ class Feed(BaseFeed["Client", "Log"]):
     def create_log(
         self, title: str, description: str | None = None, emoji: str | None = None, color: str | None = None
     ):
-        return super().create_log(title, description, emoji, color)
+        return self.client.create_log(
+            project_namespace=self.project_namespace,
+            feed_name=self.name,
+            title=title,
+            description=description,
+            emoji=emoji,
+            color=color,
+        )
 
-    def fetch_log(self, log_id: str):
-        return super().fetch_log(log_id)
+    def fetch_log(self, id: str):
+        return self.client.fetch_log(project_namespace=self.project_namespace, feed_name=self.name, log_id=id)
 
     def fetch_logs(self, limit: int | None = None, offset: int | None = None):
-        return super().fetch_logs(limit, offset)
+        return self.client.fetch_logs(
+            project_namespace=self.project_namespace, feed_name=self.name, limit=limit, offset=offset
+        )
 
     def edit_log(
         self,
-        log_id: str,
+        id: str,
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
         color: str | Undefined | None = UNDEFINED,
     ):
-        return super().edit_log(log_id, title, description, emoji, color)
+        return self.client.edit_log(
+            project_namespace=self.project_namespace,
+            feed_name=self.name,
+            log_id=id,
+            title=title,
+            description=description,
+            emoji=emoji,
+            color=color,
+        )
 
-    def delete_log(self, log_id: str):
-        return super().delete_log(log_id)
+    def delete_log(self, id: str):
+        return self.client.delete_log(project_namespace=self.project_namespace, feed_name=self.name, log_id=id)
 
     get_log = fetch_log
     get_logs = fetch_logs

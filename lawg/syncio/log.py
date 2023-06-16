@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing as t
+from lawg.exceptions import LawgAlreadyDeleted
 
 from lawg.typings import UNDEFINED, Undefined
 from lawg.base.log import BaseLog
@@ -18,7 +19,19 @@ class Log(BaseLog["Client"]):
         emoji: str | Undefined | None = UNDEFINED,
         color: str | Undefined | None = UNDEFINED,
     ) -> None:
-        return super().edit(title, description, emoji, color)
+        self.client.edit_log(
+            project_namespace=self.project_namespace,
+            feed_name=self.feed_name,
+            log_id=self.id,
+            title=title,
+            description=description,
+            emoji=emoji,
+            color=color,
+        )
 
     def delete(self) -> None:
-        return super().delete()
+        if self.is_deleted:
+            raise LawgAlreadyDeleted()
+
+        self.client.delete_log(project_namespace=self.project_namespace, feed_name=self.feed_name, log_id=self.id)
+        self.is_deleted = True

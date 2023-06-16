@@ -47,13 +47,13 @@ class BaseFeed(ABC, t.Generic[C, L]):
     @abstractmethod
     def fetch_log(
         self,
-        log_id: str,
+        id: str,
     ) -> L:
         """
         Fetch a log.
 
         Args:
-            log_id (str): id of log.
+            id (str): id of log.
         """
 
     @abstractmethod
@@ -73,7 +73,7 @@ class BaseFeed(ABC, t.Generic[C, L]):
     @abstractmethod
     def edit_log(
         self,
-        log_id: str,
+        id: str,
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
@@ -83,7 +83,7 @@ class BaseFeed(ABC, t.Generic[C, L]):
         Edit a log.
 
         Args:
-            log_id (str): id of log.
+            id (str): id of log.
             title (str | None, optional): new title of log. Defaults to keeping the existing value.
             description (str | None, optional): new description of log. Defaults to keeping the existing value.
             emoji (str | None, optional): new emoji of log. Defaults to keeping the existing value.
@@ -99,7 +99,7 @@ class BaseFeed(ABC, t.Generic[C, L]):
         Delete a log.
 
         Args:
-            log_id (str): id of log.
+            id (str): id of log.
         """
 
     get_log = fetch_log

@@ -85,7 +85,7 @@ class Project(BaseProject["Client", "Feed", "Log"]):
             color=color,
         )
 
-    def delete_log(self, feed_name: str, log_id: str) -> Log:
+    def delete_log(self, feed_name: str, log_id: str):
         return self.client.delete_log(
             project_namespace=self.namespace,
             feed_name=feed_name,

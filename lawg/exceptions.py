@@ -1,6 +1,11 @@
 class LawgException(Exception):
     """Base exception for all lawg exceptions."""
 
+    message = "An error occurred."
+
+    def __init__(self, message: str | None = None) -> None:
+        super().__init__(message or self.message)
+
 
 class LawgHTTPException(LawgException):
     """Base exception for all lawg HTTP exceptions."""
@@ -39,3 +44,15 @@ class LawgInternalServerError(LawgHTTPException):
 
 class LawgForbidden(LawgHTTPException):
     """Exception raised when a forbidden request is made."""
+
+
+class LawgAlreadyDeleted(LawgException):
+    """Exception raised when a log is already deleted and the user tries again."""
+
+    message = "This log has already been deleted."
+
+
+class LawgEmptyBody(LawgException):
+    """Exception raised when a request body is empty."""
+
+    message = "The request body is empty."
