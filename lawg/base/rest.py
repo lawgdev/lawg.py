@@ -167,7 +167,7 @@ class BaseRest(ABC, t.Generic[H]):
             try:
                 schema.load(data)
             except marshmallow.ValidationError as exc:
-                # error follows httpx error format, meaning it never got a proper json reply from api
+                # error follows fastify error format, meaning it never got a proper json reply from api
                 # in this case, 404 can be handled pretty easily but im not sure about much else.
 
                 if response.status_code == 404:

@@ -19,7 +19,7 @@ class Log(BaseLog["Client"]):
         emoji: str | Undefined | None = UNDEFINED,
         color: str | Undefined | None = UNDEFINED,
     ) -> None:
-        self.client.edit_log(
+        resp_data = self.client._edit_log(
             project_namespace=self.project_namespace,
             feed_name=self.feed_name,
             log_id=self.id,
@@ -28,6 +28,11 @@ class Log(BaseLog["Client"]):
             emoji=emoji,
             color=color,
         )
+
+        # self.title = resp_data["title"]
+        # self.description = resp_data["description"]
+        # self.emoji = resp_data["emoji"]
+        # self.color = resp_data["color"]
 
     def delete(self) -> None:
         if self.is_deleted:

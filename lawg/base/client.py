@@ -37,6 +37,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
 
         Args:
             project_namespace (str): namespace of project.
+        Returns:
+            the project.
         """
 
     @abstractmethod
@@ -47,6 +49,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
         Args:
             project_namespace (str): namespace of project.
             feed_name (str): name of feed.
+        Returns:
+            the feed.
         """
 
     # --- PROJECTS --- #
@@ -63,6 +67,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
         Args:
             name (str): name of project.
             namespace (str): namespace of project.
+        Returns:
+            the created project.
         """
 
     @abstractmethod
@@ -75,6 +81,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
 
         Args:
             namespace (str): namespace of log.
+        Returns:
+            the fetched project.
         """
 
     @abstractmethod
@@ -89,6 +97,24 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
         Args:
             name (str): name of project, what is being changed.
             namespace (str): namespace of project.
+        Returns:
+            the edited project.
+        """
+
+    @abstractmethod
+    def _edit_project(
+        self,
+        project_name: str,
+        project_namespace: str,
+    ) -> STR_DICT:
+        """
+        Edit a project.
+
+        Args:
+            name (str): name of project, what is being changed.
+            namespace (str): namespace of project.
+        Returns:
+            the edited project data.
         """
 
     @abstractmethod
@@ -101,6 +127,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
 
         Args:
             namespace (str): namespace of project.
+        Returns:
+            the deleted project.
         """
 
     patch_project = edit_project
@@ -122,6 +150,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             project_namespace (str): namespace of project.
             feed_name (str): name of the feed.
             description (str | None, optional): description of feed. Defaults to None.
+        Returns:
+            the created feed.
         """
 
     @abstractmethod
@@ -142,6 +172,30 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             name (str | None, optional): new name of feed. Defaults to keeping the existing value.
             description (str | None, optional): new description of feed. Defaults to keeping the existing value.
             emoji (str | None, optional): new emoji of feed. Defaults to keeping the existing value.
+        Returns:
+            the edited feed.
+        """
+
+    @abstractmethod
+    def _edit_feed(
+        self,
+        project_namespace: str,
+        feed_name: str,
+        name: str | None | Undefined = UNDEFINED,
+        description: str | None | Undefined = UNDEFINED,
+        emoji: str | None | Undefined = UNDEFINED,
+    ) -> STR_DICT:
+        """
+        Edit a feed.
+
+        Args:
+            project_namespace (str): namespace of project.
+            feed_name (str): name of feed
+            name (str | None, optional): new name of feed. Defaults to keeping the existing value.
+            description (str | None, optional): new description of feed. Defaults to keeping the existing value.
+            emoji (str | None, optional): new emoji of feed. Defaults to keeping the existing value.
+        Returns:
+            the edited feed data.
         """
 
     @abstractmethod
@@ -156,6 +210,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
         Args:
             project_namespace (str): namespace of project.
             feed_name (str): name of feed.
+        Returns:
+            None
         """
 
     patch_feed = edit_feed
@@ -182,6 +238,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             description (str | None, optional): description of log. Defaults to None.
             emoji (str | None, optional): emoji of log. Defaults to None.
             color (str | None, optional): color of log. Defaults to None.
+        Returns:
+            the created log.
         """
 
     @abstractmethod
@@ -198,6 +256,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             project_namespace (str): namespace of project.
             feed_name (str): name of feed.
             log_id (str): id of log.
+        Returns:
+            the fetched log.
         """
 
     @abstractmethod
@@ -216,6 +276,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             feed_name (str): name of feed.
             limit (int | None, optional): limit of logs. Defaults to None.
             offset (int | None, optional): offset of logs. Defaults to None.
+        Returns:
+            the fetched logs.
         """
 
     @abstractmethod
@@ -240,6 +302,34 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             description (str | None, optional): new description of log. Defaults to keeping the existing value.
             emoji (str | None, optional): new emoji of log. Defaults to keeping the existing value.
             color (str | None, optional): new color of log. Defaults to keeping the existing value.
+        Returns:
+            the edited log.
+        """
+
+    @abstractmethod
+    def _edit_log(
+        self,
+        project_namespace: str,
+        feed_name: str,
+        log_id: str,
+        title: str | None | Undefined = UNDEFINED,
+        description: str | None | Undefined = UNDEFINED,
+        emoji: str | None | Undefined = UNDEFINED,
+        color: str | None | Undefined = UNDEFINED,
+    ) -> STR_DICT:
+        """
+        Edit a log.
+
+        Args:
+            project_namespace (str): namespace of project.
+            feed_name (str): name of feed.
+            log_id (str): id of log.
+            title (str | None, optional): new title of log. Defaults to keeping the existing value.
+            description (str | None, optional): new description of log. Defaults to keeping the existing value.
+            emoji (str | None, optional): new emoji of log. Defaults to keeping the existing value.
+            color (str | None, optional): new color of log. Defaults to keeping the existing value.
+        Returns:
+            the edited log data.
         """
 
     @abstractmethod
@@ -256,6 +346,8 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             project_namespace (str): namespace of project.
             feed_name (str): name of feed.
             log_id (str): id of log.
+        Returns:
+            None
         """
 
     get_log = fetch_log

@@ -75,7 +75,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
         )
         return self._construct_project(project_data)
 
-    def edit_project(self, project_namespace: str, project_name: str):
+    def _edit_project(self, project_namespace: str, project_name: str):
         body = {
             "namespace": project_namespace,
             "name": project_name,
@@ -86,7 +86,11 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             body_with_schema=DataWithSchema(body, ProjectBodySchema()),
             response_schema=ProjectSchema(),
         )
-        return self._construct_project(project_data)
+        return project_data
+
+    def edit_project(self, project_namespace: str, project_name: str):
+        resp_data = self._edit_project(project_namespace=project_namespace, project_name=project_name)
+        return self._construct_project(resp_data)
 
     def delete_project(self, project_namespace: str) -> None:
         slugs = {
@@ -127,7 +131,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
         )
         return self._construct_feed(project_namespace, feed_data)
 
-    def edit_feed(
+    def _edit_feed(
         self,
         project_namespace: str,
         feed_name: str,
@@ -151,7 +155,20 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, FeedWithNameSlugSchema()),
             response_schema=FeedSchema(),
         )
-        return self._construct_feed(project_namespace, feed_data)
+        return feed_data
+
+    def edit_feed(
+        self,
+        project_namespace: str,
+        feed_name: str,
+        name: str | Undefined | None = UNDEFINED,
+        description: str | Undefined | None = UNDEFINED,
+        emoji: str | Undefined | None = UNDEFINED,
+    ):
+        resp_data = self._edit_feed(
+            project_namespace=project_namespace, feed_name=feed_name, name=name, description=description, emoji=emoji
+        )
+        return self._construct_feed(project_namespace, resp_data)
 
     def delete_feed(self, project_namespace: str, feed_name: str) -> None:
         slugs = {
@@ -237,7 +254,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
         )  # type: ignore
         return self._construct_logs(project_namespace, feed_name, logs_data)
 
-    def edit_log(
+    def _edit_log(
         self,
         project_namespace: str,
         feed_name: str,
@@ -265,7 +282,28 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
             response_schema=LogSchema(),
         )
-        return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=log_data["id"])
+        return log_data
+
+    def edit_log(
+        self,
+        project_namespace: str,
+        feed_name: str,
+        log_id: str,
+        title: str | Undefined | None = UNDEFINED,
+        description: str | Undefined | None = UNDEFINED,
+        emoji: str | Undefined | None = UNDEFINED,
+        color: str | Undefined | None = UNDEFINED,
+    ):
+        resp_data = self._edit_log(
+            project_namespace=project_namespace,
+            feed_name=feed_name,
+            log_id=log_id,
+            title=title,
+            description=description,
+            emoji=emoji,
+            color=color,
+        )
+        return self._construct_log(project_namespace, feed_name, resp_data)
 
     def delete_log(self, project_namespace: str, feed_name: str, log_id: str):
         slugs = {
@@ -312,7 +350,7 @@ if __name__ == "__main__":
     feed_name = "123123"
 
     project = client.create_project(project_namespace, project_name)
-    
+
     feed = project.create_feed(feed_name)
     feed.edit(name="new_name", description="new_desc", emoji="💀")
 

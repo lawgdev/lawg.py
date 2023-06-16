@@ -22,6 +22,7 @@ class BaseLog(ABC, t.Generic[C]):
         self.client = client
         self.project_namespace = project_namespace
         self.feed_name = feed_name
+        # --- attributes --- #
         self.id = id
         # --- extras --- #
         self.is_deleted = False
