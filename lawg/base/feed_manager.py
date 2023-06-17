@@ -4,46 +4,79 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
-from lawg.typings import UNDEFINED, C, L, LM
+from lawg.typings import UNDEFINED, C, F, LM
 
 if t.TYPE_CHECKING:
     from lawg.typings import Undefined
 
 
-class BaseFeed(ABC, t.Generic[C, L, LM]):
+class BaseFeedManager(ABC, t.Generic[C, F, LM]):
     """
-    A feed.
+    A manager of a feed.
     """
 
-    __slots__ = ("client", "project_namespace", "id", "project_id", "name", "description", "emoji" "is_deleted")
+    __slots__ = ("client", "project_namespace", "name")
 
     def __init__(
         self,
         client: C,
         project_namespace: str,
-        id: str,
-        project_id: str,
-        name: str,
-        description: str | None,
-        emoji: str | None,
+        feed_name: str,
     ) -> None:
         super().__init__()
         self.client = client
         # --- super attributes --- #
         self.project_namespace = project_namespace
         # --- attributes --- #
-        self.id = id
-        self.project_id = project_id
-        self.name = name
-        self.description = description
-        self.emoji = emoji
-        # --- extras --- #
-        self.is_deleted = False
+        self.name = feed_name
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} name={self.name!r} project_namespace={self.project_namespace!r}>"
 
-    # --- FEED --- #
+    # --- MANAGERS --- #
+
+    @abstractmethod
+    def log(self, log_id: str) -> LM:
+        """
+        Get a log manager.
+
+        Args:
+            feed_name (str): name of feed manager.
+            log_id (str): id of log manager.
+        Returns:
+            the log manager.
+        """
+
+    # --- FEED METHODS --- #
+
+    @abstractmethod
+    def create(
+        self,
+        description: str | None = None,
+        emoji: str | None = None,
+    ) -> F:
+        """
+        Create a feed.
+
+        Args:
+            name (str): name of feed.
+            description (str | None, optional): description of feed. Defaults to None.
+            emoji (str | None, optional): emoji of feed. Defaults to None.
+
+        Returns:
+            L: feed
+        """
+
+    # TODO: implement
+
+    # @abstractmethod
+    # def get(self) -> F:
+    #     """
+    #     Get a feed.
+
+    #     Returns:
+    #         feed
+    #     """
 
     @abstractmethod
     def edit(
@@ -51,9 +84,9 @@ class BaseFeed(ABC, t.Generic[C, L, LM]):
         name: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-    ) -> None:
+    ) -> F:
         """
-        Edit the feed.
+        Edit a feed.
 
         Args:
             name (str | None | Undefined, optional): name of feed. Defaults to keeping the previous value.
@@ -64,5 +97,8 @@ class BaseFeed(ABC, t.Generic[C, L, LM]):
     @abstractmethod
     def delete(self) -> None:
         """
-        Delete the feed.
+        Delete a feed.
+
+        Returns:
+            None
         """

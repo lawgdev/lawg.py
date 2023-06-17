@@ -5,15 +5,10 @@ import typing as t
 from abc import ABC, abstractmethod
 
 
-from lawg.typings import STR_DICT, UNDEFINED, P, F, L, R
-
-if t.TYPE_CHECKING:
-    from lawg.base.rest import BaseRest
-    from lawg.typings import Undefined
-    from marshmallow import Schema
+from lawg.typings import PM, P, F, L, R, STR_DICT, UNDEFINED, Undefined
 
 
-class BaseClient(ABC, t.Generic[P, F, L, R]):
+class BaseClient(ABC, t.Generic[PM, P, F, L, R]):
     """
     The base client for lawg.
     """
@@ -31,36 +26,26 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
     # --- MANAGERS --- #
 
     @abstractmethod
-    def project(self, project_namespace: str) -> P:
+    def project(self, project_namespace: str) -> PM:
         """
-        Get a project.
+        Get a project manager.
 
         Args:
             project_namespace (str): namespace of project.
         Returns:
-            the project.
+            the project manager.
         """
 
-    @abstractmethod
-    def feed(self, project_namespace: str, feed_name: str) -> F:
-        """
-        Get a feed.
-
-        Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of feed.
-        Returns:
-            the feed.
-        """
+    # --- API INTERACTIONS METHODS --- #
 
     # --- PROJECTS --- #
 
     @abstractmethod
-    def create_project(
+    def _create_project(
         self,
         project_name: str,
         project_namespace: str,
-    ) -> P:
+    ) -> STR_DICT:
         """
         Create a project.
 
@@ -68,37 +53,21 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             name (str): name of project.
             namespace (str): namespace of project.
         Returns:
-            the created project.
+            the created project data.
         """
 
     @abstractmethod
-    def fetch_project(
+    def _fetch_project(
         self,
         project_namespace: str,
-    ) -> P:
+    ) -> STR_DICT:
         """
         Fetch a project.
 
         Args:
             namespace (str): namespace of log.
         Returns:
-            the fetched project.
-        """
-
-    @abstractmethod
-    def edit_project(
-        self,
-        project_name: str,
-        project_namespace: str,
-    ) -> P:
-        """
-        Edit a project.
-
-        Args:
-            name (str): name of project, what is being changed.
-            namespace (str): namespace of project.
-        Returns:
-            the edited project.
+            the fetched project data.
         """
 
     @abstractmethod
@@ -118,31 +87,28 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
         """
 
     @abstractmethod
-    def delete_project(
+    def _delete_project(
         self,
         project_namespace: str,
-    ) -> P:
+    ) -> STR_DICT:
         """
         Delete a project.
 
         Args:
             namespace (str): namespace of project.
         Returns:
-            the deleted project.
+            the deleted project data.
         """
-
-    patch_project = edit_project
-    get_project = fetch_project
 
     # --- FEEDS --- #
 
     @abstractmethod
-    def create_feed(
+    def _create_feed(
         self,
         project_namespace: str,
         feed_name: str,
         description: str | None = None,
-    ) -> F:
+    ) -> STR_DICT:
         """
         Create a feed.
 
@@ -151,29 +117,7 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             feed_name (str): name of the feed.
             description (str | None, optional): description of feed. Defaults to None.
         Returns:
-            the created feed.
-        """
-
-    @abstractmethod
-    def edit_feed(
-        self,
-        project_namespace: str,
-        feed_name: str,
-        name: str | None | Undefined = UNDEFINED,
-        description: str | None | Undefined = UNDEFINED,
-        emoji: str | None | Undefined = UNDEFINED,
-    ) -> F:
-        """
-        Edit a feed.
-
-        Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of feed
-            name (str | None, optional): new name of feed. Defaults to keeping the existing value.
-            description (str | None, optional): new description of feed. Defaults to keeping the existing value.
-            emoji (str | None, optional): new emoji of feed. Defaults to keeping the existing value.
-        Returns:
-            the edited feed.
+            the created feed data.
         """
 
     @abstractmethod
@@ -199,7 +143,7 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
         """
 
     @abstractmethod
-    def delete_feed(
+    def _delete_feed(
         self,
         project_namespace: str,
         feed_name: str,
@@ -209,17 +153,15 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
 
         Args:
             project_namespace (str): namespace of project.
-            feed_name (str): name of feed.
+            feed_name (str): name of feed .
         Returns:
             None
         """
 
-    patch_feed = edit_feed
-
     # --- LOGS --- #
 
     @abstractmethod
-    def create_log(
+    def _create_log(
         self,
         project_namespace: str,
         feed_name: str,
@@ -227,7 +169,7 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
         description: str | None = None,
         emoji: str | None = None,
         color: str | None = None,
-    ) -> L:
+    ) -> STR_DICT:
         """
         Create a log.
 
@@ -239,16 +181,16 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             emoji (str | None, optional): emoji of log. Defaults to None.
             color (str | None, optional): color of log. Defaults to None.
         Returns:
-            the created log.
+            the created log data.
         """
 
     @abstractmethod
-    def fetch_log(
+    def _fetch_log(
         self,
         project_namespace: str,
         feed_name: str,
         log_id: str,
-    ) -> L:
+    ) -> STR_DICT:
         """
         Fetch a log.
 
@@ -257,17 +199,17 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             feed_name (str): name of feed.
             log_id (str): id of log.
         Returns:
-            the fetched log.
+            the fetched log data.
         """
 
     @abstractmethod
-    def fetch_logs(
+    def _fetch_logs(
         self,
         project_namespace: str,
         feed_name: str,
         limit: int | None = None,
         offset: int | None = None,
-    ) -> list[L]:
+    ) -> list[STR_DICT]:
         """
         Fetch multiple logs.
 
@@ -277,33 +219,7 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
             limit (int | None, optional): limit of logs. Defaults to None.
             offset (int | None, optional): offset of logs. Defaults to None.
         Returns:
-            the fetched logs.
-        """
-
-    @abstractmethod
-    def edit_log(
-        self,
-        project_namespace: str,
-        feed_name: str,
-        log_id: str,
-        title: str | None | Undefined = UNDEFINED,
-        description: str | None | Undefined = UNDEFINED,
-        emoji: str | None | Undefined = UNDEFINED,
-        color: str | None | Undefined = UNDEFINED,
-    ) -> L:
-        """
-        Edit a log.
-
-        Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of feed.
-            log_id (str): id of log.
-            title (str | None, optional): new title of log. Defaults to keeping the existing value.
-            description (str | None, optional): new description of log. Defaults to keeping the existing value.
-            emoji (str | None, optional): new emoji of log. Defaults to keeping the existing value.
-            color (str | None, optional): new color of log. Defaults to keeping the existing value.
-        Returns:
-            the edited log.
+            the fetched logs' data.
         """
 
     @abstractmethod
@@ -333,7 +249,7 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
         """
 
     @abstractmethod
-    def delete_log(
+    def _delete_log(
         self,
         project_namespace: str,
         feed_name: str,
@@ -349,10 +265,6 @@ class BaseClient(ABC, t.Generic[P, F, L, R]):
         Returns:
             None
         """
-
-    get_log = fetch_log
-    get_logs = fetch_logs
-    patch_log = edit_log
 
     # --- MANAGER CONSTRUCTORS --- #
 

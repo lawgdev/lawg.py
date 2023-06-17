@@ -5,20 +5,28 @@ import typing as t
 import httpx
 
 if t.TYPE_CHECKING:
-    import marshmallow
+    from marshmallow import Schema
 
 STR_DICT: t.TypeAlias = "dict[str, t.Any]"
 
 Undefined = t.NewType("Undefined", object)
 UNDEFINED = Undefined(object)
 
-C = t.TypeVar("C")  # C for client
-P = t.TypeVar("P")  # P for project
-F = t.TypeVar("F")  # F for feed
-L = t.TypeVar("L")  # L for log
-R = t.TypeVar("R")  # R for rest
 
+P = t.TypeVar("P")  # P for project
+PM = t.TypeVar("PM")  # PM for project manager
+
+F = t.TypeVar("F")  # F for feed
+FM = t.TypeVar("FM")  # FM for feed manager
+
+L = t.TypeVar("L")  # L for log
+LM = t.TypeVar("LM")  # LM for log manager
+
+C = t.TypeVar("C")  # C for client
+R = t.TypeVar("R")  # R for rest
+M = t.TypeVar("M")  # M for member
 H = t.TypeVar("H", httpx.Client, httpx.AsyncClient)  # H for httpx client
+
 
 ErrorCode: t.TypeAlias = (
     str
@@ -35,4 +43,4 @@ ErrorCode: t.TypeAlias = (
 
 class DataWithSchema(t.NamedTuple):
     data: STR_DICT
-    schema: marshmallow.Schema
+    schema: Schema

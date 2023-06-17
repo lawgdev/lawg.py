@@ -5,6 +5,10 @@ import typing as t
 from lawg.base.client import BaseClient
 from lawg.syncio.rest import Rest
 from lawg.typings import STR_DICT, UNDEFINED, DataWithSchema
+
+from lawg.syncio.project_manager import ProjectManager
+from lawg.syncio.feed_manager import FeedManager
+from lawg.syncio.log_manager import LogManager
 from lawg.syncio.project import Project
 from lawg.syncio.feed import Feed
 from lawg.syncio.log import Log
@@ -31,7 +35,7 @@ if t.TYPE_CHECKING:
     from lawg.typings import Undefined
 
 
-class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
+class Client(BaseClient["ProjectManager", "Project", "Feed", "Log", "Rest"]):
     """
     The syncio client for lawg.
     """
@@ -43,14 +47,11 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
     # --- MANAGERS --- #
 
     def project(self, project_namespace: str):
-        return super().project(project_namespace)
-
-    def feed(self, project_namespace: str, feed_name: str):
-        return super().feed(project_namespace, feed_name)
+        return ProjectManager(self, project_namespace)
 
     # --- PROJECTS --- #
 
-    def create_project(self, project_namespace: str, project_name: str):
+    def _create_project(self, project_namespace: str, project_name: str):
         body = {
             "namespace": project_namespace,
             "name": project_name,
@@ -61,9 +62,9 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             body_with_schema=DataWithSchema(body, ProjectBodySchema()),
             response_schema=ProjectSchema(),
         )
-        return self._construct_project(project_data)
+        return project_data
 
-    def fetch_project(self, project_namespace: str):
+    def _fetch_project(self, project_namespace: str):
         slugs = {
             "namespace": project_namespace,
         }
@@ -73,7 +74,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, ProjectSlugSchema()),
             response_schema=ProjectSchema(),
         )
-        return self._construct_project(project_data)
+        return project_data
 
     def _edit_project(self, project_namespace: str, project_name: str):
         body = {
@@ -88,11 +89,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
         )
         return project_data
 
-    def edit_project(self, project_namespace: str, project_name: str):
-        resp_data = self._edit_project(project_namespace=project_namespace, project_name=project_name)
-        return self._construct_project(resp_data)
-
-    def delete_project(self, project_namespace: str) -> None:
+    def _delete_project(self, project_namespace: str) -> None:
         slugs = {
             "namespace": project_namespace,
         }
@@ -102,12 +99,9 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, ProjectSlugSchema()),
         )
 
-    patch_project = edit_project
-    get_project = fetch_project
-
     # --- FEEDS --- #
 
-    def create_feed(
+    def _create_feed(
         self,
         project_namespace: str,
         feed_name: str,
@@ -129,7 +123,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, FeedSlugSchema()),
             response_schema=FeedSchema(),
         )
-        return self._construct_feed(project_namespace, feed_data)
+        return feed_data
 
     def _edit_feed(
         self,
@@ -157,20 +151,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
         )
         return feed_data
 
-    def edit_feed(
-        self,
-        project_namespace: str,
-        feed_name: str,
-        name: str | Undefined | None = UNDEFINED,
-        description: str | Undefined | None = UNDEFINED,
-        emoji: str | Undefined | None = UNDEFINED,
-    ):
-        resp_data = self._edit_feed(
-            project_namespace=project_namespace, feed_name=feed_name, name=name, description=description, emoji=emoji
-        )
-        return self._construct_feed(project_namespace, resp_data)
-
-    def delete_feed(self, project_namespace: str, feed_name: str) -> None:
+    def _delete_feed(self, project_namespace: str, feed_name: str) -> None:
         slugs = {
             "namespace": project_namespace,
             "feed_name": feed_name,
@@ -181,11 +162,9 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, FeedWithNameSlugSchema()),
         )
 
-    patch_feed = edit_feed
-
     # --- LOGS --- #
 
-    def create_log(
+    def _create_log(
         self,
         project_namespace: str,
         feed_name: str,
@@ -211,9 +190,9 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, LogSlugSchema()),
             response_schema=LogSchema(),
         )
-        return self._construct_log(project_namespace, feed_name, log_data)
+        return log_data
 
-    def fetch_log(self, project_namespace: str, feed_name: str, log_id: str):
+    def _fetch_log(self, project_namespace: str, feed_name: str, log_id: str):
         slugs = {
             "namespace": project_namespace,
             "feed_name": feed_name,
@@ -225,10 +204,9 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
             response_schema=LogSchema(),
         )
+        return log_data
 
-        return self._construct_log(project_namespace, feed_name, log_data)
-
-    def fetch_logs(
+    def _fetch_logs(
         self,
         project_namespace: str,
         feed_name: str,
@@ -244,7 +222,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             "offset": offset,
         }
         # this is definitely not best practice, but this is the only route with
-        # a list return type and it's okay with this :p
+        # a list return type and I couldn't get the generic working :p
         logs_data: list[STR_DICT] = self.rest.request(
             url=self.rest.API_GET_LOGS,
             method="GET",
@@ -252,7 +230,7 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, LogSlugSchema()),
             response_schema=LogSchema(many=True),
         )  # type: ignore
-        return self._construct_logs(project_namespace, feed_name, logs_data)
+        return logs_data
 
     def _edit_log(
         self,
@@ -284,61 +262,85 @@ class Client(BaseClient["Project", "Feed", "Log", "Rest"]):
         )
         return log_data
 
-    def edit_log(
-        self,
-        project_namespace: str,
-        feed_name: str,
-        log_id: str,
-        title: str | Undefined | None = UNDEFINED,
-        description: str | Undefined | None = UNDEFINED,
-        emoji: str | Undefined | None = UNDEFINED,
-        color: str | Undefined | None = UNDEFINED,
-    ):
-        resp_data = self._edit_log(
-            project_namespace=project_namespace,
-            feed_name=feed_name,
-            log_id=log_id,
-            title=title,
-            description=description,
-            emoji=emoji,
-            color=color,
-        )
-        return self._construct_log(project_namespace, feed_name, resp_data)
-
-    def delete_log(self, project_namespace: str, feed_name: str, log_id: str):
+    def _delete_log(self, project_namespace: str, feed_name: str, log_id: str):
         slugs = {
             "namespace": project_namespace,
             "feed_name": feed_name,
             "log_id": log_id,
         }
-
         self.rest.request(
             url=self.rest.API_DELETE_LOG,
             method="DELETE",
             slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
         )
 
-    get_log = fetch_log
-    get_logs = fetch_logs
-    patch_log = edit_log
-
     # --- MANAGER CONSTRUCTORS --- #
 
     def _construct_project(self, project_data: STR_DICT) -> Project:
+        id = project_data["id"]
         namespace = project_data["namespace"]
-        return Project(self, namespace=namespace)
+        name = project_data["name"]
+        flags = project_data["flags"]
+        icon = project_data["icon"]
+        # created_at = project_data["created_at"]
+        # TODO: make these objects
+        feeds = project_data["feeds"]
+        members = project_data["members"]
+
+        return Project(
+            client=self,
+            id=id,
+            namespace=namespace,
+            name=name,
+            flags=flags,
+            icon=icon,
+            # created_at=created_at,
+            feeds=feeds,
+            members=members,
+        )
 
     def _construct_feed(self, project_namespace: str, feed_data: STR_DICT) -> Feed:
+        id = feed_data["id"]
+        project_id = feed_data["project_id"]
         name = feed_data["name"]
-        return Feed(self, project_namespace=project_namespace, name=name)
+        description = feed_data["description"]
+        emoji = feed_data["emoji"]
+
+        return Feed(
+            self,
+            project_namespace=project_namespace,
+            id=id,
+            project_id=project_id,
+            name=name,
+            description=description,
+            emoji=emoji,
+        )
 
     def _construct_log(self, project_namespace: str, feed_name: str, log_data: STR_DICT) -> Log:
         id = log_data["id"]
-        return Log(self, project_namespace=project_namespace, feed_name=feed_name, id=id)
+        project_id = log_data["project_id"]
+        feed_id = log_data["feed_id"]
+        title = log_data["title"]
+        description = log_data["description"]
+        emoji = log_data["emoji"]
+        color = log_data["color"]
+        return Log(
+            self,
+            project_namespace=project_namespace,
+            feed_name=feed_name,
+            id=id,
+            project_id=project_id,
+            feed_id=feed_id,
+            title=title,
+            description=description,
+            emoji=emoji,
+            color=color,
+        )
 
 
 if __name__ == "__main__":
     import os
+    from rich import print
 
     token = os.getenv("LAWG_DEV_API_TOKEN")
     assert token is not None
@@ -349,12 +351,17 @@ if __name__ == "__main__":
     project_name = "test"
     feed_name = "123123"
 
-    project = client.create_project(project_namespace, project_name)
-
-    feed = project.create_feed(feed_name)
-    feed.edit(name="new_name", description="new_desc", emoji="💀")
-
-    log = feed.create_log(title="title", description="desc", emoji="👍", color="red")
+    project = client.project("hop").create()
+    feed = project.feed(feed_name).create()
+    log = feed.log().create(title="title", description="desc", emoji="👍", color="red")
     log.edit(title="new_title", description="new_desc", emoji="👎", color="blue")
 
     print(log)
+
+    # feed = project.create_feed(feed_name)
+    # feed.edit(name="new_name", description="new_desc", emoji="💀")
+
+    # log = feed.create_log(title="title", description="desc", emoji="👍", color="red")
+    # log.edit(title="new_title", description="new_desc", emoji="👎", color="blue")
+
+    # print(log)

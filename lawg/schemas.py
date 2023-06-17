@@ -214,7 +214,7 @@ class LogSchema(Schema):
     title = LogTitleSchema(required=True)
     description = LogDescriptionSchema(required=True, allow_none=True)
     emoji = EmojiSchema(required=True, allow_none=True)
-    hex = ColorSchema(required=True, allow_none=True)
+    color = ColorSchema(required=True, allow_none=True)
 
     class Meta:
         unknown = EXCLUDE

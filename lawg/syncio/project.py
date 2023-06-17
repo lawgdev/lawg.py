@@ -4,20 +4,26 @@ import typing as t
 
 from lawg.base.project import BaseProject
 from lawg.exceptions import LawgAlreadyDeleted
+from lawg.syncio.feed_manager import FeedManager
+from lawg.syncio.log_manager import LogManager
 from lawg.typings import UNDEFINED
 
 if t.TYPE_CHECKING:
     from lawg.syncio.client import Client
     from lawg.syncio.feed import Feed
     from lawg.syncio.log import Log
+    from lawg.syncio.member import Member
     from lawg.typings import Undefined
 
 
-class Project(BaseProject["Client", "Feed", "Log"]):
+class Project(BaseProject["Client", "Feed", "Log", "Member"]):
     # --- MANAGERS --- #
 
-    def feed(self, feed_name: str):
-        return self.client.feed(project_namespace=self.namespace, feed_name=feed_name)
+    def feed(self, name: str):
+        return FeedManager(client=self.client, project_namespace=self.namespace, feed_name=name)
+
+    def log(self, feed_name: str, log_id: str):
+        return LogManager(client=self.client, project_namespace=self.namespace, feed_name=feed_name, id=log_id)
 
     # --- PROJECT --- #
 
@@ -29,83 +35,5 @@ class Project(BaseProject["Client", "Feed", "Log"]):
         if self.is_deleted:
             raise LawgAlreadyDeleted("project")
 
-        self.client.delete_project(project_namespace=self.namespace)
+        self.client._delete_project(project_namespace=self.namespace)
         self.is_deleted = True
-
-    # --- FEEDS --- #
-
-    def create_feed(self, feed_name: str, description: str | None = None):
-        return self.client.create_feed(project_namespace=self.namespace, feed_name=feed_name, description=description)
-
-    def edit_feed(
-        self,
-        feed_name: str,
-        name: str | Undefined | None = UNDEFINED,
-        description: str | Undefined | None = UNDEFINED,
-        emoji: str | Undefined | None = UNDEFINED,
-    ) -> Feed:
-        return self.client.edit_feed(
-            project_namespace=self.namespace, feed_name=feed_name, name=name, description=description, emoji=emoji
-        )
-
-    def delete_feed(self, feed_name: str):
-        return self.client.delete_feed(project_namespace=self.namespace, feed_name=feed_name)
-
-    patch_feed = edit_feed
-
-    # --- LOGS --- #
-
-    def create_log(
-        self,
-        feed_name: str,
-        title: str,
-        description: str | None = None,
-        emoji: str | None = None,
-        color: str | None = None,
-    ) -> Log:
-        return self.client.create_log(
-            project_namespace=self.namespace,
-            feed_name=feed_name,
-            title=title,
-            description=description,
-            emoji=emoji,
-            color=color,
-        )
-
-    def fetch_log(self, feed_name: str, log_id: str) -> Log:
-        return self.client.fetch_log(project_namespace=self.namespace, feed_name=feed_name, log_id=log_id)
-
-    def fetch_logs(self, feed_name: str, limit: int | None = None, offset: int | None = None) -> list[Log]:
-        return self.client.fetch_logs(
-            project_namespace=self.namespace, feed_name=feed_name, limit=limit, offset=offset
-        )
-
-    def edit_log(
-        self,
-        feed_name: str,
-        log_id: str,
-        title: str | Undefined | None = UNDEFINED,
-        description: str | Undefined | None = UNDEFINED,
-        emoji: str | Undefined | None = UNDEFINED,
-        color: str | Undefined | None = UNDEFINED,
-    ) -> Log:
-        return self.client.edit_log(
-            project_namespace=self.namespace,
-            feed_name=feed_name,
-            log_id=log_id,
-            title=title,
-            description=description,
-            emoji=emoji,
-            color=color,
-        )
-
-    def delete_log(self, feed_name: str, log_id: str):
-        return self.client.delete_log(
-            project_namespace=self.namespace,
-            feed_name=feed_name,
-            log_id=log_id,
-        )
-
-    get_log = fetch_log
-    get_logs = fetch_logs
-    patch_log = edit_log
