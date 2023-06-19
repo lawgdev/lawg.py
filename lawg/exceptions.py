@@ -59,3 +59,9 @@ class LawgEmptyBody(LawgException):
     """Exception raised when a request body is empty."""
 
     message = "The request body is empty."
+
+
+class LawgIDMissing(LawgException):
+    """Exception raised when a log's ID isn't provided."""
+
+    message = "The log ID is missing."

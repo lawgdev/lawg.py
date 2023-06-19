@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing as t
 
 from lawg.base.log_manager import BaseLogManager
+from lawg.exceptions import LawgIDMissing
 from lawg.syncio.log import Log
 from lawg.typings import UNDEFINED, Undefined
 
@@ -29,7 +30,7 @@ class LogManager(BaseLogManager["Client", "Log"]):
 
     def get(self) -> Log:
         if not self.id:
-            raise ValueError("id is required to get a log")
+            raise LawgIDMissing("id is required to get a log")
 
         log_data = self.client._fetch_log(
             project_namespace=self.project_namespace,
@@ -46,7 +47,7 @@ class LogManager(BaseLogManager["Client", "Log"]):
         color: str | Undefined | None = UNDEFINED,
     ) -> Log:
         if not self.id:
-            raise ValueError("id is required to edit a log")
+            raise LawgIDMissing("id is required to edit a log")
 
         log_data = self.client._edit_log(
             project_namespace=self.project_namespace,
@@ -61,5 +62,6 @@ class LogManager(BaseLogManager["Client", "Log"]):
 
     def delete(self) -> None:
         if not self.id:
-            raise ValueError("id is required to delete a log")
+            raise LawgIDMissing("id is required to delete a log")
+
         self.client._delete_log(project_namespace=self.project_namespace, feed_name=self.feed_name, log_id=self.id)
