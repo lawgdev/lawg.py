@@ -5,10 +5,10 @@ import typing as t
 from abc import ABC, abstractmethod
 
 
-from lawg.typings import PM, P, F, L, R, STR_DICT, UNDEFINED, Undefined
+from lawg.typings import PM, P, F, L, I, R, STR_DICT, UNDEFINED, Undefined
 
 
-class BaseClient(ABC, t.Generic[PM, P, F, L, R]):
+class BaseClient(ABC, t.Generic[PM, P, F, L, I, R]):
     """
     The base client for lawg.
     """
@@ -266,6 +266,86 @@ class BaseClient(ABC, t.Generic[PM, P, F, L, R]):
             None
         """
 
+    # --- INSIGHT --- #
+
+    @abstractmethod
+    def _create_insight(
+        self,
+        project_namespace: str,
+        title: str,
+        description: str | None = None,
+        emoji: str | None = None,
+        value: float | None = None,
+    ) -> STR_DICT:
+        """
+        Create an insight.
+
+        Args:
+            project_namespace (str): namespace of project.
+            title (str): title of insight.
+            description (str | None, optional): description of insight. Defaults to None.
+            emoji (str | None, optional): emoji of insight. Defaults to None.
+            value (float | None, optional): value of insight. Defaults to None.
+        Returns:
+            the created insight data.
+        """
+
+    @abstractmethod
+    def _fetch_insight(
+        self,
+        project_namespace: str,
+        insight_id: str,
+    ) -> STR_DICT:
+        """
+        Fetch an insight.
+
+        Args:
+            project_namespace (str): namespace of project.
+            insight_id (str): id of insight.
+        Returns:
+            the fetched insight data.
+        """
+
+    @abstractmethod
+    def _edit_insight(
+        self,
+        project_namespace: str,
+        insight_id: str,
+        title: str | None | Undefined = UNDEFINED,
+        description: str | None | Undefined = UNDEFINED,
+        emoji: str | None | Undefined = UNDEFINED,
+        value: float | None | Undefined = UNDEFINED,
+    ) -> STR_DICT:
+        """
+        Edit an insight.
+
+        Args:
+            project_namespace (str): namespace of project.
+            insight_id (str): id of insight.
+            title (str | None, optional): new title of insight. Defaults to keeping the existing value.
+            description (str | None, optional): new description of insight. Defaults to keeping the existing value.
+            emoji (str | None, optional): new emoji of insight. Defaults to keeping the existing value.
+            value (float | None, optional): new value of insight. Defaults to keeping the existing value.
+        Returns:
+            the edited insight data.
+        """
+
+    @abstractmethod
+    def _delete_insight(
+        self,
+        project_namespace: str,
+        insight_id: str,
+    ) -> None:
+        """
+        Delete an insight.
+
+        Args:
+            project_namespace (str): namespace of project.
+            insight_id (str): id of insight.
+        Returns:
+            None
+        """
+
     # --- MANAGER CONSTRUCTORS --- #
 
     @abstractmethod
@@ -288,3 +368,9 @@ class BaseClient(ABC, t.Generic[PM, P, F, L, R]):
 
     def _construct_logs(self, project_namespace: str, feed_name: str, logs_data: list[STR_DICT]) -> list[L]:
         return [self._construct_log(project_namespace, feed_name, log_data) for log_data in logs_data]
+
+    @abstractmethod
+    def _construct_insight(self, project_namespace: str, insight_data: STR_DICT) -> I:
+        """
+        Construct an insight from API response data.
+        """

@@ -60,6 +60,12 @@ class BaseRest(ABC, t.Generic[H]):
     API_GET_LOGS = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs"
     API_EDIT_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs/{{log_id}}"
     API_DELETE_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs/{{log_id}}"
+    
+    # --- INSIGHTS --- #
+    API_CREATE_INSIGHT = f"{API_V1_PROJECTS}/{{namespace}}/insights"
+    API_GET_INSIGHT = f"{API_V1_PROJECTS}/{{namespace}}/insights/{{insight_id}}"
+    API_EDIT_INSIGHT = f"{API_V1_PROJECTS}/{{namespace}}/insights/{{insight_id}}"
+    API_DELETE_INSIGHT = f"{API_V1_PROJECTS}/{{namespace}}/insights/{{insight_id}}"
 
     __slots__ = ("client", "http_client")
 
@@ -103,7 +109,7 @@ class BaseRest(ABC, t.Generic[H]):
         if body is None:
             return None
 
-        original_body: STR_DICT = body.schema.load(body.data)  # type: ignore
+        original_body: STR_DICT = body.data
         new_body: STR_DICT = {}
 
         for key, value in original_body.items():
@@ -111,10 +117,13 @@ class BaseRest(ABC, t.Generic[H]):
                 continue
             new_body[key] = value
 
-        if not new_body:
+        loaded_body: STR_DICT = body.schema.load(new_body)  # type: ignore
+
+
+        if not loaded_body:
             raise LawgEmptyBody()
 
-        return new_body
+        return loaded_body
 
     def prepare_url(self, url: str, slugs_with_schema: DataWithSchema | None) -> str:
         """

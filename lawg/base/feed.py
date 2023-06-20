@@ -4,13 +4,13 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
-from lawg.typings import UNDEFINED, C, L, LM
+from lawg.typings import UNDEFINED, C, LM
 
 if t.TYPE_CHECKING:
     from lawg.typings import Undefined
 
 
-class BaseFeed(ABC, t.Generic[C, L, LM]):
+class BaseFeed(ABC, t.Generic[C, LM]):
     """
     A feed.
     """
@@ -42,6 +42,20 @@ class BaseFeed(ABC, t.Generic[C, L, LM]):
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} name={self.name!r} project_namespace={self.project_namespace!r}>"
+
+    # --- MANAGERS --- #
+
+    @abstractmethod
+    def log(self, id: str | None = None) -> LM:
+        """
+        Get a log.
+
+        Args:
+            id (str | None, optional): id of log. Defaults to None.
+
+        Returns:
+            log.
+        """
 
     # --- FEED --- #
 

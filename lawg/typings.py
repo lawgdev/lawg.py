@@ -22,6 +22,7 @@ FM = t.TypeVar("FM")  # FM for feed manager
 L = t.TypeVar("L")  # L for log
 LM = t.TypeVar("LM")  # LM for log manager
 
+I = t.TypeVar("I")  # I for insight
 C = t.TypeVar("C")  # C for client
 R = t.TypeVar("R")  # R for rest
 M = t.TypeVar("M")  # M for member

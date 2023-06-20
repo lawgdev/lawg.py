@@ -9,10 +9,9 @@ from lawg.syncio.log_manager import LogManager
 
 if t.TYPE_CHECKING:
     from lawg.syncio.client import Client
-    from lawg.syncio.log import Log
 
 
-class Feed(BaseFeed["Client", "Log", "LogManager"]):
+class Feed(BaseFeed["Client", "LogManager"]):
     # --- MANAGERS --- #
 
     def log(self, id: str | None = None):

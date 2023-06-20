@@ -153,6 +153,42 @@ class LogPatchBodySchema(Schema):
     color = ColorSchema(required=False, allow_none=True)
 
 
+# --- INSIGHTS --- #
+
+InsightTitleSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=32))
+InsightDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=128))
+
+
+class InsightCreateBodySchema(Schema):
+    title = InsightTitleSchema(required=True)
+    description = InsightDescriptionSchema(required=False, allow_none=True)
+    emoji = EmojiSchema(required=False, allow_none=True)
+    value = fields.Float(required=False, allow_none=True)
+
+
+class InsightCreateSlugSchema(Schema):
+    namespace = ProjectNamespaceSchema(required=True)
+
+
+class InsightSlugSchema(Schema):
+    namespace = ProjectNamespaceSchema(required=True)
+    insight_id = fields.Str(required=True, validate=PikaId("insight"))
+
+
+class InsightValueSchema(Schema):
+    set = fields.Float(required=False, allow_none=True)
+    increment = fields.Float(required=False, allow_none=True)
+
+
+class InsightPatchBodySchema(Schema):
+    title = InsightTitleSchema(required=False, allow_none=True)
+    description = InsightDescriptionSchema(required=False, allow_none=True)
+    emoji = EmojiSchema(required=False, allow_none=True)
+    value = fields.Nested(InsightValueSchema, required=False, allow_none=True)
+
+
+
+
 # ----- API VALIDATION SCHEMAS ----- #
 
 
@@ -215,6 +251,19 @@ class LogSchema(Schema):
     description = LogDescriptionSchema(required=True, allow_none=True)
     emoji = EmojiSchema(required=True, allow_none=True)
     color = ColorSchema(required=True, allow_none=True)
+
+    class Meta:
+        unknown = EXCLUDE
+
+
+class InsightSchema(Schema):
+    id = fields.Str(required=True, validate=PikaId("insight"))
+    title = InsightTitleSchema(required=True)
+    description = InsightDescriptionSchema(required=True, allow_none=True)
+    value = fields.Float(required=True)
+    emoji = EmojiSchema(required=True, allow_none=True)
+    updated_at = fields.DateTime(required=True, allow_none=True)
+    created_at = fields.DateTime(required=True)
 
     class Meta:
         unknown = EXCLUDE

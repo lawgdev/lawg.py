@@ -7,11 +7,10 @@ from lawg.syncio.rest import Rest
 from lawg.typings import STR_DICT, UNDEFINED, DataWithSchema
 
 from lawg.syncio.project_manager import ProjectManager
-from lawg.syncio.feed_manager import FeedManager
-from lawg.syncio.log_manager import LogManager
 from lawg.syncio.project import Project
 from lawg.syncio.feed import Feed
 from lawg.syncio.log import Log
+from lawg.syncio.insight import Insight
 
 from lawg.schemas import (
     FeedCreateBodySchema,
@@ -19,6 +18,11 @@ from lawg.schemas import (
     FeedSchema,
     FeedSlugSchema,
     FeedWithNameSlugSchema,
+    InsightCreateBodySchema,
+    InsightCreateSlugSchema,
+    InsightPatchBodySchema,
+    InsightSchema,
+    InsightSlugSchema,
     LogCreateBodySchema,
     LogGetMultipleBodySchema,
     LogPatchBodySchema,
@@ -35,7 +39,7 @@ if t.TYPE_CHECKING:
     from lawg.typings import Undefined
 
 
-class Client(BaseClient["ProjectManager", "Project", "Feed", "Log", "Rest"]):
+class Client(BaseClient["ProjectManager", "Project", "Feed", "Log", "Insight", "Rest"]):
     """
     The syncio client for lawg.
     """
@@ -274,6 +278,94 @@ class Client(BaseClient["ProjectManager", "Project", "Feed", "Log", "Rest"]):
             slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
         )
 
+    # --- INSIGHTS --- #
+
+    def _create_insight(
+        self,
+        project_namespace: str,
+        title: str,
+        description: str | None = None,
+        value: float | None = None,
+        emoji: str | None = None,
+    ):
+        slugs = {
+            "namespace": project_namespace,
+        }
+        data = {
+            "title": title,
+            "description": description,
+            "emoji": emoji,
+            "value": value,
+        }
+        insight_data = self.rest.request(
+            url=self.rest.API_CREATE_INSIGHT,
+            method="POST",
+            body_with_schema=DataWithSchema(data, InsightCreateBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, InsightCreateSlugSchema()),
+            response_schema=InsightSchema(),
+        )
+        return insight_data
+
+    def _fetch_insight(
+        self,
+        project_namespace: str,
+        insight_id: str,
+    ):
+        slugs = {
+            "namespace": project_namespace,
+            "insight_id": insight_id,
+        }
+        insight_data = self.rest.request(
+            url=self.rest.API_GET_INSIGHT,
+            method="GET",
+            slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
+            response_schema=InsightSchema(),
+        )
+        return insight_data
+
+    def _edit_insight(
+        self,
+        project_namespace: str,
+        insight_id: str,
+        title: str | None | Undefined = UNDEFINED,
+        description: str | None | Undefined = UNDEFINED,
+        emoji: str | None | Undefined = UNDEFINED,
+        value: dict[str, float] | None | Undefined = UNDEFINED,
+    ) -> STR_DICT:
+        slugs = {
+            "namespace": project_namespace,
+            "insight_id": insight_id,
+        }
+        data = {
+            "title": title,
+            "description": description,
+            "emoji": emoji,
+            "value": value,
+        }
+        insight_data = self.rest.request(
+            url=self.rest.API_EDIT_INSIGHT,
+            method="PATCH",
+            body_with_schema=DataWithSchema(data, InsightPatchBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
+            response_schema=InsightSchema(),
+        )
+        return insight_data
+
+    def _delete_insight(
+        self,
+        project_namespace: str,
+        insight_id: str,
+    ):
+        slugs = {
+            "namespace": project_namespace,
+            "insight_id": insight_id,
+        }
+        self.rest.request(
+            url=self.rest.API_DELETE_INSIGHT,
+            method="DELETE",
+            slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
+        )
+
     # --- MANAGER CONSTRUCTORS --- #
 
     def _construct_project(self, project_data: STR_DICT) -> Project:
@@ -337,6 +429,31 @@ class Client(BaseClient["ProjectManager", "Project", "Feed", "Log", "Rest"]):
             color=color,
         )
 
+    def _construct_insight(
+        self,
+        project_namespace: str,
+        insight_data: STR_DICT,
+    ):
+        id = insight_data["id"]
+        title = insight_data["title"]
+        description = insight_data["description"]
+        value = insight_data["value"]
+        emoji = insight_data["emoji"]
+        updated_at = insight_data["updated_at"]
+        created_at = insight_data["created_at"]
+
+        return Insight(
+            self,
+            project_namespace=project_namespace,
+            id=id,
+            title=title,
+            description=description,
+            value=value,
+            emoji=emoji,
+            updated_at=updated_at,
+            created_at=created_at,
+        )
+
 
 if __name__ == "__main__":
     import os
@@ -352,11 +469,21 @@ if __name__ == "__main__":
     feed_name = "123123"
 
     project = client.project("hop").create()
-    feed = project.feed(feed_name).create()
-    log = feed.log().create(title="title", description="desc", emoji="👍", color="red")
-    log.edit(title="new_title", description="new_desc", emoji="👎", color="blue")
+    # feed = project.feed(feed_name).create()
+    # log = feed.log().create(title="title", description="desc", emoji="👍", color="red")
+    # log.edit(title="new_title", description="new_desc", emoji="👎", color="blue")
 
-    print(log)
+    insight = project.insight().create(title="profit", value=123, description="desc", emoji="👍")
+
+    print(insight)
+
+    insight.increment(5)
+    insight.increment(5)
+    insight.increment(5)
+    insight.increment(5)
+    
+    insight_2 = project.insight().get(insight.id)
+    print(insight_2)
 
     # feed = project.create_feed(feed_name)
     # feed.edit(name="new_name", description="new_desc", emoji="💀")

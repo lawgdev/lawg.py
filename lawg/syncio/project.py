@@ -6,6 +6,7 @@ from lawg.base.project import BaseProject
 from lawg.exceptions import LawgAlreadyDeleted
 from lawg.syncio.feed_manager import FeedManager
 from lawg.syncio.log_manager import LogManager
+from lawg.syncio.insight_manager import InsightManager
 from lawg.typings import UNDEFINED
 
 if t.TYPE_CHECKING:
@@ -24,6 +25,9 @@ class Project(BaseProject["Client", "Feed", "Log", "Member"]):
 
     def log(self, feed_name: str, log_id: str):
         return LogManager(client=self.client, project_namespace=self.namespace, feed_name=feed_name, id=log_id)
+
+    def insight(self):
+        return InsightManager(client=self.client, project_namespace=self.namespace)
 
     # --- PROJECT --- #
 
