@@ -481,7 +481,7 @@ if __name__ == "__main__":
     insight.increment(5)
     insight.increment(5)
     insight.increment(5)
-    
+
     insight_2 = project.insight().get(insight.id)
     print(insight_2)
 

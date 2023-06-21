@@ -139,6 +139,14 @@ class LogCreateBodySchema(Schema):
     description = LogDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
     color = ColorSchema(required=False, allow_none=True)
+    tags = fields.Dict(
+        keys=fields.Str(validate=validate.Length(min=1, max=175)),
+        values=Union([fields.Str(), fields.Int(), fields.Float(), fields.Bool()]),
+        required=False,
+        allow_none=True,
+    )
+    timestamp = fields.DateTime(required=False, allow_none=True)
+    notify = fields.Bool(required=False, allow_none=True)
 
 
 class LogGetMultipleBodySchema(Schema):
@@ -185,8 +193,6 @@ class InsightPatchBodySchema(Schema):
     description = InsightDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
     value = fields.Nested(InsightValueSchema, required=False, allow_none=True)
-
-
 
 
 # ----- API VALIDATION SCHEMAS ----- #
@@ -267,3 +273,19 @@ class InsightSchema(Schema):
 
     class Meta:
         unknown = EXCLUDE
+
+
+# --- WEBSOCKET SCHEMAS --- #
+
+
+class WebsocketEventData(Schema):
+    project_namespace = fields.Str(required=True)
+    feed_name = fields.Str(required=True)
+    log = fields.Nested(LogCreateBodySchema(), required=True)
+
+
+class WebsocketEvent(Schema):
+    # event
+    e = fields.Str(required=True, validate=validate.OneOf(("LOG_CREATE", "LOG_DELETE", "LOG_UPDATE")))
+    # data
+    d = fields.Nested(WebsocketEventData(), required=True)
