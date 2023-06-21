@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing as t
 import logging
+from lawg.exceptions import LawgEventUndefined
 
 if t.TYPE_CHECKING:
     from logging import _FormatStyle, _Level
@@ -11,7 +12,15 @@ from lawg.schemas import WebsocketEvent
 from lawg.typings import STR_DICT
 
 
+class Event(t.TypedDict):
+    title: t.NotRequired[str]
+    description: t.NotRequired[str]
+    emoji: t.NotRequired[str]
+    color: t.NotRequired[str]
+
+
 class LogRecord(logging.LogRecord):
+    event: str | None
     title: str | None
     description: str | None
     emoji: str | None
@@ -51,11 +60,9 @@ class Formatter(logging.Formatter):
         super().__init__(fmt, datefmt, style, validate, defaults=defaults)
         self.handler = handler
 
-    @staticmethod
-    def prepare(record: LogRecord) -> LogRecord:
+    def prepare(self, record: LogRecord) -> LogRecord:
         record_dict = record.__dict__
-        attrs = ("title", "description", "emoji", "color")
-        for attr in attrs:
+        for attr in LogRecord.__annotations__:
             record_dict[attr] = record_dict.get(attr, None)
         return record
 
@@ -79,11 +86,39 @@ class Formatter(logging.Formatter):
         """
         Format the lawg log request body.
         """
+        title: str | None = None
+        description: str | None = None
+        emoji: str | None = None
+        color: str | None = None
 
-        title = record.title or f"{record.name} ({record.levelname})"
-        description = record.description or record.getMessage()
-        emoji = record.emoji or self.EMOJI_MAP.get(record.levelno, self.EMOJI_DEFAULT)
-        color = record.color or self.COLOR_MAP.get(record.levelno, self.COLOR_DEFAULT)
+        if record.event:
+            event = self.handler.events.get(record.event)
+            if not event:
+                raise LawgEventUndefined(record.event)
+            title = event.get("title")
+            description = event.get("description")
+            emoji = event.get("emoji")
+            color = event.get("color")
+
+        if record.title:
+            title = record.title
+        elif not title:
+            title = f"{record.name} ({record.levelname})"
+
+        if record.description:
+            description = record.description
+        elif not description:
+            description = record.getMessage()
+
+        if record.emoji:
+            emoji = record.emoji
+        elif not emoji:
+            emoji = self.EMOJI_MAP.get(record.levelno, self.EMOJI_DEFAULT)
+
+        if record.color:
+            color = record.color
+        elif not color:
+            color = self.COLOR_MAP.get(record.levelno, self.COLOR_DEFAULT)
 
         return {
             "title": title,
@@ -94,12 +129,13 @@ class Formatter(logging.Formatter):
 
 
 class Handler(logging.Handler):
-    __slots__ = ("level", "namespace", "feed_name")
+    __slots__ = ("namespace", "feed_name", "events", "formatter")
 
-    def __init__(self, *, namespace: str, feed_name: str, level: _Level = 0) -> None:
+    def __init__(self, *, namespace: str, feed_name: str, events: dict[str, Event], level: _Level = 0) -> None:
         super().__init__(level)
         self.namespace = namespace
         self.feed_name = feed_name
+        self.events = events
         self.formatter: Formatter = Formatter(handler=self)
 
     def emit(self, record: LogRecord) -> None:
@@ -120,11 +156,21 @@ if __name__ == "__main__":
     logger = logging.getLogger("handler-test")
     logger.setLevel(logging.DEBUG)
 
-    handler = Handler(namespace="lawg-py", feed_name="handler-test")
+    handler = Handler(
+        namespace="lawg-py",
+        feed_name="handler-test",
+        events={
+            "screen-resize": {"title": "Screen Resize", "emoji": "🖥️"},
+            "user-login": {"title": "User Login", "emoji": "👤"},
+            "user-login-failed": {"title": "User Login Failed", "emoji": "❌"},
+            "api-call-failed": {"title": "API Call Failed", "emoji": "🔌"},
+            "database-connection": {"title": "Database Connection", "emoji": "💾"},
+        },
+    )
     logger.addHandler(handler)
 
-    logger.debug("Screen resized to 860x420 pixels", extra={"title": "Screen Resize", "emoji": "🖥️"})
-    logger.info("User logged in", extra={"title": "User Login", "emoji": "👤"})
-    logger.warning("User tried to login with incorrect password", extra={"title": "User Login", "emoji": "👤"})
-    logger.error("API call timed out", extra={"title": "API Call Failed", "emoji": "🔌"})
-    logger.critical("Database connection failed", extra={"title": "Database Connection", "emoji": "💾"})
+    logger.debug("Screen resized to 860x420 pixels", extra={"event": "screen-resize"})
+    logger.info("User logged in", extra={"event": "user-login"})
+    logger.warning("User tried to login with incorrect password", extra={"event": "user-login-failed"})
+    logger.error("API call timed out", extra={"event": "api-call-failed"})
+    logger.critical("Database connection failed", extra={"event": "database-connection"})

@@ -289,3 +289,7 @@ class WebsocketEvent(Schema):
     e = fields.Str(required=True, validate=validate.OneOf(("LOG_CREATE", "LOG_DELETE", "LOG_UPDATE")))
     # data
     d = fields.Nested(WebsocketEventData(), required=True)
+
+
+if __name__ == "__main__":
+    print((LogCreateBodySchema._declared_fields.keys()))

@@ -65,3 +65,11 @@ class LawgIDMissing(LawgException):
     """Exception raised when a log's ID isn't provided."""
 
     message = "The log ID is missing."
+
+class LawgEventUndefined(LawgException):
+    """Exception raised when an event isn't defined."""
+
+    message = "The event {event} is not defined."
+
+    def __init__(self, event: str) -> None:
+        super().__init__(self.message.format(event=event))
