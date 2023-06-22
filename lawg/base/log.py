@@ -15,7 +15,7 @@ class BaseLog(ABC, t.Generic[C]):
     A log.
     """
 
-    __slots__ = ("client", "project_namespace", "feed_name", "id", "is_deleted")
+    __slots__ = ("client", "project_namespace", "feed_name", "id", "project_id", "feed_id", "title", "description", "emoji", "is_deleted")
 
     def __init__(
         self,
@@ -28,7 +28,6 @@ class BaseLog(ABC, t.Generic[C]):
         title: str,
         description: str | None,
         emoji: str | None,
-        color: str | None,
     ) -> None:
         super().__init__()
         self.client = client
@@ -42,7 +41,6 @@ class BaseLog(ABC, t.Generic[C]):
         self.title = title
         self.description = description
         self.emoji = emoji
-        self.color = color
         # --- extras --- #
         self.is_deleted = False
 
@@ -57,7 +55,6 @@ class BaseLog(ABC, t.Generic[C]):
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-        color: str | None | Undefined = UNDEFINED,
     ) -> None:
         """
         Edit the log.

@@ -76,7 +76,6 @@ class Client(BaseClient["ProjectManager", "Project", "Feed", "Log", "Insight", "
         title = log_data["title"]
         description = log_data["description"]
         emoji = log_data["emoji"]
-        color = log_data["color"]
         return Log(
             self,
             project_namespace=project_namespace,
@@ -87,7 +86,6 @@ class Client(BaseClient["ProjectManager", "Project", "Feed", "Log", "Insight", "
             title=title,
             description=description,
             emoji=emoji,
-            color=color,
         )
 
     def _construct_insight(
@@ -132,8 +130,8 @@ if __name__ == "__main__":
     project = client.project("hop").create()
     feed = project.feed(feed_name).create()
 
-    log = feed.log().create(title="title", description="desc", emoji="👍", color="red")
-    log.edit(title="new_title", description="new_desc", emoji="👎", color="blue")
+    log = feed.log().create(title="title", description="desc", emoji="👍")
+    log.edit(title="new_title", description="new_desc", emoji="👎")
 
     print(log)
 
@@ -148,11 +146,3 @@ if __name__ == "__main__":
 
     # insight_2 = project.insight().get(insight.id)
     # print(insight_2)
-
-    # feed = project.create_feed(feed_name)
-    # feed.edit(name="new_name", description="new_desc", emoji="💀")
-
-    # log = feed.create_log(title="title", description="desc", emoji="👍", color="red")
-    # log.edit(title="new_title", description="new_desc", emoji="👎", color="blue")
-
-    # print(log)

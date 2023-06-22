@@ -352,7 +352,6 @@ class BaseRest(ABC, t.Generic[H]):
         title: str,
         description: str | None = None,
         emoji: str | None = None,
-        color: str | None = None,
     ) -> STR_DICT:
         """
         Create a log.
@@ -363,7 +362,6 @@ class BaseRest(ABC, t.Generic[H]):
             title (str): title of log.
             description (str | None, optional): description of log. Defaults to None.
             emoji (str | None, optional): emoji of log. Defaults to None.
-            color (str | None, optional): color of log. Defaults to None.
         Returns:
             the created log data.
         """
@@ -415,7 +413,6 @@ class BaseRest(ABC, t.Generic[H]):
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-        color: str | None | Undefined = UNDEFINED,
     ) -> STR_DICT:
         """
         Edit a log.
@@ -427,7 +424,6 @@ class BaseRest(ABC, t.Generic[H]):
             title (str | None, optional): new title of log. Defaults to keeping the existing value.
             description (str | None, optional): new description of log. Defaults to keeping the existing value.
             emoji (str | None, optional): new emoji of log. Defaults to keeping the existing value.
-            color (str | None, optional): new color of log. Defaults to keeping the existing value.
         Returns:
             the edited log data.
         """

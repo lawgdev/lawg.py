@@ -16,7 +16,6 @@ class Event(t.TypedDict):
     title: t.NotRequired[str]
     description: t.NotRequired[str]
     emoji: t.NotRequired[str]
-    color: t.NotRequired[str]
 
 
 class LogRecord(logging.LogRecord):
@@ -24,27 +23,16 @@ class LogRecord(logging.LogRecord):
     title: str | None
     description: str | None
     emoji: str | None
-    color: str | None
 
 
 class Formatter(logging.Formatter):
     EMOJI_DEFAULT = "📝"
-    COLOR_DEFAULT = "#57F287"
-
     EMOJI_MAP: dict[int, str] = {
         logging.DEBUG: "🔍",
         logging.INFO: EMOJI_DEFAULT,
         logging.WARNING: "⚠️",
         logging.ERROR: "❌",
         logging.CRITICAL: "🚨",
-    }
-
-    COLOR_MAP = {
-        logging.DEBUG: "#676765",  # gray
-        logging.INFO: COLOR_DEFAULT,  # green
-        logging.WARNING: "#F3E702",  # yellow
-        logging.ERROR: "#E31937",  # red
-        logging.CRITICAL: "#8B0000",  # dark red
     }
 
     def __init__(
@@ -89,7 +77,6 @@ class Formatter(logging.Formatter):
         title: str | None = None
         description: str | None = None
         emoji: str | None = None
-        color: str | None = None
 
         if record.event:
             event = self.handler.events.get(record.event)
@@ -98,7 +85,6 @@ class Formatter(logging.Formatter):
             title = event.get("title")
             description = event.get("description")
             emoji = event.get("emoji")
-            color = event.get("color")
 
         if record.title:
             title = record.title
@@ -115,16 +101,10 @@ class Formatter(logging.Formatter):
         elif not emoji:
             emoji = self.EMOJI_MAP.get(record.levelno, self.EMOJI_DEFAULT)
 
-        if record.color:
-            color = record.color
-        elif not color:
-            color = self.COLOR_MAP.get(record.levelno, self.COLOR_DEFAULT)
-
         return {
             "title": title,
             "description": description,
             "emoji": emoji,
-            "color": color,
         }
 
 

@@ -31,7 +31,6 @@ class BaseLogManager(ABC, t.Generic[C, L]):
         title: str,
         description: str | None,
         emoji: str | None,
-        color: str | None,
     ) -> L:
         """
         Get the log.
@@ -49,7 +48,6 @@ class BaseLogManager(ABC, t.Generic[C, L]):
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-        color: str | None | Undefined = UNDEFINED,
     ) -> L:
         """
         Edit the log.

@@ -40,10 +40,6 @@ class PikaId(validate.Validator):
 EmojiSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=32))
 
 
-ColorSchema = functools.partial(
-    Union, fields=[fields.Integer(), fields.String(validate=validate.Length(min=1, max=16))]
-)
-
 # --- PROJECTS --- #
 
 # github.com/lawgdev/api/blob/main/src/utils/zodSchemas.ts
@@ -138,7 +134,6 @@ class LogCreateBodySchema(Schema):
     title = LogTitleSchema(required=True)
     description = LogDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
-    color = ColorSchema(required=False, allow_none=True)
     tags = fields.Dict(
         keys=fields.Str(validate=validate.Length(min=1, max=175)),
         values=Union([fields.Str(), fields.Int(), fields.Float(), fields.Bool()]),
@@ -158,7 +153,6 @@ class LogPatchBodySchema(Schema):
     title = LogTitleSchema(required=False)
     description = LogDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
-    color = ColorSchema(required=False, allow_none=True)
 
 
 # --- INSIGHTS --- #
@@ -256,7 +250,6 @@ class LogSchema(Schema):
     title = LogTitleSchema(required=True)
     description = LogDescriptionSchema(required=True, allow_none=True)
     emoji = EmojiSchema(required=True, allow_none=True)
-    color = ColorSchema(required=True, allow_none=True)
 
     class Meta:
         unknown = EXCLUDE

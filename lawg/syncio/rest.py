@@ -180,7 +180,6 @@ class Rest(BaseRest[httpx.Client]):
         title: str,
         description: str | None = None,
         emoji: str | None = None,
-        color: str | None = None,
     ):
         slugs = {
             "namespace": project_namespace,
@@ -190,7 +189,6 @@ class Rest(BaseRest[httpx.Client]):
             "title": title,
             "description": description,
             "emoji": emoji,
-            "color": color,
         }
         log_data = self.request(
             url=self.API_CREATE_LOG,
@@ -249,7 +247,6 @@ class Rest(BaseRest[httpx.Client]):
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
-        color: str | Undefined | None = UNDEFINED,
     ):
         slugs = {
             "namespace": project_namespace,
@@ -260,7 +257,6 @@ class Rest(BaseRest[httpx.Client]):
             "title": title,
             "description": description,
             "emoji": emoji,
-            "color": color,
         }
         log_data = self.request(
             url=self.API_EDIT_LOG,
