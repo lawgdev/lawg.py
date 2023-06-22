@@ -12,7 +12,7 @@ class Insight(BaseInsight["Client"]):
     """An insight."""
 
     def set(self, value: float) -> None:
-        insight_data = self.client._edit_insight(
+        insight_data = self.client.rest._edit_insight(
             project_namespace=self.project_namespace,
             insight_id=self.id,
             value={"set": value},
@@ -21,7 +21,7 @@ class Insight(BaseInsight["Client"]):
         self.value = return_value
 
     def increment(self, value: float) -> None:
-        insight_data = self.client._edit_insight(
+        insight_data = self.client.rest._edit_insight(
             project_namespace=self.project_namespace,
             insight_id=self.id,
             value={"increment": value},
@@ -33,5 +33,5 @@ class Insight(BaseInsight["Client"]):
         if self.is_deleted:
             raise LawgAlreadyDeleted("insight")
 
-        self.client._delete_insight(project_namespace=self.project_namespace, insight_id=self.id)
+        self.client.rest._delete_insight(project_namespace=self.project_namespace, insight_id=self.id)
         self.is_deleted = True

@@ -30,7 +30,7 @@ class FeedManager(BaseFeedManager["Client", "Feed", "LogManager"]):
     # --- FEED METHODS --- #
 
     def create(self, description: str | None = None, emoji: str | None = None) -> Feed:
-        feed_data = self.client._create_feed(
+        feed_data = self.client.rest._create_feed(
             project_namespace=self.project_namespace, feed_name=self.name, description=description, emoji=emoji
         )
         return self.client._construct_feed(self.project_namespace, feed_data)
@@ -45,7 +45,7 @@ class FeedManager(BaseFeedManager["Client", "Feed", "LogManager"]):
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ) -> Feed:
-        feed_data = self.client._edit_feed(
+        feed_data = self.client.rest._edit_feed(
             project_namespace=self.project_namespace,
             feed_name=self.name,
             name=name,
@@ -55,4 +55,4 @@ class FeedManager(BaseFeedManager["Client", "Feed", "LogManager"]):
         return self.client._construct_feed(self.project_namespace, feed_data)
 
     def delete(self):
-        self.client._delete_feed(project_namespace=self.project_namespace, feed_name=self.name)
+        self.client.rest._delete_feed(project_namespace=self.project_namespace, feed_name=self.name)

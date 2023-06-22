@@ -37,16 +37,16 @@ class ProjectManager(
     def create(self, name: str | None = None):
         if name is None:
             name = self.namespace
-        project_data = self.client._create_project(project_namespace=self.namespace, project_name=name)
+        project_data = self.client.rest._create_project(project_namespace=self.namespace, project_name=name)
         return self.client._construct_project(project_data)
 
     def get(self) -> Project:
-        project_data = self.client._fetch_project(project_namespace=self.namespace)
+        project_data = self.client.rest._fetch_project(project_namespace=self.namespace)
         return self.client._construct_project(project_data)
 
     def edit(self, name: str):
-        project_data = self.client._edit_project(project_namespace=self.namespace, project_name=name)
+        project_data = self.client.rest._edit_project(project_namespace=self.namespace, project_name=name)
         return self.client._construct_project(project_data)
 
     def delete(self):
-        self.client._delete_project(project_namespace=self.namespace)
+        self.client.rest._delete_project(project_namespace=self.namespace)

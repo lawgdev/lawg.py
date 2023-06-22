@@ -9,7 +9,7 @@ if t.TYPE_CHECKING:
 
 class InsightManager(BaseInsightManager["Client", "Insight"]):
     def create(self, title: str, description: str | None = None, value: float | None = None, emoji: str | None = None):
-        insight_data = self.client._create_insight(
+        insight_data = self.client.rest._create_insight(
             project_namespace=self.project_namespace,
             title=title,
             description=description,
@@ -19,11 +19,11 @@ class InsightManager(BaseInsightManager["Client", "Insight"]):
         return self.client._construct_insight(self.project_namespace, insight_data)
 
     def get(self, id: str):
-        insight_data = self.client._fetch_insight(project_namespace=self.project_namespace, insight_id=id)
+        insight_data = self.client.rest._fetch_insight(project_namespace=self.project_namespace, insight_id=id)
         return self.client._construct_insight(self.project_namespace, insight_data)
 
     def set(self, id: str, value: float):
-        insight_data = self.client._edit_insight(
+        insight_data = self.client.rest._edit_insight(
             project_namespace=self.project_namespace,
             insight_id=id,
             value={"set": value},
@@ -31,7 +31,7 @@ class InsightManager(BaseInsightManager["Client", "Insight"]):
         return self.client._construct_insight(self.project_namespace, insight_data)
 
     def increment(self, id: str, value: float):
-        insight_data = self.client._edit_insight(
+        insight_data = self.client.rest._edit_insight(
             project_namespace=self.project_namespace,
             insight_id=id,
             value={"increment": value},

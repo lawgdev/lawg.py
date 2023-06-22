@@ -18,7 +18,7 @@ class LogManager(BaseLogManager["Client", "Log"]):
     """
 
     def create(self, title: str, description: str | None, emoji: str | None, color: str | None) -> Log:
-        log_data = self.client._create_log(
+        log_data = self.client.rest._create_log(
             project_namespace=self.project_namespace,
             feed_name=self.feed_name,
             title=title,
@@ -32,7 +32,7 @@ class LogManager(BaseLogManager["Client", "Log"]):
         if not self.id:
             raise LawgIDMissing("id is required to get a log")
 
-        log_data = self.client._fetch_log(
+        log_data = self.client.rest._fetch_log(
             project_namespace=self.project_namespace,
             feed_name=self.feed_name,
             log_id=self.id,
@@ -49,7 +49,7 @@ class LogManager(BaseLogManager["Client", "Log"]):
         if not self.id:
             raise LawgIDMissing("id is required to edit a log")
 
-        log_data = self.client._edit_log(
+        log_data = self.client.rest._edit_log(
             project_namespace=self.project_namespace,
             feed_name=self.feed_name,
             log_id=self.id,
@@ -64,4 +64,4 @@ class LogManager(BaseLogManager["Client", "Log"]):
         if not self.id:
             raise LawgIDMissing("id is required to delete a log")
 
-        self.client._delete_log(project_namespace=self.project_namespace, feed_name=self.feed_name, log_id=self.id)
+        self.client.rest._delete_log(project_namespace=self.project_namespace, feed_name=self.feed_name, log_id=self.id)
