@@ -317,12 +317,27 @@ class Rest(BaseRest[httpx.Client]):
             "insight_id": insight_id,
         }
         insight_data = self.request(
-            url=self.API_GET_INSIGHT,
+            url=self.API_GET_INSIGHTS,
             method="GET",
             slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
             response_schema=InsightSchema(),
         )
         return insight_data
+
+    def _fetch_insights(
+        self,
+        project_namespace: str,
+    ):
+        slugs = {
+            "namespace": project_namespace,
+        }
+        insights_data: list[STR_DICT] = self.request(
+            url=self.API_GET_INSIGHTS,
+            method="GET",
+            slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
+            response_schema=InsightSchema(many=True),
+        )  # type: ignore
+        return insights_data
 
     def _edit_insight(
         self,

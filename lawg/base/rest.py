@@ -64,6 +64,7 @@ class BaseRest(ABC, t.Generic[H]):
     # --- INSIGHTS --- #
     API_CREATE_INSIGHT = f"{API_V1_PROJECTS}/{{namespace}}/insights"
     API_GET_INSIGHT = f"{API_V1_PROJECTS}/{{namespace}}/insights/{{insight_id}}"
+    API_GET_INSIGHTS = f"{API_V1_PROJECTS}/{{namespace}}/insights"
     API_EDIT_INSIGHT = f"{API_V1_PROJECTS}/{{namespace}}/insights/{{insight_id}}"
     API_DELETE_INSIGHT = f"{API_V1_PROJECTS}/{{namespace}}/insights/{{insight_id}}"
 
@@ -484,6 +485,20 @@ class BaseRest(ABC, t.Generic[H]):
             insight_id (str): id of insight.
         Returns:
             the fetched insight data.
+        """
+
+    @abstractmethod
+    def _fetch_insights(
+        self,
+        project_namespace: str,
+    ) -> list[STR_DICT]:
+        """
+        Fetch multiple insights.
+
+        Args:
+            project_namespace (str): namespace of project.
+        Returns:
+            the fetched insights data.
         """
 
     @abstractmethod

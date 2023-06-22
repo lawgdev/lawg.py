@@ -1,73 +1,146 @@
 from __future__ import annotations
 
-import typing as t
 
 from lawg.base.client import BaseClient
 from lawg.syncio.rest import Rest
-from lawg.typings import STR_DICT
+from lawg.typings import STR_DICT, UNDEFINED, Undefined
 
-from lawg.syncio.project_manager import ProjectManager
-from lawg.syncio.project import Project
-from lawg.syncio.feed import Feed
 from lawg.syncio.log import Log
 from lawg.syncio.insight import Insight
 
 
-class Client(BaseClient["ProjectManager", "Project", "Feed", "Log", "Insight", "Rest"]):
+class Client(BaseClient["Log", "Insight", "Rest"]):
     """
     The syncio client for lawg.
     """
 
-    def __init__(self, token: str) -> None:
-        super().__init__(token)
+    def __init__(
+        self,
+        *,
+        token: str,
+        project: str,
+    ) -> None:
+        super().__init__(token, project)
         self.rest = Rest(self)
 
-    # --- MANAGERS --- #
+    # --- LOGS --- #
 
-    def project(self, project_namespace: str):
-        return ProjectManager(self, project_namespace)
-
-    # --- MANAGER CONSTRUCTORS --- #
-
-    def _construct_project(self, project_data: STR_DICT) -> Project:
-        id = project_data["id"]
-        namespace = project_data["namespace"]
-        name = project_data["name"]
-        flags = project_data["flags"]
-        icon = project_data["icon"]
-        # created_at = project_data["created_at"]
-        # TODO: make these objects
-        feeds = project_data["feeds"]
-        members = project_data["members"]
-
-        return Project(
-            client=self,
-            id=id,
-            namespace=namespace,
-            name=name,
-            flags=flags,
-            icon=icon,
-            # created_at=created_at,
-            feeds=feeds,
-            members=members,
-        )
-
-    def _construct_feed(self, project_namespace: str, feed_data: STR_DICT) -> Feed:
-        id = feed_data["id"]
-        project_id = feed_data["project_id"]
-        name = feed_data["name"]
-        description = feed_data["description"]
-        emoji = feed_data["emoji"]
-
-        return Feed(
-            self,
-            project_namespace=project_namespace,
-            id=id,
-            project_id=project_id,
-            name=name,
+    def log(self, *, feed_name: str, title: str, description: str, emoji: str | None = None) -> Log:
+        log_data = self.rest._create_log(
+            project_namespace=self.project,
+            feed_name=feed_name,
+            title=title,
             description=description,
             emoji=emoji,
         )
+        return self._construct_log(self.project, feed_name, log_data)
+
+    def edit_log(
+        self,
+        *,
+        feed_name: str,
+        id: str,
+        title: str | Undefined | None = UNDEFINED,
+        description: str | Undefined | None = UNDEFINED,
+        emoji: str | Undefined | None = UNDEFINED,
+    ):
+        log_data = self.rest._edit_log(
+            project_namespace=self.project,
+            feed_name=feed_name,
+            log_id=id,
+            title=title,
+            description=description,
+            emoji=emoji,
+        )
+        return self._construct_log(self.project, feed_name, log_data)
+
+    def fetch_log(self, *, feed_name: str, id: str) -> Log:
+        log_data = self.rest._fetch_log(
+            project_namespace=self.project,
+            feed_name=feed_name,
+            log_id=id,
+        )
+        return self._construct_log(self.project, feed_name, log_data)
+
+    def fetch_logs(self, *, feed_name: str):
+        logs_data = self.rest._fetch_logs(
+            project_namespace=self.project,
+            feed_name=feed_name,
+        )
+        return self._construct_logs(self.project, feed_name, logs_data)
+
+    def delete_log(self, *, feed_name: str, id: str):
+        self.rest._delete_log(
+            project_namespace=self.project,
+            feed_name=feed_name,
+            log_id=id,
+        )
+
+    # --- INSIGHTS --- #
+
+    def insight(self, *, title: str, description: str, value: int, emoji: str | None = None) -> Insight:
+        insight_data = self.rest._create_insight(
+            project_namespace=self.project,
+            title=title,
+            description=description,
+            value=value,
+            emoji=emoji,
+        )
+        return self._construct_insight(self.project, insight_data)
+
+    def edit_insight(
+        self,
+        *,
+        id: str,
+        title: str | None | Undefined = UNDEFINED,
+        description: str | None | Undefined = UNDEFINED,
+        emoji: str | None | Undefined = UNDEFINED,
+    ):
+        insight_data = self.rest._edit_insight(
+            project_namespace=self.project,
+            insight_id=id,
+            title=title,
+            description=description,
+            emoji=emoji,
+        )
+        return self._construct_insight(self.project, insight_data)
+
+    def increment_insight(self, *, id: str, value: float):
+        insight_data = self.rest._edit_insight(
+            project_namespace=self.project,
+            insight_id=id,
+            value={"increment": value},
+        )
+        return self._construct_insight(self.project, insight_data)
+
+    def set_insight(self, *, id: str, value: int):
+        insight_data = self.rest._edit_insight(
+            project_namespace=self.project,
+            insight_id=id,
+            value={"set": value},
+        )
+        return self._construct_insight(self.project, insight_data)
+
+    def fetch_insight(self, *, id: str):
+        insight_data = self.rest._fetch_insight(
+            project_namespace=self.project,
+            insight_id=id,
+        )
+        return self._construct_insight(self.project, insight_data)
+
+    def fetch_insights(self):
+        insights_data = self.rest._fetch_insights(
+            project_namespace=self.project,
+        )
+        return self._construct_insights(self.project, insights_data)
+
+    def delete_insight(self, *, id: str):
+        self.rest._delete_insight(
+            project_namespace=self.project,
+            insight_id=id,
+        )
+
+    # --- MANAGER CONSTRUCTORS --- #
 
     def _construct_log(self, project_namespace: str, feed_name: str, log_data: STR_DICT) -> Log:
         id = log_data["id"]
@@ -121,19 +194,22 @@ if __name__ == "__main__":
     token = os.getenv("LAWG_DEV_API_TOKEN")
     assert token is not None
 
-    client = Client(token)
-
-    project_namespace = "test"
-    project_name = "test"
-    feed_name = "123123"
-
-    project = client.project("hop").create()
-    feed = project.feed(feed_name).create()
-
-    log = feed.log().create(title="title", description="desc", emoji="👍")
-    log.edit(title="new_title", description="new_desc", emoji="👎")
-
+    client = Client(token=token, project="lawg-py")
+    log = client.log(
+        feed_name="handler-test",
+        title="title",
+        description="desc",
+    )
+    log.edit(description="new_desc")
     print(log)
+
+    # project = client.project("hop").create()
+    # feed = project.feed(feed_name).create()
+
+    # log = feed.log().create(title="title", description="desc", emoji="👍")
+    # log.edit(title="new_title", description="new_desc", emoji="👎")
+
+    # print(log)
 
     # insight = project.insight().create(title="profit", value=123, description="desc", emoji="👍")
 
