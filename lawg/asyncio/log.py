@@ -1,26 +1,25 @@
 from __future__ import annotations
 
 import typing as t
-from lawg.exceptions import LawgAlreadyDeleted
-
-from lawg.typings import UNDEFINED, Undefined
 from lawg.base.log import BaseLog
+from lawg.exceptions import LawgAlreadyDeleted
+from lawg.typings import UNDEFINED, Undefined
 
 
 if t.TYPE_CHECKING:
-    from lawg.syncio.client import Client
+    from lawg.asyncio.client import AsyncClient
 
 
-class Log(BaseLog["Client"]):
-    """A log."""
+class AsyncLog(BaseLog["AsyncClient"]):
+    """An async log."""
 
-    def edit(
+    async def edit(
         self,
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ) -> None:
-        log_data = self.client.rest._edit_log(
+        log_data = await self.client.rest._edit_log(
             project_namespace=self.project_namespace,
             feed_name=self.feed_name,
             log_id=self.id,
@@ -33,11 +32,9 @@ class Log(BaseLog["Client"]):
         self.description = log_data["description"]
         self.emoji = log_data["emoji"]
 
-    def delete(self) -> None:
+    async def delete(self) -> None:
         if self.is_deleted:
             raise LawgAlreadyDeleted()
 
-        self.client.rest._delete_log(
-            project_namespace=self.project_namespace, feed_name=self.feed_name, log_id=self.id
-        )
+        await self.client.rest._delete_log(project_namespace=self.project_namespace, feed_name=self.feed_name, log_id=self.id)
         self.is_deleted = True

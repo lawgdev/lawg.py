@@ -6,6 +6,15 @@ import httpx
 
 if t.TYPE_CHECKING:
     from marshmallow import Schema
+    from lawg.syncio.client import Client
+    from lawg.asyncio.client import AsyncClient
+    from lawg.syncio.rest import Rest
+    from lawg.asyncio.rest import AsyncRest
+    from lawg.syncio.log import Log
+    from lawg.asyncio.log import AsyncLog
+    from lawg.syncio.insight import Insight
+    from lawg.asyncio.insight import AsyncInsight
+
 
 STR_DICT: t.TypeAlias = "dict[str, t.Any]"
 
@@ -13,20 +22,11 @@ Undefined = t.NewType("Undefined", object)
 UNDEFINED = Undefined(object)
 
 
-P = t.TypeVar("P")  # P for project
-PM = t.TypeVar("PM")  # PM for project manager
-
-F = t.TypeVar("F")  # F for feed
-FM = t.TypeVar("FM")  # FM for feed manager
-
-L = t.TypeVar("L")  # L for log
-LM = t.TypeVar("LM")  # LM for log manager
-
-I = t.TypeVar("I")  # I for insight
-C = t.TypeVar("C")  # C for client
-R = t.TypeVar("R")  # R for rest
-M = t.TypeVar("M")  # M for member
-H = t.TypeVar("H", httpx.Client, httpx.AsyncClient)  # H for httpx client
+C = t.TypeVar("C", "Client", "AsyncClient")
+R = t.TypeVar("R", "Rest", "AsyncRest")
+H = t.TypeVar("H", httpx.Client, httpx.AsyncClient)
+L = t.TypeVar("L", "Log", "AsyncLog")
+I = t.TypeVar("I", "Insight", "AsyncInsight")
 
 
 ErrorCode: t.TypeAlias = (

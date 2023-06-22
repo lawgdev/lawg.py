@@ -4,13 +4,9 @@ import typing as t
 
 import httpx
 from marshmallow import Schema
-
+from lawg.base.client import BaseClient
 from lawg.base.rest import BaseRest
 from lawg.typings import STR_DICT, UNDEFINED, DataWithSchema, Undefined
-
-if t.TYPE_CHECKING:
-    from lawg.syncio.client import Client
-
 
 from lawg.schemas import (
     FeedCreateBodySchema,
@@ -34,38 +30,46 @@ from lawg.schemas import (
     ProjectSlugSchema,
 )
 
+if t.TYPE_CHECKING:
+    from lawg.asyncio.client import AsyncClient
 
-class Rest(BaseRest["Client", httpx.Client]):
-    """The syncio rest manager."""
 
-    def __init__(self, client: Client) -> None:
+class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
+    """Async rest client for lawg."""
+
+    def __init__(self, client: AsyncClient) -> None:
         super().__init__(client)
-        self.http_client = httpx.Client()
+        self.http_client = httpx.AsyncClient()
         self.http_client.headers.update(self.headers)
 
-    def request(
+    async def request(
         self,
         *,
         url: str,
         method: str,
         body_with_schema: DataWithSchema | None = None,
         slugs_with_schema: DataWithSchema | None = None,
-        response_schema: Schema | None = None,
+        response_schema: Schema | None = None
     ) -> STR_DICT:
         url, body_dict = self.prepare_request(url, body_with_schema, slugs_with_schema)
 
-        resp = self.http_client.request(method=method, url=url, json=body_dict)
+        resp = await self.http_client.request(method=method, url=url, json=body_dict)
 
         return self.prepare_response(resp, response_schema=response_schema)
 
+    # --- ASYNCIO --- #
+
+    async def close(self) -> None:
+        await self.http_client.aclose()
+
     # --- PROJECTS --- #
 
-    def _create_project(self, project_namespace: str, project_name: str):
+    async def _create_project(self, project_namespace: str, project_name: str):
         body = {
             "namespace": project_namespace,
             "name": project_name,
         }
-        project_data = self.request(
+        project_data = await self.request(
             url=self.API_CREATE_PROJECT,
             method="POST",
             body_with_schema=DataWithSchema(body, ProjectBodySchema()),
@@ -73,11 +77,11 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return project_data
 
-    def _fetch_project(self, project_namespace: str):
+    async def _fetch_project(self, project_namespace: str):
         slugs = {
             "namespace": project_namespace,
         }
-        project_data = self.request(
+        project_data = await self.request(
             url=self.API_GET_PROJECT,
             method="GET",
             slugs_with_schema=DataWithSchema(slugs, ProjectSlugSchema()),
@@ -85,12 +89,12 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return project_data
 
-    def _edit_project(self, project_namespace: str, project_name: str):
+    async def _edit_project(self, project_namespace: str, project_name: str):
         body = {
             "namespace": project_namespace,
             "name": project_name,
         }
-        project_data = self.request(
+        project_data = await self.request(
             url=self.API_EDIT_PROJECT,
             method="PATCH",
             body_with_schema=DataWithSchema(body, ProjectBodySchema()),
@@ -98,11 +102,11 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return project_data
 
-    def _delete_project(self, project_namespace: str) -> None:
+    async def _delete_project(self, project_namespace: str) -> None:
         slugs = {
             "namespace": project_namespace,
         }
-        self.request(
+        await self.request(
             url=self.API_DELETE_PROJECT,
             method="DELETE",
             slugs_with_schema=DataWithSchema(slugs, ProjectSlugSchema()),
@@ -110,7 +114,7 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     # --- FEEDS --- #
 
-    def _create_feed(
+    async def _create_feed(
         self,
         project_namespace: str,
         feed_name: str,
@@ -125,7 +129,7 @@ class Rest(BaseRest["Client", httpx.Client]):
             "description": description,
             "emoji": emoji,
         }
-        feed_data = self.request(
+        feed_data = await self.request(
             url=self.API_CREATE_FEED,
             method="POST",
             body_with_schema=DataWithSchema(data, FeedCreateBodySchema()),
@@ -134,7 +138,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return feed_data
 
-    def _edit_feed(
+    async def _edit_feed(
         self,
         project_namespace: str,
         feed_name: str,
@@ -151,7 +155,7 @@ class Rest(BaseRest["Client", httpx.Client]):
             "description": description,
             "emoji": emoji,
         }
-        feed_data = self.request(
+        feed_data = await self.request(
             url=self.API_EDIT_FEED,
             method="PATCH",
             body_with_schema=DataWithSchema(data, FeedPatchBodySchema()),
@@ -160,12 +164,12 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return feed_data
 
-    def _delete_feed(self, project_namespace: str, feed_name: str) -> None:
+    async def _delete_feed(self, project_namespace: str, feed_name: str) -> None:
         slugs = {
             "namespace": project_namespace,
             "feed_name": feed_name,
         }
-        self.request(
+        await self.request(
             url=self.API_DELETE_FEED,
             method="DELETE",
             slugs_with_schema=DataWithSchema(slugs, FeedWithNameSlugSchema()),
@@ -173,7 +177,7 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     # --- LOGS --- #
 
-    def _create_log(
+    async def _create_log(
         self,
         project_namespace: str,
         feed_name: str,
@@ -190,7 +194,7 @@ class Rest(BaseRest["Client", httpx.Client]):
             "description": description,
             "emoji": emoji,
         }
-        log_data = self.request(
+        log_data = await self.request(
             url=self.API_CREATE_LOG,
             method="POST",
             body_with_schema=DataWithSchema(data, LogCreateBodySchema()),
@@ -199,13 +203,13 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return log_data
 
-    def _fetch_log(self, project_namespace: str, feed_name: str, log_id: str):
+    async def _fetch_log(self, project_namespace: str, feed_name: str, log_id: str):
         slugs = {
             "namespace": project_namespace,
             "feed_name": feed_name,
             "log_id": log_id,
         }
-        log_data = self.request(
+        log_data = await self.request(
             url=self.API_GET_LOG,
             method="GET",
             slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
@@ -213,7 +217,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return log_data
 
-    def _fetch_logs(
+    async def _fetch_logs(
         self,
         project_namespace: str,
         feed_name: str,
@@ -228,9 +232,7 @@ class Rest(BaseRest["Client", httpx.Client]):
             "limit": limit,
             "offset": offset,
         }
-        # this is definitely not best practice, but this is the only route with
-        # a list return type and I couldn't get the generic working :p
-        logs_data: list[STR_DICT] = self.request(
+        logs_data: list[STR_DICT] = await self.request(
             url=self.API_GET_LOGS,
             method="GET",
             body_with_schema=DataWithSchema(data, LogGetMultipleBodySchema()),
@@ -239,7 +241,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )  # type: ignore
         return logs_data
 
-    def _edit_log(
+    async def _edit_log(
         self,
         project_namespace: str,
         feed_name: str,
@@ -258,7 +260,7 @@ class Rest(BaseRest["Client", httpx.Client]):
             "description": description,
             "emoji": emoji,
         }
-        log_data = self.request(
+        log_data = await self.request(
             url=self.API_EDIT_LOG,
             method="PATCH",
             body_with_schema=DataWithSchema(data, LogPatchBodySchema()),
@@ -267,13 +269,13 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return log_data
 
-    def _delete_log(self, project_namespace: str, feed_name: str, log_id: str):
+    async def _delete_log(self, project_namespace: str, feed_name: str, log_id: str):
         slugs = {
             "namespace": project_namespace,
             "feed_name": feed_name,
             "log_id": log_id,
         }
-        self.request(
+        await self.request(
             url=self.API_DELETE_LOG,
             method="DELETE",
             slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
@@ -281,7 +283,7 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     # --- INSIGHTS --- #
 
-    def _create_insight(
+    async def _create_insight(
         self,
         project_namespace: str,
         title: str,
@@ -298,7 +300,7 @@ class Rest(BaseRest["Client", httpx.Client]):
             "emoji": emoji,
             "value": value,
         }
-        insight_data = self.request(
+        insight_data = await self.request(
             url=self.API_CREATE_INSIGHT,
             method="POST",
             body_with_schema=DataWithSchema(data, InsightCreateBodySchema()),
@@ -307,7 +309,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return insight_data
 
-    def _fetch_insight(
+    async def _fetch_insight(
         self,
         project_namespace: str,
         insight_id: str,
@@ -316,7 +318,7 @@ class Rest(BaseRest["Client", httpx.Client]):
             "namespace": project_namespace,
             "insight_id": insight_id,
         }
-        insight_data = self.request(
+        insight_data = await self.request(
             url=self.API_GET_INSIGHTS,
             method="GET",
             slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
@@ -324,14 +326,14 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return insight_data
 
-    def _fetch_insights(
+    async def _fetch_insights(
         self,
         project_namespace: str,
     ):
         slugs = {
             "namespace": project_namespace,
         }
-        insights_data: list[STR_DICT] = self.request(
+        insights_data: list[STR_DICT] = await self.request(
             url=self.API_GET_INSIGHTS,
             method="GET",
             slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
@@ -339,7 +341,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )  # type: ignore
         return insights_data
 
-    def _edit_insight(
+    async def _edit_insight(
         self,
         project_namespace: str,
         insight_id: str,
@@ -358,7 +360,7 @@ class Rest(BaseRest["Client", httpx.Client]):
             "emoji": emoji,
             "value": value,
         }
-        insight_data = self.request(
+        insight_data = await self.request(
             url=self.API_EDIT_INSIGHT,
             method="PATCH",
             body_with_schema=DataWithSchema(data, InsightPatchBodySchema()),
@@ -367,7 +369,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return insight_data
 
-    def _delete_insight(
+    async def _delete_insight(
         self,
         project_namespace: str,
         insight_id: str,
@@ -376,7 +378,7 @@ class Rest(BaseRest["Client", httpx.Client]):
             "namespace": project_namespace,
             "insight_id": insight_id,
         }
-        self.request(
+        await self.request(
             url=self.API_DELETE_INSIGHT,
             method="DELETE",
             slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),

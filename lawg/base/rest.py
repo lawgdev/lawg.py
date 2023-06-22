@@ -18,7 +18,7 @@ from lawg.exceptions import (
     LawgForbidden,
 )
 from lawg.schemas import APIErrorSchema, APISuccessSchema
-from lawg.typings import H, UNDEFINED, DataWithSchema, Undefined
+from lawg.typings import C, H, UNDEFINED, DataWithSchema, Undefined
 
 if t.TYPE_CHECKING:
     from lawg.base.client import BaseClient
@@ -26,8 +26,8 @@ if t.TYPE_CHECKING:
     from marshmallow import Schema
 
 
-class BaseRest(ABC, t.Generic[H]):
-    USER_AGENT = "lawg.py; (+https://github.com/lawg/lawg.py)"
+class BaseRest(ABC, t.Generic[C, H]):
+    USER_AGENT = "lawg.py; (+https://github.com/lawgdev/lawg.py)"
     HOSTNAME = "https://lawg.dev"
 
     API = os.getenv("LAWG_DEV_API", "https://api.lawg.dev")
@@ -70,8 +70,8 @@ class BaseRest(ABC, t.Generic[H]):
 
     __slots__ = ("client", "http_client")
 
-    def __init__(self, client: BaseClient) -> None:
-        self.client: BaseClient = client
+    def __init__(self, client: C) -> None:
+        self.client: C = client
         self.http_client: H
 
     @property
@@ -84,9 +84,9 @@ class BaseRest(ABC, t.Generic[H]):
         *,
         url: str,
         method: str,
-        body: DataWithSchema | None = None,
-        slugs: DataWithSchema | None = None,
-        response_schema: Schema,
+        body_with_schema: DataWithSchema | None = None,
+        slugs_with_schema: DataWithSchema | None = None,
+        response_schema: Schema | None = None,
     ) -> STR_DICT:
         """
         Make a request to the API.

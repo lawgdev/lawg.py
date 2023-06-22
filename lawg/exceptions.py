@@ -66,6 +66,7 @@ class LawgIDMissing(LawgException):
 
     message = "The log ID is missing."
 
+
 class LawgEventUndefined(LawgException):
     """Exception raised when an event isn't defined."""
 
