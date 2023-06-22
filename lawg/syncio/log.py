@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import typing as t
-from lawg.exceptions import LawgAlreadyDeleted
+from lawg.exceptions import LawgAlreadyDeletedError
 
 from lawg.typings import UNDEFINED, Undefined
 from lawg.base.log import BaseLog
 
 
 if t.TYPE_CHECKING:
-    from lawg.syncio.client import Client
+    from lawg.syncio.client import Client  # noqa: F401
 
 
 class Log(BaseLog["Client"]):
@@ -35,7 +35,7 @@ class Log(BaseLog["Client"]):
 
     def delete(self) -> None:
         if self.is_deleted:
-            raise LawgAlreadyDeleted()
+            raise LawgAlreadyDeletedError()
 
         self.client.rest._delete_log(
             project_namespace=self.project_namespace, feed_name=self.feed_name, log_id=self.id

@@ -3,12 +3,12 @@ from __future__ import annotations
 import typing as t
 
 import httpx
-from marshmallow import Schema
 
 from lawg.base.rest import BaseRest
 from lawg.typings import STR_DICT, UNDEFINED, DataWithSchema, Undefined
 
 if t.TYPE_CHECKING:
+    from marshmallow import Schema
     from lawg.syncio.client import Client
 
 

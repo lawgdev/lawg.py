@@ -143,7 +143,7 @@ class Client(BaseClient["Log", "Insight", "Rest"]):
     # --- MANAGER CONSTRUCTORS --- #
 
     def _construct_log(self, project_namespace: str, feed_name: str, log_data: STR_DICT) -> Log:
-        id = log_data["id"]
+        id = log_data["id"]  # noqa: A001
         project_id = log_data["project_id"]
         feed_id = log_data["feed_id"]
         title = log_data["title"]
@@ -166,7 +166,7 @@ class Client(BaseClient["Log", "Insight", "Rest"]):
         project_namespace: str,
         insight_data: STR_DICT,
     ):
-        id = insight_data["id"]
+        id = insight_data["id"]  # noqa: A001
         title = insight_data["title"]
         description = insight_data["description"]
         value = insight_data["value"]
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     from rich import print
 
     token = os.getenv("LAWG_DEV_API_TOKEN")
-    assert token is not None
+    assert token is not None  # noqa: S101
 
     client = Client(token=token, project="lawg-py")
     log = client.log(
@@ -202,23 +202,3 @@ if __name__ == "__main__":
     )
     log.edit(description="new_desc")
     print(log)
-
-    # project = client.project("hop").create()
-    # feed = project.feed(feed_name).create()
-
-    # log = feed.log().create(title="title", description="desc", emoji="👍")
-    # log.edit(title="new_title", description="new_desc", emoji="👎")
-
-    # print(log)
-
-    # insight = project.insight().create(title="profit", value=123, description="desc", emoji="👍")
-
-    # print(insight)
-
-    # insight.increment(5)
-    # insight.increment(5)
-    # insight.increment(5)
-    # insight.increment(5)
-
-    # insight_2 = project.insight().get(insight.id)
-    # print(insight_2)

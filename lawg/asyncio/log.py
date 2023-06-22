@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import typing as t
 from lawg.base.log import BaseLog
-from lawg.exceptions import LawgAlreadyDeleted
+from lawg.exceptions import LawgAlreadyDeletedError
 from lawg.typings import UNDEFINED, Undefined
 
 
 if t.TYPE_CHECKING:
-    from lawg.asyncio.client import AsyncClient
+    from lawg.asyncio.client import AsyncClient  # noqa: F401
 
 
 class AsyncLog(BaseLog["AsyncClient"]):
@@ -34,7 +34,9 @@ class AsyncLog(BaseLog["AsyncClient"]):
 
     async def delete(self) -> None:
         if self.is_deleted:
-            raise LawgAlreadyDeleted()
+            raise LawgAlreadyDeletedError()
 
-        await self.client.rest._delete_log(project_namespace=self.project_namespace, feed_name=self.feed_name, log_id=self.id)
+        await self.client.rest._delete_log(
+            project_namespace=self.project_namespace, feed_name=self.feed_name, log_id=self.id
+        )
         self.is_deleted = True

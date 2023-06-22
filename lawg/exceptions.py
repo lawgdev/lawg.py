@@ -1,4 +1,4 @@
-class LawgException(Exception):
+class LawgError(Exception):
     """Base exception for all lawg exceptions."""
 
     message = "An error occurred."
@@ -7,7 +7,7 @@ class LawgException(Exception):
         super().__init__(message or self.message)
 
 
-class LawgHTTPException(LawgException):
+class LawgHTTPError(LawgError):
     """Base exception for all lawg HTTP exceptions."""
 
     message = "An HTTP error occurred."
@@ -22,31 +22,31 @@ class LawgHTTPException(LawgException):
         self.status_code: int = status_code
 
 
-class LawgConflict(LawgHTTPException):
+class LawgConflictError(LawgHTTPError):
     """Exception raised when a request is made that conflicts with another resource."""
 
 
-class LawgBadRequest(LawgHTTPException):
+class LawgBadRequestError(LawgHTTPError):
     """Exception raised when a bad request is made."""
 
 
-class LawgUnauthorized(LawgHTTPException):
+class LawgUnauthorizedError(LawgHTTPError):
     """Exception raised when an unauthorized request is made."""
 
 
-class LawgNotFound(LawgHTTPException):
+class LawgNotFoundError(LawgHTTPError):
     """Exception raised when a request is made to a non-existent resource."""
 
 
-class LawgInternalServerError(LawgHTTPException):
+class LawgInternalServerError(LawgHTTPError):
     """Exception raised when an internal server error occurs."""
 
 
-class LawgForbidden(LawgHTTPException):
+class LawgForbiddenError(LawgHTTPError):
     """Exception raised when a forbidden request is made."""
 
 
-class LawgAlreadyDeleted(LawgException):
+class LawgAlreadyDeletedError(LawgError):
     """Exception raised when a log is already deleted and the user tries again."""
 
     message = "The {type} has already been deleted."
@@ -55,19 +55,13 @@ class LawgAlreadyDeleted(LawgException):
         super().__init__(self.message.format(type=type))
 
 
-class LawgEmptyBody(LawgException):
+class LawgEmptyBodyError(LawgError):
     """Exception raised when a request body is empty."""
 
     message = "The request body is empty."
 
 
-class LawgIDMissing(LawgException):
-    """Exception raised when a log's ID isn't provided."""
-
-    message = "The log ID is missing."
-
-
-class LawgEventUndefined(LawgException):
+class LawgEventUndefinedError(LawgError):
     """Exception raised when an event isn't defined."""
 
     message = "The event {event} is not defined."

@@ -154,7 +154,7 @@ class AsyncClient(BaseClient["AsyncLog", "AsyncInsight", "AsyncRest"]):
     # --- MANAGER CONSTRUCTORS --- #
 
     def _construct_log(self, project_namespace: str, feed_name: str, log_data: STR_DICT):
-        id = log_data["id"]
+        id = log_data["id"]  # noqa: A001
         project_id = log_data["project_id"]
         feed_id = log_data["feed_id"]
         title = log_data["title"]
@@ -177,7 +177,7 @@ class AsyncClient(BaseClient["AsyncLog", "AsyncInsight", "AsyncRest"]):
         project_namespace: str,
         insight_data: STR_DICT,
     ):
-        id = insight_data["id"]
+        id = insight_data["id"]  # noqa: A001
         title = insight_data["title"]
         description = insight_data["description"]
         value = insight_data["value"]
@@ -201,10 +201,9 @@ class AsyncClient(BaseClient["AsyncLog", "AsyncInsight", "AsyncRest"]):
 if __name__ == "__main__":
     import os, asyncio
     from rich import print
-    from lawg.asyncio.log import AsyncLog
 
     token = os.getenv("LAWG_DEV_API_TOKEN")
-    assert token is not None
+    assert token is not None  # noqa: S101
 
     async def main():
         feed_name = "test-feed"

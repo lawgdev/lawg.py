@@ -2,10 +2,10 @@ from lawg.base.insight import BaseInsight
 
 import typing as t
 
-from lawg.exceptions import LawgAlreadyDeleted
+from lawg.exceptions import LawgAlreadyDeletedError
 
 if t.TYPE_CHECKING:
-    from lawg.syncio.client import Client
+    from lawg.syncio.client import Client  # noqa: F401
 
 
 class Insight(BaseInsight["Client"]):
@@ -31,7 +31,7 @@ class Insight(BaseInsight["Client"]):
 
     def delete(self) -> None:
         if self.is_deleted:
-            raise LawgAlreadyDeleted("insight")
+            raise LawgAlreadyDeletedError("insight")
 
         self.client.rest._delete_insight(project_namespace=self.project_namespace, insight_id=self.id)
         self.is_deleted = True

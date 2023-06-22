@@ -1,15 +1,16 @@
 from __future__ import annotations
+from types import MappingProxyType
 
 import typing as t
 import logging
-from lawg.exceptions import LawgEventUndefined
+from lawg.exceptions import LawgEventUndefinedError
 
 if t.TYPE_CHECKING:
+    from lawg.typings import STR_DICT
     from logging import _FormatStyle, _Level
     from collections.abc import Mapping
 
 from lawg.schemas import WebsocketEvent
-from lawg.typings import STR_DICT
 
 
 class Event(t.TypedDict):
@@ -27,13 +28,13 @@ class LogRecord(logging.LogRecord):
 
 class Formatter(logging.Formatter):
     EMOJI_DEFAULT = "📝"
-    EMOJI_MAP: dict[int, str] = {
+    EMOJI_MAP: MappingProxyType[int, str] = MappingProxyType({
         logging.DEBUG: "🔍",
         logging.INFO: EMOJI_DEFAULT,
         logging.WARNING: "⚠️",
         logging.ERROR: "❌",
         logging.CRITICAL: "🚨",
-    }
+    })
 
     def __init__(
         self,
@@ -81,7 +82,7 @@ class Formatter(logging.Formatter):
         if record.event:
             event = self.handler.events.get(record.event)
             if not event:
-                raise LawgEventUndefined(record.event)
+                raise LawgEventUndefinedError(record.event)
             title = event.get("title")
             description = event.get("description")
             emoji = event.get("emoji")
@@ -126,7 +127,7 @@ class Handler(logging.Handler):
         formatted = self.format(record)
         print(formatted)
 
-        # TODO: implement emitting to websocket functionality
+        # TODO(<hexiro>): implement emitting to websocket functionality
         # once websocket has been made
 
 

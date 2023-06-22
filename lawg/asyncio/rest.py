@@ -3,8 +3,6 @@ from __future__ import annotations
 import typing as t
 
 import httpx
-from marshmallow import Schema
-from lawg.base.client import BaseClient
 from lawg.base.rest import BaseRest
 from lawg.typings import STR_DICT, UNDEFINED, DataWithSchema, Undefined
 
@@ -31,6 +29,7 @@ from lawg.schemas import (
 )
 
 if t.TYPE_CHECKING:
+    from marshmallow import Schema
     from lawg.asyncio.client import AsyncClient
 
 
@@ -49,7 +48,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         method: str,
         body_with_schema: DataWithSchema | None = None,
         slugs_with_schema: DataWithSchema | None = None,
-        response_schema: Schema | None = None
+        response_schema: Schema | None = None,
     ) -> STR_DICT:
         url, body_dict = self.prepare_request(url, body_with_schema, slugs_with_schema)
 

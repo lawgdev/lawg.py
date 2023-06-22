@@ -8,20 +8,19 @@ import marshmallow
 import httpx
 
 from lawg.exceptions import (
-    LawgEmptyBody,
-    LawgHTTPException,
-    LawgConflict,
-    LawgBadRequest,
-    LawgUnauthorized,
-    LawgNotFound,
+    LawgEmptyBodyError,
+    LawgHTTPError,
+    LawgConflictError,
+    LawgBadRequestError,
+    LawgUnauthorizedError,
+    LawgNotFoundError,
     LawgInternalServerError,
-    LawgForbidden,
+    LawgForbiddenError,
 )
 from lawg.schemas import APIErrorSchema, APISuccessSchema
 from lawg.typings import C, H, UNDEFINED, DataWithSchema, Undefined
 
 if t.TYPE_CHECKING:
-    from lawg.base.client import BaseClient
     from lawg.typings import STR_DICT
     from marshmallow import Schema
 
@@ -121,7 +120,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         loaded_body: STR_DICT = body.schema.load(new_body)  # type: ignore
 
         if not loaded_body:
-            raise LawgEmptyBody()
+            raise LawgEmptyBodyError()
 
         return loaded_body
 
@@ -180,27 +179,27 @@ class BaseRest(ABC, t.Generic[C, H]):
                 # in this case, 404 can be handled pretty easily but im not sure about much else.
 
                 if response.status_code == 404:
-                    raise LawgNotFound(message=data["message"], status_code=response.status_code) from exc
+                    raise LawgNotFoundError(message=data["message"], status_code=response.status_code) from exc
 
-                raise LawgHTTPException(status_code=response.status_code) from exc
+                raise LawgHTTPError(status_code=response.status_code) from exc
 
             error_code: str = data["error"]["code"]
             error_message: str = data["error"]["message"]
 
             if error_code == "conflict":
-                raise LawgConflict(message=error_message, status_code=response.status_code) from exc
+                raise LawgConflictError(message=error_message, status_code=response.status_code) from exc
             elif error_code == "bad_request":
-                raise LawgBadRequest(message=error_message, status_code=response.status_code) from exc
+                raise LawgBadRequestError(message=error_message, status_code=response.status_code) from exc
             elif error_code == "unauthorized":
-                raise LawgUnauthorized(message=error_message, status_code=response.status_code) from exc
+                raise LawgUnauthorizedError(message=error_message, status_code=response.status_code) from exc
             elif error_code == "not_found":
-                raise LawgNotFound(message=error_message, status_code=response.status_code) from exc
+                raise LawgNotFoundError(message=error_message, status_code=response.status_code) from exc
             elif error_code == "internal_server_error":
                 raise LawgInternalServerError(message=error_message, status_code=response.status_code) from exc
             elif error_code == "forbidden":
-                raise LawgForbidden(message=error_message, status_code=response.status_code) from exc
+                raise LawgForbiddenError(message=error_message, status_code=response.status_code) from exc
             else:
-                raise LawgHTTPException(message=error_message, status_code=response.status_code) from exc
+                raise LawgHTTPError(message=error_message, status_code=response.status_code) from exc
 
     def prepare_response(
         self,

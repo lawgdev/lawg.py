@@ -31,8 +31,6 @@ class PikaId(validate.Validator):
         return value
 
 
-# TODO: edit these schemas to split slugs and req.body
-
 # ----- REQUEST VALIDATION SCHEMAS ----- #
 
 # unfortunately marshmallow doesn't have a fields.Emoji() comparable to zod's string().emoji() :(

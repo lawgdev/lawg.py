@@ -22,5 +22,5 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.ruff]
-select = ["TCH", "RUF", "SIM", "N", "S", "B", "A", "C4", "EM", "INP", "PIE", "SIM", "ERA", "TRY", "TID", "F"]
-ignore = ["A002", "A003", "EM101"]  
+select = ["TCH", "RUF", "SIM", "N", "S", "B", "A", "C4", "EM", "INP", "PIE", "SIM", "ERA", "TRY", "TD",  "TID", "F"]
+ignore = ["A002", "A003", "EM101", "TD003"]  
