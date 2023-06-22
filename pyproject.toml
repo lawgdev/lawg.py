@@ -2,12 +2,14 @@
 name = "lawg.py"
 version = "0.1.0a1"
 description = "lawg's python integration"
-authors = ["Hexiro <mail@hexiro.me>", "devlooskie <hello@looskie.com>"]
+authors = ["Nathan Lodge <mail@hexiro.me>", "Devlooskie <hello@looskie.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-httpx = "^0.23.0"
+httpx = "^0.24.1"
+marshmallow = "^3.19.0"
+marshmallow-union = "^0.1.15.post1"
 
 [tool.poetry.dev-dependencies]
 
