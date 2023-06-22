@@ -13,6 +13,14 @@ marshmallow-union = "^0.1.15.post1"
 
 [tool.poetry.dev-dependencies]
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.0.275"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.ruff]
+select = ["TCH", "RUF", "SIM", "N", "S", "B", "A", "C4", "EM", "INP", "PIE", "SIM", "ERA", "TRY", "TID", "F"]
+ignore = ["A002", "A003", "EM101"]  
