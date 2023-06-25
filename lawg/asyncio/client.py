@@ -2,6 +2,7 @@ from __future__ import annotations
 
 
 from lawg.base.client import BaseClient
+from lawg.asyncio.feed import AsyncFeed
 from lawg.asyncio.rest import AsyncRest
 from lawg.asyncio.log import AsyncLog
 from lawg.asyncio.insight import AsyncInsight
@@ -9,7 +10,7 @@ from lawg.asyncio.insight import AsyncInsight
 from lawg.typings import STR_DICT, UNDEFINED, Undefined
 
 
-class AsyncClient(BaseClient["AsyncLog", "AsyncInsight", "AsyncRest"]):
+class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest"]):
     """
     The syncio client for lawg.
     """
@@ -33,6 +34,11 @@ class AsyncClient(BaseClient["AsyncLog", "AsyncInsight", "AsyncRest"]):
 
     async def close(self) -> None:
         await self.rest.close()
+
+    # --- MANAGERS --- #
+
+    def feed(self, *, name: str):
+        return AsyncFeed(self, name=name)
 
     # --- LOGS --- #
 
@@ -206,25 +212,25 @@ if __name__ == "__main__":
     assert token is not None  # noqa: S101
 
     async def main():
-        feed_name = "test-feed"
-        async with AsyncClient(token=token, project="lawg-py") as client:
-            tasks_1: list[asyncio.Task[AsyncLog]] = []
+        feed = AsyncClient(token=token, project="lawg-py").feed(name="test-feed") 
+        tasks_1: list[asyncio.Task[AsyncLog]] = []
 
-            for i in range(10):
-                coro = client.log(feed_name=feed_name, title=str(i + 1), description="async log :)")
-                task = asyncio.create_task(coro)
-                tasks_1.append(task)
+        for i in range(10):
+            coro = feed.log(title=str(i + 1), description="async log :)")
+            task = asyncio.create_task(coro)
+            tasks_1.append(task)
 
-            logs = await asyncio.gather(*tasks_1)
-            tasks_2: list[asyncio.Task[None]] = []
+        logs: list[AsyncLog] = await asyncio.gather(*tasks_1)
+        tasks_2: list[asyncio.Task[None]] = []
 
-            print(logs)
+        print(logs)
 
-            for log in logs:
-                coro = log.delete()
-                task = asyncio.create_task(coro)
-                tasks_2.append(task)
+        for log in logs:
+            coro = log.delete()
+            task = asyncio.create_task(coro)
+            tasks_2.append(task)
 
-            await asyncio.gather(*tasks_2)
+        await asyncio.gather(*tasks_2)
+        await feed.close()
 
     asyncio.run(main())

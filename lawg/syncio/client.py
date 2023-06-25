@@ -5,11 +5,12 @@ from lawg.base.client import BaseClient
 from lawg.syncio.rest import Rest
 from lawg.typings import STR_DICT, UNDEFINED, Undefined
 
+from lawg.syncio.feed import Feed
 from lawg.syncio.log import Log
 from lawg.syncio.insight import Insight
 
 
-class Client(BaseClient["Log", "Insight", "Rest"]):
+class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
     """
     The syncio client for lawg.
     """
@@ -22,6 +23,11 @@ class Client(BaseClient["Log", "Insight", "Rest"]):
     ):
         super().__init__(token, project)
         self.rest = Rest(self)
+
+    # --- MANAGERS --- #
+
+    def feed(self, *, name: str):
+        return Feed(self, name=name)
 
     # --- LOGS --- #
 

@@ -5,10 +5,10 @@ import typing as t
 from abc import ABC, abstractmethod
 
 
-from lawg.typings import L, I, R, STR_DICT, UNDEFINED, Undefined
+from lawg.typings import F, L, I, R, STR_DICT, UNDEFINED, Undefined
 
 
-class BaseClient(ABC, t.Generic[L, I, R]):
+class BaseClient(ABC, t.Generic[F, L, I, R]):
     """
     The base client for lawg.
     """
@@ -23,6 +23,19 @@ class BaseClient(ABC, t.Generic[L, I, R]):
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} token={self.token!r} project={self.project!r}>"
+
+    # --- MANAGERS --- #
+
+    @abstractmethod
+    def feed(self, * name: str) -> F:
+        """
+        Get a feed.
+
+        Args:
+            name (str): The name of the feed.
+        Returns:
+            The feed.
+        """
 
     # --- LOGS --- #
 
