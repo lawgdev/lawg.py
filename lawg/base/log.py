@@ -15,13 +15,22 @@ class BaseLog(ABC, t.Generic[C]):
     A log.
     """
 
-    __slots__ = ("client", "project_namespace", "feed_name", "id", "project_id", "feed_id", "title", "description", "emoji", "is_deleted")
+    __slots__ = (
+        "client",
+        "feed",
+        "id",
+        "project_id",
+        "feed_id",
+        "title",
+        "description",
+        "emoji",
+        "is_deleted",
+    )
 
     def __init__(
         self,
         client: C,
-        project_namespace: str,
-        feed_name: str,
+        feed: str,
         id: str,
         project_id: str,
         feed_id: str,
@@ -31,9 +40,7 @@ class BaseLog(ABC, t.Generic[C]):
     ) -> None:
         super().__init__()
         self.client = client
-        # --- super attributes --- #
-        self.project_namespace = project_namespace
-        self.feed_name = feed_name
+        self.feed = feed
         # --- attributes --- #
         self.id = id
         self.project_id = project_id
@@ -45,7 +52,7 @@ class BaseLog(ABC, t.Generic[C]):
         self.is_deleted = False
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} id={self.id!r} title={self.title!r} emoji={self.emoji!r} feed_name={self.feed_name!r} project_namespace={self.project_namespace!r}>"
+        return f"<{self.__class__.__name__} id={self.id!r} title={self.title!r} emoji={self.emoji!r} feed={self.feed!r} project={self.client.project!r}>"
 
     # --- LOG --- #
 

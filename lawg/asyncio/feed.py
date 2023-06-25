@@ -26,7 +26,7 @@ class AsyncFeed(BaseFeed["AsyncClient", "AsyncLog"]):
 
     async def log(self, *, title: str, description: str):
         return await self.client.log(
-            feed_name=self.name,
+            feed=self.name,
             title=title,
             description=description,
         )
@@ -40,7 +40,7 @@ class AsyncFeed(BaseFeed["AsyncClient", "AsyncLog"]):
         emoji: str | Undefined | None = UNDEFINED,
     ):
         return await self.client.edit_log(
-            feed_name=self.name,
+            feed=self.name,
             id=id,
             title=title,
             description=description,
@@ -48,10 +48,10 @@ class AsyncFeed(BaseFeed["AsyncClient", "AsyncLog"]):
         )
 
     async def fetch_log(self, *, id: str):
-        return await self.client.fetch_log(feed_name=self.name, id=id)
+        return await self.client.fetch_log(feed=self.name, id=id)
 
     async def fetch_logs(self):
-        return await self.client.fetch_logs(feed_name=self.name)
+        return await self.client.fetch_logs(feed=self.name)
 
     async def delete_log(self, *, id: str):
-        return await self.client.delete_log(feed_name=self.name, id=id)
+        return await self.client.delete_log(feed=self.name, id=id)

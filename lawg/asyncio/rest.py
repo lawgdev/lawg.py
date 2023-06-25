@@ -63,9 +63,9 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     # --- PROJECTS --- #
 
-    async def _create_project(self, project_namespace: str, project_name: str):
+    async def _create_project(self, project: str, project_name: str):
         body = {
-            "namespace": project_namespace,
+            "namespace": project,
             "name": project_name,
         }
         project_data = await self.request(
@@ -76,9 +76,9 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return project_data
 
-    async def _fetch_project(self, project_namespace: str):
+    async def _fetch_project(self, project: str):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
         }
         project_data = await self.request(
             url=self.API_GET_PROJECT,
@@ -88,9 +88,9 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return project_data
 
-    async def _edit_project(self, project_namespace: str, project_name: str):
+    async def _edit_project(self, project: str, project_name: str):
         body = {
-            "namespace": project_namespace,
+            "namespace": project,
             "name": project_name,
         }
         project_data = await self.request(
@@ -101,9 +101,9 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return project_data
 
-    async def _delete_project(self, project_namespace: str) -> None:
+    async def _delete_project(self, project: str) -> None:
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
         }
         await self.request(
             url=self.API_DELETE_PROJECT,
@@ -115,16 +115,16 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     async def _create_feed(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         description: str | None = None,
         emoji: str | None = None,
     ):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
         }
         data = {
-            "name": feed_name,
+            "name": feed,
             "description": description,
             "emoji": emoji,
         }
@@ -139,15 +139,15 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     async def _edit_feed(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         name: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
         }
         data = {
             "name": name,
@@ -163,10 +163,10 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return feed_data
 
-    async def _delete_feed(self, project_namespace: str, feed_name: str) -> None:
+    async def _delete_feed(self, project: str, feed: str) -> None:
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
         }
         await self.request(
             url=self.API_DELETE_FEED,
@@ -178,15 +178,15 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     async def _create_log(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         title: str,
         description: str | None = None,
         emoji: str | None = None,
     ):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
         }
         data = {
             "title": title,
@@ -202,10 +202,10 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return log_data
 
-    async def _fetch_log(self, project_namespace: str, feed_name: str, log_id: str):
+    async def _fetch_log(self, project: str, feed: str, log_id: str):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
             "log_id": log_id,
         }
         log_data = await self.request(
@@ -218,14 +218,14 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     async def _fetch_logs(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         limit: int | None = None,
         offset: int | None = None,
     ):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
         }
         data = {
             "limit": limit,
@@ -242,16 +242,16 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     async def _edit_log(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         log_id: str,
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
             "log_id": log_id,
         }
         data = {
@@ -268,10 +268,10 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return log_data
 
-    async def _delete_log(self, project_namespace: str, feed_name: str, log_id: str):
+    async def _delete_log(self, project: str, feed: str, log_id: str):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
             "log_id": log_id,
         }
         await self.request(
@@ -284,14 +284,14 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     async def _create_insight(
         self,
-        project_namespace: str,
+        project: str,
         title: str,
         description: str | None = None,
         value: float | None = None,
         emoji: str | None = None,
     ):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
         }
         data = {
             "title": title,
@@ -310,11 +310,11 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     async def _fetch_insight(
         self,
-        project_namespace: str,
+        project: str,
         insight_id: str,
     ):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
             "insight_id": insight_id,
         }
         insight_data = await self.request(
@@ -327,10 +327,10 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     async def _fetch_insights(
         self,
-        project_namespace: str,
+        project: str,
     ):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
         }
         insights_data: list[STR_DICT] = await self.request(
             url=self.API_GET_INSIGHTS,
@@ -342,7 +342,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     async def _edit_insight(
         self,
-        project_namespace: str,
+        project: str,
         insight_id: str,
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
@@ -350,7 +350,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         value: dict[str, float] | None | Undefined = UNDEFINED,
     ) -> STR_DICT:
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
             "insight_id": insight_id,
         }
         data = {
@@ -370,11 +370,11 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     async def _delete_insight(
         self,
-        project_namespace: str,
+        project: str,
         insight_id: str,
     ):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
             "insight_id": insight_id,
         }
         await self.request(

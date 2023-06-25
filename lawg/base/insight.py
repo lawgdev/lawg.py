@@ -12,7 +12,6 @@ class BaseInsight(ABC, t.Generic[C]):
 
     __slots__ = (
         "client",
-        "project_namespace",
         "id",
         "title",
         "description",
@@ -26,7 +25,6 @@ class BaseInsight(ABC, t.Generic[C]):
     def __init__(
         self,
         client: C,
-        project_namespace: str,
         id: str,
         title: str,
         description: str | None,
@@ -37,8 +35,6 @@ class BaseInsight(ABC, t.Generic[C]):
     ) -> None:
         super().__init__()
         self.client = client
-        # --- super attributes --- #
-        self.project_namespace = project_namespace
         # --- attributes --- #
         self.id = id
         self.title = title
@@ -51,7 +47,9 @@ class BaseInsight(ABC, t.Generic[C]):
         self.is_deleted = False
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} title={self.title!r} value={self.value!r} project_namespace={self.project_namespace!r}>"
+        return (
+            f"<{self.__class__.__name__} title={self.title!r} value={self.value!r} project={self.client.project!r}>"
+        )
 
     @abstractmethod
     def set(self, value: float) -> None:

@@ -42,54 +42,54 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
 
     # --- LOGS --- #
 
-    async def log(self, *, feed_name: str, title: str, description: str, emoji: str | None = None):
+    async def log(self, *, feed: str, title: str, description: str, emoji: str | None = None):
         log_data = await self.rest._create_log(
-            project_namespace=self.project,
-            feed_name=feed_name,
+            project=self.project,
+            feed=feed,
             title=title,
             description=description,
             emoji=emoji,
         )
-        return self._construct_log(self.project, feed_name, log_data)
+        return self._construct_log(feed, log_data)
 
     async def edit_log(
         self,
         *,
-        feed_name: str,
+        feed: str,
         id: str,
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
         log_data = await self.rest._edit_log(
-            project_namespace=self.project,
-            feed_name=feed_name,
+            project=self.project,
+            feed=feed,
             log_id=id,
             title=title,
             description=description,
             emoji=emoji,
         )
-        return self._construct_log(self.project, feed_name, log_data)
+        return self._construct_log(feed, log_data)
 
-    async def fetch_log(self, *, feed_name: str, id: str):
+    async def fetch_log(self, *, feed: str, id: str):
         log_data = await self.rest._fetch_log(
-            project_namespace=self.project,
-            feed_name=feed_name,
+            project=self.project,
+            feed=feed,
             log_id=id,
         )
-        return self._construct_log(self.project, feed_name, log_data)
+        return self._construct_log(feed, log_data)
 
-    async def fetch_logs(self, *, feed_name: str):
+    async def fetch_logs(self, *, feed: str):
         logs_data = await self.rest._fetch_logs(
-            project_namespace=self.project,
-            feed_name=feed_name,
+            project=self.project,
+            feed=feed,
         )
-        return self._construct_logs(self.project, feed_name, logs_data)
+        return self._construct_logs(feed, logs_data)
 
-    async def delete_log(self, *, feed_name: str, id: str):
+    async def delete_log(self, *, feed: str, id: str):
         await self.rest._delete_log(
-            project_namespace=self.project,
-            feed_name=feed_name,
+            project=self.project,
+            feed=feed,
             log_id=id,
         )
 
@@ -97,13 +97,13 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
 
     async def insight(self, *, title: str, description: str, value: int, emoji: str | None = None):
         insight_data = await self.rest._create_insight(
-            project_namespace=self.project,
+            project=self.project,
             title=title,
             description=description,
             value=value,
             emoji=emoji,
         )
-        return self._construct_insight(self.project, insight_data)
+        return self._construct_insight(insight_data)
 
     async def edit_insight(
         self,
@@ -114,52 +114,52 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
         emoji: str | None | Undefined = UNDEFINED,
     ):
         insight_data = await self.rest._edit_insight(
-            project_namespace=self.project,
+            project=self.project,
             insight_id=id,
             title=title,
             description=description,
             emoji=emoji,
         )
-        return self._construct_insight(self.project, insight_data)
+        return self._construct_insight(insight_data)
 
     async def increment_insight(self, *, id: str, value: float):
         insight_data = await self.rest._edit_insight(
-            project_namespace=self.project,
+            project=self.project,
             insight_id=id,
             value={"increment": value},
         )
-        return self._construct_insight(self.project, insight_data)
+        return self._construct_insight(insight_data)
 
     async def set_insight(self, *, id: str, value: int):
         insight_data = await self.rest._edit_insight(
-            project_namespace=self.project,
+            project=self.project,
             insight_id=id,
             value={"set": value},
         )
-        return self._construct_insight(self.project, insight_data)
+        return self._construct_insight(insight_data)
 
     async def fetch_insight(self, *, id: str):
         insight_data = await self.rest._fetch_insight(
-            project_namespace=self.project,
+            project=self.project,
             insight_id=id,
         )
-        return self._construct_insight(self.project, insight_data)
+        return self._construct_insight(insight_data)
 
     async def fetch_insights(self):
         insights_data = await self.rest._fetch_insights(
-            project_namespace=self.project,
+            project=self.project,
         )
-        return self._construct_insights(self.project, insights_data)
+        return self._construct_insights(insights_data)
 
     async def delete_insight(self, *, id: str):
         await self.rest._delete_insight(
-            project_namespace=self.project,
+            project=self.project,
             insight_id=id,
         )
 
     # --- MANAGER CONSTRUCTORS --- #
 
-    def _construct_log(self, project_namespace: str, feed_name: str, log_data: STR_DICT):
+    def _construct_log(self, feed: str, log_data: STR_DICT):
         id = log_data["id"]  # noqa: A001
         project_id = log_data["project_id"]
         feed_id = log_data["feed_id"]
@@ -168,8 +168,7 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
         emoji = log_data["emoji"]
         return AsyncLog(
             self,
-            project_namespace=project_namespace,
-            feed_name=feed_name,
+            feed=feed,
             id=id,
             project_id=project_id,
             feed_id=feed_id,
@@ -180,7 +179,6 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
 
     def _construct_insight(
         self,
-        project_namespace: str,
         insight_data: STR_DICT,
     ):
         id = insight_data["id"]  # noqa: A001
@@ -193,7 +191,6 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
 
         return AsyncInsight(
             self,
-            project_namespace=project_namespace,
             id=id,
             title=title,
             description=description,
@@ -212,7 +209,7 @@ if __name__ == "__main__":
     assert token is not None  # noqa: S101
 
     async def main():
-        feed = AsyncClient(token=token, project="lawg-py").feed(name="test-feed") 
+        feed = AsyncClient(token=token, project="lawg-py").feed(name="test-feed")
         tasks_1: list[asyncio.Task[AsyncLog]] = []
 
         for i in range(10):

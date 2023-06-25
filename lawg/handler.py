@@ -28,13 +28,15 @@ class LogRecord(logging.LogRecord):
 
 class Formatter(logging.Formatter):
     EMOJI_DEFAULT = "📝"
-    EMOJI_MAP: MappingProxyType[int, str] = MappingProxyType({
-        logging.DEBUG: "🔍",
-        logging.INFO: EMOJI_DEFAULT,
-        logging.WARNING: "⚠️",
-        logging.ERROR: "❌",
-        logging.CRITICAL: "🚨",
-    })
+    EMOJI_MAP: MappingProxyType[int, str] = MappingProxyType(
+        {
+            logging.DEBUG: "🔍",
+            logging.INFO: EMOJI_DEFAULT,
+            logging.WARNING: "⚠️",
+            logging.ERROR: "❌",
+            logging.CRITICAL: "🚨",
+        }
+    )
 
     def __init__(
         self,
@@ -63,8 +65,8 @@ class Formatter(logging.Formatter):
             {
                 "e": "LOG_CREATE",
                 "d": {
-                    "project_namespace": self.handler.namespace,
-                    "feed_name": self.handler.feed_name,
+                    "project_namespace": self.handler.project,
+                    "feed_name": self.handler.feed,
                     "log": self.format_log(record),
                 },
             }
@@ -110,12 +112,12 @@ class Formatter(logging.Formatter):
 
 
 class Handler(logging.Handler):
-    __slots__ = ("namespace", "feed_name", "events", "formatter")
+    __slots__ = ("project", "feed", "events", "formatter")
 
-    def __init__(self, *, namespace: str, feed_name: str, events: dict[str, Event], level: _Level = 0) -> None:
+    def __init__(self, *, project: str, feed: str, events: dict[str, Event], level: _Level = 0) -> None:
         super().__init__(level)
-        self.namespace = namespace
-        self.feed_name = feed_name
+        self.project = project
+        self.feed = feed
         self.events = events
         self.formatter: Formatter = Formatter(handler=self)
 
@@ -138,8 +140,8 @@ if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)
 
     handler = Handler(
-        namespace="lawg-py",
-        feed_name="handler-test",
+        project="lawg-py",
+        feed="handler-test",
         events={
             "screen-resize": {"title": "Screen Resize", "emoji": "🖥️"},
             "user-login": {"title": "User Login", "emoji": "👤"},

@@ -16,7 +16,7 @@ class Feed(BaseFeed["Client", "Log"]):
 
     def log(self, *, title: str, description: str):
         return self.client.log(
-            feed_name=self.name,
+            feed=self.name,
             title=title,
             description=description,
         )
@@ -30,7 +30,7 @@ class Feed(BaseFeed["Client", "Log"]):
         emoji: str | Undefined | None = UNDEFINED,
     ):
         return self.client.edit_log(
-            feed_name=self.name,
+            feed=self.name,
             id=id,
             title=title,
             description=description,
@@ -38,10 +38,10 @@ class Feed(BaseFeed["Client", "Log"]):
         )
 
     def fetch_log(self, *, id: str):
-        return self.client.fetch_log(feed_name=self.name, id=id)
+        return self.client.fetch_log(feed=self.name, id=id)
 
     def fetch_logs(self):
-        return self.client.fetch_logs(feed_name=self.name)
+        return self.client.fetch_logs(feed=self.name)
 
     def delete_log(self, *, id: str):
-        return self.client.delete_log(feed_name=self.name, id=id)
+        return self.client.delete_log(feed=self.name, id=id)

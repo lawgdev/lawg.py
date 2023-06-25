@@ -15,6 +15,7 @@ marshmallow-union = "^0.1.15.post1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.275"
+mypy = "^1.4.0"
 
 [tool.poetry.group.docs]
 optional = true

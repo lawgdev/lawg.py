@@ -88,7 +88,7 @@ class FeedWithNameSlugSchema(Schema):
     """Used for patching, and deleting feeds."""
 
     namespace = ProjectNamespaceSchema(required=True)
-    feed_name = FeedNameSchema(required=True)
+    feed = FeedNameSchema(required=True)
 
 
 class FeedCreateBodySchema(Schema):
@@ -115,7 +115,7 @@ class LogSlugSchema(Schema):
     """
 
     namespace = ProjectNamespaceSchema(required=True)
-    feed_name = FeedNameSchema(required=True)
+    feed = FeedNameSchema(required=True)
 
 
 class LogWithIdSlugSchema(Schema):
@@ -124,7 +124,7 @@ class LogWithIdSlugSchema(Schema):
     """
 
     namespace = ProjectNamespaceSchema(required=True)
-    feed_name = FeedNameSchema(required=True)
+    feed = FeedNameSchema(required=True)
     log_id = fields.Str(required=True, validate=PikaId("log"))
 
 
@@ -270,8 +270,8 @@ class InsightSchema(Schema):
 
 
 class WebsocketEventData(Schema):
-    project_namespace = fields.Str(required=True)
-    feed_name = fields.Str(required=True)
+    project = fields.Str(required=True)
+    feed = fields.Str(required=True)
     log = fields.Nested(LogCreateBodySchema(), required=True)
 
 

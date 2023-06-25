@@ -14,7 +14,7 @@ class AsyncInsight(BaseInsight["AsyncClient"]):
 
     async def set(self, value: float) -> None:
         insight_data = await self.client.rest._edit_insight(
-            project_namespace=self.project_namespace,
+            project=self.client.project,
             insight_id=self.id,
             value={"set": value},
         )
@@ -23,7 +23,7 @@ class AsyncInsight(BaseInsight["AsyncClient"]):
 
     async def increment(self, value: float) -> None:
         insight_data = await self.client.rest._edit_insight(
-            project_namespace=self.project_namespace,
+            project=self.client.project,
             insight_id=self.id,
             value={"increment": value},
         )
@@ -34,5 +34,5 @@ class AsyncInsight(BaseInsight["AsyncClient"]):
         if self.is_deleted:
             raise LawgAlreadyDeletedError("insight")
 
-        await self.client.rest._delete_insight(project_namespace=self.project_namespace, insight_id=self.id)
+        await self.client.rest._delete_insight(project=self.client.project, insight_id=self.id)
         self.is_deleted = True

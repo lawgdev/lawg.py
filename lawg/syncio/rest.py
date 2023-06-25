@@ -60,9 +60,9 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     # --- PROJECTS --- #
 
-    def _create_project(self, project_namespace: str, project_name: str):
+    def _create_project(self, project: str, project_name: str):
         body = {
-            "namespace": project_namespace,
+            "namespace": project,
             "name": project_name,
         }
         project_data = self.request(
@@ -73,9 +73,9 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return project_data
 
-    def _fetch_project(self, project_namespace: str):
+    def _fetch_project(self, project: str):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
         }
         project_data = self.request(
             url=self.API_GET_PROJECT,
@@ -85,9 +85,9 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return project_data
 
-    def _edit_project(self, project_namespace: str, project_name: str):
+    def _edit_project(self, project: str, project_name: str):
         body = {
-            "namespace": project_namespace,
+            "namespace": project,
             "name": project_name,
         }
         project_data = self.request(
@@ -98,9 +98,9 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return project_data
 
-    def _delete_project(self, project_namespace: str) -> None:
+    def _delete_project(self, project: str) -> None:
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
         }
         self.request(
             url=self.API_DELETE_PROJECT,
@@ -112,16 +112,16 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     def _create_feed(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         description: str | None = None,
         emoji: str | None = None,
     ):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
         }
         data = {
-            "name": feed_name,
+            "name": feed,
             "description": description,
             "emoji": emoji,
         }
@@ -136,15 +136,15 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     def _edit_feed(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         name: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
         }
         data = {
             "name": name,
@@ -160,10 +160,10 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return feed_data
 
-    def _delete_feed(self, project_namespace: str, feed_name: str) -> None:
+    def _delete_feed(self, project: str, feed: str) -> None:
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
         }
         self.request(
             url=self.API_DELETE_FEED,
@@ -175,15 +175,15 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     def _create_log(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         title: str,
         description: str | None = None,
         emoji: str | None = None,
     ):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
         }
         data = {
             "title": title,
@@ -199,10 +199,10 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return log_data
 
-    def _fetch_log(self, project_namespace: str, feed_name: str, log_id: str):
+    def _fetch_log(self, project: str, feed: str, log_id: str):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
             "log_id": log_id,
         }
         log_data = self.request(
@@ -215,14 +215,14 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     def _fetch_logs(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         limit: int | None = None,
         offset: int | None = None,
     ):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
         }
         data = {
             "limit": limit,
@@ -241,16 +241,16 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     def _edit_log(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         log_id: str,
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
             "log_id": log_id,
         }
         data = {
@@ -267,10 +267,10 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return log_data
 
-    def _delete_log(self, project_namespace: str, feed_name: str, log_id: str):
+    def _delete_log(self, project: str, feed: str, log_id: str):
         slugs = {
-            "namespace": project_namespace,
-            "feed_name": feed_name,
+            "namespace": project,
+            "feed": feed,
             "log_id": log_id,
         }
         self.request(
@@ -283,14 +283,14 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     def _create_insight(
         self,
-        project_namespace: str,
+        project: str,
         title: str,
         description: str | None = None,
         value: float | None = None,
         emoji: str | None = None,
     ):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
         }
         data = {
             "title": title,
@@ -309,11 +309,11 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     def _fetch_insight(
         self,
-        project_namespace: str,
+        project: str,
         insight_id: str,
     ):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
             "insight_id": insight_id,
         }
         insight_data = self.request(
@@ -326,10 +326,10 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     def _fetch_insights(
         self,
-        project_namespace: str,
+        project: str,
     ):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
         }
         insights_data: list[STR_DICT] = self.request(
             url=self.API_GET_INSIGHTS,
@@ -341,7 +341,7 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     def _edit_insight(
         self,
-        project_namespace: str,
+        project: str,
         insight_id: str,
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
@@ -349,7 +349,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         value: dict[str, float] | None | Undefined = UNDEFINED,
     ) -> STR_DICT:
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
             "insight_id": insight_id,
         }
         data = {
@@ -369,11 +369,11 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     def _delete_insight(
         self,
-        project_namespace: str,
+        project: str,
         insight_id: str,
     ):
         slugs = {
-            "namespace": project_namespace,
+            "namespace": project,
             "insight_id": insight_id,
         }
         self.request(

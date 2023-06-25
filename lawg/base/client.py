@@ -27,7 +27,7 @@ class BaseClient(ABC, t.Generic[F, L, I, R]):
     # --- MANAGERS --- #
 
     @abstractmethod
-    def feed(self, * name: str) -> F:
+    def feed(self, *, name: str) -> F:
         """
         Get a feed.
 
@@ -40,12 +40,12 @@ class BaseClient(ABC, t.Generic[F, L, I, R]):
     # --- LOGS --- #
 
     @abstractmethod
-    def log(self, *, feed_name: str, title: str, description: str) -> L:
+    def log(self, *, feed: str, title: str, description: str) -> L:
         """
         Create a log.
 
         Args:
-            feed_name (str): The name of the feed.
+            feed (str): The name of the feed.
             title (str): The title of the log.
             description (str): The description of the log.
         """
@@ -54,7 +54,7 @@ class BaseClient(ABC, t.Generic[F, L, I, R]):
     def edit_log(
         self,
         *,
-        feed_name: str,
+        feed: str,
         id: str,
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
@@ -64,7 +64,7 @@ class BaseClient(ABC, t.Generic[F, L, I, R]):
         Edit a log.
 
         Args:
-            feed_name (str): The name of the feed.
+            feed (str): The name of the feed.
             id (str): The id of the log.
             title (str, optional): The new title of the log.
             description (str, optional): The new description of the log.
@@ -72,31 +72,31 @@ class BaseClient(ABC, t.Generic[F, L, I, R]):
         """
 
     @abstractmethod
-    def fetch_log(self, *, feed_name: str, id: str) -> L:
+    def fetch_log(self, *, feed: str, id: str) -> L:
         """
         Fetch a log.
 
         Args:
-            feed_name (str): The name of the feed.
+            feed (str): The name of the feed.
             id (str): The id of the log.
         """
 
     @abstractmethod
-    def fetch_logs(self, *, feed_name: str) -> list[L]:
+    def fetch_logs(self, *, feed: str) -> list[L]:
         """
         Fetch all logs.
 
         Args:
-            feed_name (str): The name of the feed.
+            feed (str): The name of the feed.
         """
 
     @abstractmethod
-    def delete_log(self, *, feed_name: str, id: str) -> None:
+    def delete_log(self, *, feed: str, id: str) -> None:
         """
         Delete a log.
 
         Args:
-            feed_name (str): The name of the feed.
+            feed (str): The name of the feed.
             id (str): The id of the log.
         """
 
@@ -185,19 +185,19 @@ class BaseClient(ABC, t.Generic[F, L, I, R]):
     # --- MANAGER CONSTRUCTORS --- #
 
     @abstractmethod
-    def _construct_log(self, project_namespace: str, feed_name: str, log_data: STR_DICT) -> L:
+    def _construct_log(self, feed: str, log_data: STR_DICT) -> L:
         """
         Construct a log from API response data.
         """
 
-    def _construct_logs(self, project_namespace: str, feed_name: str, logs_data: list[STR_DICT]) -> list[L]:
-        return [self._construct_log(project_namespace, feed_name, log_data) for log_data in logs_data]
+    def _construct_logs(self, feed: str, logs_data: list[STR_DICT]) -> list[L]:
+        return [self._construct_log(feed, log_data) for log_data in logs_data]
 
     @abstractmethod
-    def _construct_insight(self, project_namespace: str, insight_data: STR_DICT) -> I:
+    def _construct_insight(self, insight_data: STR_DICT) -> I:
         """
         Construct an insight from API response data.
         """
 
-    def _construct_insights(self, project_namespace: str, insights_data: list[STR_DICT]) -> list[I]:
-        return [self._construct_insight(project_namespace, insight_data) for insight_data in insights_data]
+    def _construct_insights(self, insights_data: list[STR_DICT]) -> list[I]:
+        return [self._construct_insight(insight_data) for insight_data in insights_data]

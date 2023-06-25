@@ -50,15 +50,15 @@ class BaseRest(ABC, t.Generic[C, H]):
 
     # --- FEEDS --- #
     API_CREATE_FEED = f"{API_V1_PROJECTS}/{{namespace}}/feeds"
-    API_EDIT_FEED = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}"
-    API_DELETE_FEED = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}"
+    API_EDIT_FEED = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}"
+    API_DELETE_FEED = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}"
 
     # --- LOGS --- #
-    API_CREATE_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs"
-    API_GET_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs/{{log_id}}"
-    API_GET_LOGS = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs"
-    API_EDIT_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs/{{log_id}}"
-    API_DELETE_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed_name}}/logs/{{log_id}}"
+    API_CREATE_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/logs"
+    API_GET_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/logs/{{log_id}}"
+    API_GET_LOGS = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/logs"
+    API_EDIT_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/logs/{{log_id}}"
+    API_DELETE_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/logs/{{log_id}}"
 
     # --- INSIGHTS --- #
     API_CREATE_INSIGHT = f"{API_V1_PROJECTS}/{{namespace}}/insights"
@@ -225,26 +225,19 @@ class BaseRest(ABC, t.Generic[C, H]):
     # --- PROJECTS --- #
 
     @abstractmethod
-    def _create_project(
-        self,
-        project_name: str,
-        project_namespace: str,
-    ) -> STR_DICT:
+    def _create_project(self, name: str, project: str) -> STR_DICT:
         """
         Create a project.
 
         Args:
             name (str): name of project.
-            namespace (str): namespace of project.
+            project (str): namespace of project.
         Returns:
             the created project data.
         """
 
     @abstractmethod
-    def _fetch_project(
-        self,
-        project_namespace: str,
-    ) -> STR_DICT:
+    def _fetch_project(self, project: str) -> STR_DICT:
         """
         Fetch a project.
 
@@ -255,17 +248,13 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _edit_project(
-        self,
-        project_name: str,
-        project_namespace: str,
-    ) -> STR_DICT:
+    def _edit_project(self, name: str, project: str) -> STR_DICT:
         """
         Edit a project.
 
         Args:
             name (str): name of project, what is being changed.
-            namespace (str): namespace of project.
+            project (str): namespace of project.
         Returns:
             the edited project data.
         """
@@ -273,7 +262,7 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _delete_project(
         self,
-        project_namespace: str,
+        project: str,
     ) -> STR_DICT:
         """
         Delete a project.
@@ -289,16 +278,16 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _create_feed(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         description: str | None = None,
     ) -> STR_DICT:
         """
         Create a feed.
 
         Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of the feed.
+            project (str): namespace of project.
+            feed (str): name of the feed.
             description (str | None, optional): description of feed. Defaults to None.
         Returns:
             the created feed data.
@@ -307,8 +296,8 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _edit_feed(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         name: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
@@ -317,8 +306,8 @@ class BaseRest(ABC, t.Generic[C, H]):
         Edit a feed.
 
         Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of feed
+            project (str): namespace of project.
+            feed (str): name of feed
             name (str | None, optional): new name of feed. Defaults to keeping the existing value.
             description (str | None, optional): new description of feed. Defaults to keeping the existing value.
             emoji (str | None, optional): new emoji of feed. Defaults to keeping the existing value.
@@ -329,15 +318,15 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _delete_feed(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
     ) -> None:
         """
         Delete a feed.
 
         Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of feed .
+            project (str): namespace of project.
+            feed (str): name of feed .
         Returns:
             None
         """
@@ -347,8 +336,8 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _create_log(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         title: str,
         description: str | None = None,
         emoji: str | None = None,
@@ -357,8 +346,8 @@ class BaseRest(ABC, t.Generic[C, H]):
         Create a log.
 
         Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of feed.
+            project (str): namespace of project.
+            feed (str): name of feed.
             title (str): title of log.
             description (str | None, optional): description of log. Defaults to None.
             emoji (str | None, optional): emoji of log. Defaults to None.
@@ -369,16 +358,16 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _fetch_log(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         log_id: str,
     ) -> STR_DICT:
         """
         Fetch a log.
 
         Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of feed.
+            project (str): namespace of project.
+            feed (str): name of feed.
             log_id (str): id of log.
         Returns:
             the fetched log data.
@@ -387,8 +376,8 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _fetch_logs(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         limit: int | None = None,
         offset: int | None = None,
     ) -> list[STR_DICT]:
@@ -396,8 +385,8 @@ class BaseRest(ABC, t.Generic[C, H]):
         Fetch multiple logs.
 
         Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of feed.
+            project (str): namespace of project.
+            feed (str): name of feed.
             limit (int | None, optional): limit of logs. Defaults to None.
             offset (int | None, optional): offset of logs. Defaults to None.
         Returns:
@@ -407,8 +396,8 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _edit_log(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         log_id: str,
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
@@ -418,8 +407,8 @@ class BaseRest(ABC, t.Generic[C, H]):
         Edit a log.
 
         Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of feed.
+            project (str): namespace of project.
+            feed (str): name of feed.
             log_id (str): id of log.
             title (str | None, optional): new title of log. Defaults to keeping the existing value.
             description (str | None, optional): new description of log. Defaults to keeping the existing value.
@@ -431,16 +420,16 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _delete_log(
         self,
-        project_namespace: str,
-        feed_name: str,
+        project: str,
+        feed: str,
         log_id: str,
     ) -> None:
         """
         Delete a log.
 
         Args:
-            project_namespace (str): namespace of project.
-            feed_name (str): name of feed.
+            project (str): namespace of project.
+            feed (str): name of feed.
             log_id (str): id of log.
         Returns:
             None
@@ -451,7 +440,7 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _create_insight(
         self,
-        project_namespace: str,
+        project: str,
         title: str,
         description: str | None = None,
         emoji: str | None = None,
@@ -461,7 +450,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         Create an insight.
 
         Args:
-            project_namespace (str): namespace of project.
+            project (str): namespace of project.
             title (str): title of insight.
             description (str | None, optional): description of insight. Defaults to None.
             emoji (str | None, optional): emoji of insight. Defaults to None.
@@ -473,14 +462,14 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _fetch_insight(
         self,
-        project_namespace: str,
+        project: str,
         insight_id: str,
     ) -> STR_DICT:
         """
         Fetch an insight.
 
         Args:
-            project_namespace (str): namespace of project.
+            project (str): namespace of project.
             insight_id (str): id of insight.
         Returns:
             the fetched insight data.
@@ -489,13 +478,13 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _fetch_insights(
         self,
-        project_namespace: str,
+        project: str,
     ) -> list[STR_DICT]:
         """
         Fetch multiple insights.
 
         Args:
-            project_namespace (str): namespace of project.
+            project (str): namespace of project.
         Returns:
             the fetched insights data.
         """
@@ -503,7 +492,7 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _edit_insight(
         self,
-        project_namespace: str,
+        project: str,
         insight_id: str,
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
@@ -514,7 +503,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         Edit an insight.
 
         Args:
-            project_namespace (str): namespace of project.
+            project (str): namespace of project.
             insight_id (str): id of insight.
             title (str | None, optional): new title of insight. Defaults to keeping the existing value.
             description (str | None, optional): new description of insight. Defaults to keeping the existing value.
@@ -527,14 +516,14 @@ class BaseRest(ABC, t.Generic[C, H]):
     @abstractmethod
     def _delete_insight(
         self,
-        project_namespace: str,
+        project: str,
         insight_id: str,
     ) -> None:
         """
         Delete an insight.
 
         Args:
-            project_namespace (str): namespace of project.
+            project (str): namespace of project.
             insight_id (str): id of insight.
         Returns:
             None
