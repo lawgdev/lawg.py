@@ -43,7 +43,7 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
     # --- LOGS --- #
 
     async def log(self, *, feed: str, title: str, description: str, emoji: str | None = None):
-        log_data = await self.rest._create_log(
+        log_data = await self.rest.create_log(
             project=self.project,
             feed=feed,
             title=title,
@@ -61,7 +61,7 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
-        log_data = await self.rest._edit_log(
+        log_data = await self.rest.edit_log(
             project=self.project,
             feed=feed,
             log_id=id,
@@ -72,7 +72,7 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
         return self._construct_log(feed, log_data)
 
     async def fetch_log(self, *, feed: str, id: str):
-        log_data = await self.rest._fetch_log(
+        log_data = await self.rest.fetch_log(
             project=self.project,
             feed=feed,
             log_id=id,
@@ -80,14 +80,14 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
         return self._construct_log(feed, log_data)
 
     async def fetch_logs(self, *, feed: str):
-        logs_data = await self.rest._fetch_logs(
+        logs_data = await self.rest.fetch_logs(
             project=self.project,
             feed=feed,
         )
         return self._construct_logs(feed, logs_data)
 
     async def delete_log(self, *, feed: str, id: str):
-        await self.rest._delete_log(
+        await self.rest.delete_log(
             project=self.project,
             feed=feed,
             log_id=id,
@@ -96,7 +96,7 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
     # --- INSIGHTS --- #
 
     async def insight(self, *, title: str, description: str, value: int, emoji: str | None = None):
-        insight_data = await self.rest._create_insight(
+        insight_data = await self.rest.create_insight(
             project=self.project,
             title=title,
             description=description,
@@ -113,7 +113,7 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
     ):
-        insight_data = await self.rest._edit_insight(
+        insight_data = await self.rest.edit_insight(
             project=self.project,
             insight_id=id,
             title=title,
@@ -123,7 +123,7 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
         return self._construct_insight(insight_data)
 
     async def increment_insight(self, *, id: str, value: float):
-        insight_data = await self.rest._edit_insight(
+        insight_data = await self.rest.edit_insight(
             project=self.project,
             insight_id=id,
             value={"increment": value},
@@ -131,7 +131,7 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
         return self._construct_insight(insight_data)
 
     async def set_insight(self, *, id: str, value: int):
-        insight_data = await self.rest._edit_insight(
+        insight_data = await self.rest.edit_insight(
             project=self.project,
             insight_id=id,
             value={"set": value},
@@ -139,20 +139,20 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
         return self._construct_insight(insight_data)
 
     async def fetch_insight(self, *, id: str):
-        insight_data = await self.rest._fetch_insight(
+        insight_data = await self.rest.fetch_insight(
             project=self.project,
             insight_id=id,
         )
         return self._construct_insight(insight_data)
 
     async def fetch_insights(self):
-        insights_data = await self.rest._fetch_insights(
+        insights_data = await self.rest.fetch_insights(
             project=self.project,
         )
         return self._construct_insights(insights_data)
 
     async def delete_insight(self, *, id: str):
-        await self.rest._delete_insight(
+        await self.rest.delete_insight(
             project=self.project,
             insight_id=id,
         )

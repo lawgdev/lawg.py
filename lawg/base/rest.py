@@ -225,7 +225,7 @@ class BaseRest(ABC, t.Generic[C, H]):
     # --- PROJECTS --- #
 
     @abstractmethod
-    def _create_project(self, name: str, project: str) -> STR_DICT:
+    def create_project(self, name: str, project: str) -> STR_DICT:
         """
         Create a project.
 
@@ -237,7 +237,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _fetch_project(self, project: str) -> STR_DICT:
+    def fetch_project(self, project: str) -> STR_DICT:
         """
         Fetch a project.
 
@@ -248,7 +248,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _edit_project(self, name: str, project: str) -> STR_DICT:
+    def edit_project(self, name: str, project: str) -> STR_DICT:
         """
         Edit a project.
 
@@ -260,7 +260,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _delete_project(
+    def delete_project(
         self,
         project: str,
     ) -> STR_DICT:
@@ -276,7 +276,7 @@ class BaseRest(ABC, t.Generic[C, H]):
     # --- FEEDS --- #
 
     @abstractmethod
-    def _create_feed(
+    def create_feed(
         self,
         project: str,
         feed: str,
@@ -294,7 +294,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _edit_feed(
+    def edit_feed(
         self,
         project: str,
         feed: str,
@@ -316,7 +316,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _delete_feed(
+    def delete_feed(
         self,
         project: str,
         feed: str,
@@ -334,7 +334,7 @@ class BaseRest(ABC, t.Generic[C, H]):
     # --- LOGS --- #
 
     @abstractmethod
-    def _create_log(
+    def create_log(
         self,
         project: str,
         feed: str,
@@ -356,7 +356,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _fetch_log(
+    def fetch_log(
         self,
         project: str,
         feed: str,
@@ -374,7 +374,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _fetch_logs(
+    def fetch_logs(
         self,
         project: str,
         feed: str,
@@ -394,7 +394,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _edit_log(
+    def edit_log(
         self,
         project: str,
         feed: str,
@@ -418,7 +418,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _delete_log(
+    def delete_log(
         self,
         project: str,
         feed: str,
@@ -438,7 +438,7 @@ class BaseRest(ABC, t.Generic[C, H]):
     # --- INSIGHT --- #
 
     @abstractmethod
-    def _create_insight(
+    def create_insight(
         self,
         project: str,
         title: str,
@@ -460,7 +460,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _fetch_insight(
+    def fetch_insight(
         self,
         project: str,
         insight_id: str,
@@ -476,7 +476,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _fetch_insights(
+    def fetch_insights(
         self,
         project: str,
     ) -> list[STR_DICT]:
@@ -490,7 +490,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _edit_insight(
+    def edit_insight(
         self,
         project: str,
         insight_id: str,
@@ -514,7 +514,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         """
 
     @abstractmethod
-    def _delete_insight(
+    def delete_insight(
         self,
         project: str,
         insight_id: str,

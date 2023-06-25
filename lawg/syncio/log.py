@@ -20,7 +20,7 @@ class Log(BaseLog["Client"]):
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ) -> None:
-        log_data = self.client.rest._edit_log(
+        log_data = self.client.rest.edit_log(
             project=self.client.project,
             feed=self.feed,
             log_id=self.id,
@@ -37,5 +37,5 @@ class Log(BaseLog["Client"]):
         if self.is_deleted:
             raise LawgAlreadyDeletedError()
 
-        self.client.rest._delete_log(project=self.client.project, feed=self.feed, log_id=self.id)
+        self.client.rest.delete_log(project=self.client.project, feed=self.feed, log_id=self.id)
         self.is_deleted = True

@@ -28,12 +28,12 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
 
     def feed(self, *, name: str):
         # TODO(<hexiro>): figure out why pylance is erroring here.
-        return Feed(client=self, name=name) # type: ignore
+        return Feed(client=self, name=name)  # type: ignore
 
     # --- LOGS --- #
 
     def log(self, *, feed: str, title: str, description: str, emoji: str | None = None):
-        log_data = self.rest._create_log(
+        log_data = self.rest.create_log(
             project=self.project,
             feed=feed,
             title=title,
@@ -51,7 +51,7 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
-        log_data = self.rest._edit_log(
+        log_data = self.rest.edit_log(
             project=self.project,
             feed=feed,
             log_id=id,
@@ -62,7 +62,7 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
         return self._construct_log(feed, log_data)
 
     def fetch_log(self, *, feed: str, id: str):
-        log_data = self.rest._fetch_log(
+        log_data = self.rest.fetch_log(
             project=self.project,
             feed=feed,
             log_id=id,
@@ -70,14 +70,14 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
         return self._construct_log(feed, log_data)
 
     def fetch_logs(self, *, feed: str):
-        logs_data = self.rest._fetch_logs(
+        logs_data = self.rest.fetch_logs(
             project=self.project,
             feed=feed,
         )
         return self._construct_logs(feed, logs_data)
 
     def delete_log(self, *, feed: str, id: str):
-        self.rest._delete_log(
+        self.rest.delete_log(
             project=self.project,
             feed=feed,
             log_id=id,
@@ -86,7 +86,7 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
     # --- INSIGHTS --- #
 
     def insight(self, *, title: str, description: str, value: int, emoji: str | None = None):
-        insight_data = self.rest._create_insight(
+        insight_data = self.rest.create_insight(
             project=self.project,
             title=title,
             description=description,
@@ -103,7 +103,7 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
     ):
-        insight_data = self.rest._edit_insight(
+        insight_data = self.rest.edit_insight(
             project=self.project,
             insight_id=id,
             title=title,
@@ -113,7 +113,7 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
         return self._construct_insight(insight_data)
 
     def increment_insight(self, *, id: str, value: float):
-        insight_data = self.rest._edit_insight(
+        insight_data = self.rest.edit_insight(
             project=self.project,
             insight_id=id,
             value={"increment": value},
@@ -121,7 +121,7 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
         return self._construct_insight(insight_data)
 
     def set_insight(self, *, id: str, value: int):
-        insight_data = self.rest._edit_insight(
+        insight_data = self.rest.edit_insight(
             project=self.project,
             insight_id=id,
             value={"set": value},
@@ -129,20 +129,20 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
         return self._construct_insight(insight_data)
 
     def fetch_insight(self, *, id: str):
-        insight_data = self.rest._fetch_insight(
+        insight_data = self.rest.fetch_insight(
             project=self.project,
             insight_id=id,
         )
         return self._construct_insight(insight_data)
 
     def fetch_insights(self):
-        insights_data = self.rest._fetch_insights(
+        insights_data = self.rest.fetch_insights(
             project=self.project,
         )
         return self._construct_insights(insights_data)
 
     def delete_insight(self, *, id: str):
-        self.rest._delete_insight(
+        self.rest.delete_insight(
             project=self.project,
             insight_id=id,
         )

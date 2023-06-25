@@ -60,7 +60,7 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     # --- PROJECTS --- #
 
-    def _create_project(self, project: str, project_name: str):
+    def create_project(self, project: str, project_name: str):
         body = {
             "namespace": project,
             "name": project_name,
@@ -73,7 +73,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return project_data
 
-    def _fetch_project(self, project: str):
+    def fetch_project(self, project: str):
         slugs = {
             "namespace": project,
         }
@@ -85,7 +85,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return project_data
 
-    def _edit_project(self, project: str, project_name: str):
+    def edit_project(self, project: str, project_name: str):
         body = {
             "namespace": project,
             "name": project_name,
@@ -98,7 +98,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return project_data
 
-    def _delete_project(self, project: str) -> None:
+    def delete_project(self, project: str) -> None:
         slugs = {
             "namespace": project,
         }
@@ -110,7 +110,7 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     # --- FEEDS --- #
 
-    def _create_feed(
+    def create_feed(
         self,
         project: str,
         feed: str,
@@ -134,7 +134,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return feed_data
 
-    def _edit_feed(
+    def edit_feed(
         self,
         project: str,
         feed: str,
@@ -160,7 +160,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return feed_data
 
-    def _delete_feed(self, project: str, feed: str) -> None:
+    def delete_feed(self, project: str, feed: str) -> None:
         slugs = {
             "namespace": project,
             "feed": feed,
@@ -173,7 +173,7 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     # --- LOGS --- #
 
-    def _create_log(
+    def create_log(
         self,
         project: str,
         feed: str,
@@ -199,7 +199,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return log_data
 
-    def _fetch_log(self, project: str, feed: str, log_id: str):
+    def fetch_log(self, project: str, feed: str, log_id: str):
         slugs = {
             "namespace": project,
             "feed": feed,
@@ -213,7 +213,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return log_data
 
-    def _fetch_logs(
+    def fetch_logs(
         self,
         project: str,
         feed: str,
@@ -239,7 +239,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )  # type: ignore
         return logs_data
 
-    def _edit_log(
+    def edit_log(
         self,
         project: str,
         feed: str,
@@ -267,7 +267,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return log_data
 
-    def _delete_log(self, project: str, feed: str, log_id: str):
+    def delete_log(self, project: str, feed: str, log_id: str):
         slugs = {
             "namespace": project,
             "feed": feed,
@@ -281,7 +281,7 @@ class Rest(BaseRest["Client", httpx.Client]):
 
     # --- INSIGHTS --- #
 
-    def _create_insight(
+    def create_insight(
         self,
         project: str,
         title: str,
@@ -307,7 +307,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return insight_data
 
-    def _fetch_insight(
+    def fetch_insight(
         self,
         project: str,
         insight_id: str,
@@ -324,7 +324,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return insight_data
 
-    def _fetch_insights(
+    def fetch_insights(
         self,
         project: str,
     ):
@@ -339,7 +339,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )  # type: ignore
         return insights_data
 
-    def _edit_insight(
+    def edit_insight(
         self,
         project: str,
         insight_id: str,
@@ -367,7 +367,7 @@ class Rest(BaseRest["Client", httpx.Client]):
         )
         return insight_data
 
-    def _delete_insight(
+    def delete_insight(
         self,
         project: str,
         insight_id: str,

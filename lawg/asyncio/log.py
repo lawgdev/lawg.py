@@ -19,7 +19,7 @@ class AsyncLog(BaseLog["AsyncClient"]):
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ) -> None:
-        log_data = await self.client.rest._edit_log(
+        log_data = await self.client.rest.edit_log(
             project=self.client.project,
             feed=self.feed,
             log_id=self.id,
@@ -36,5 +36,5 @@ class AsyncLog(BaseLog["AsyncClient"]):
         if self.is_deleted:
             raise LawgAlreadyDeletedError()
 
-        await self.client.rest._delete_log(project=self.client.project, feed=self.feed, log_id=self.id)
+        await self.client.rest.delete_log(project=self.client.project, feed=self.feed, log_id=self.id)
         self.is_deleted = True

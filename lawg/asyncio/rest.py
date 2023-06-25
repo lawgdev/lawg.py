@@ -63,7 +63,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     # --- PROJECTS --- #
 
-    async def _create_project(self, project: str, project_name: str):
+    async def create_project(self, project: str, project_name: str):
         body = {
             "namespace": project,
             "name": project_name,
@@ -76,7 +76,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return project_data
 
-    async def _fetch_project(self, project: str):
+    async def fetch_project(self, project: str):
         slugs = {
             "namespace": project,
         }
@@ -88,7 +88,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return project_data
 
-    async def _edit_project(self, project: str, project_name: str):
+    async def edit_project(self, project: str, project_name: str):
         body = {
             "namespace": project,
             "name": project_name,
@@ -101,7 +101,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return project_data
 
-    async def _delete_project(self, project: str) -> None:
+    async def delete_project(self, project: str) -> None:
         slugs = {
             "namespace": project,
         }
@@ -113,7 +113,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     # --- FEEDS --- #
 
-    async def _create_feed(
+    async def create_feed(
         self,
         project: str,
         feed: str,
@@ -137,7 +137,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return feed_data
 
-    async def _edit_feed(
+    async def edit_feed(
         self,
         project: str,
         feed: str,
@@ -163,7 +163,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return feed_data
 
-    async def _delete_feed(self, project: str, feed: str) -> None:
+    async def delete_feed(self, project: str, feed: str) -> None:
         slugs = {
             "namespace": project,
             "feed": feed,
@@ -176,7 +176,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     # --- LOGS --- #
 
-    async def _create_log(
+    async def create_log(
         self,
         project: str,
         feed: str,
@@ -202,7 +202,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return log_data
 
-    async def _fetch_log(self, project: str, feed: str, log_id: str):
+    async def fetch_log(self, project: str, feed: str, log_id: str):
         slugs = {
             "namespace": project,
             "feed": feed,
@@ -216,7 +216,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return log_data
 
-    async def _fetch_logs(
+    async def fetch_logs(
         self,
         project: str,
         feed: str,
@@ -240,7 +240,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )  # type: ignore
         return logs_data
 
-    async def _edit_log(
+    async def edit_log(
         self,
         project: str,
         feed: str,
@@ -268,7 +268,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return log_data
 
-    async def _delete_log(self, project: str, feed: str, log_id: str):
+    async def delete_log(self, project: str, feed: str, log_id: str):
         slugs = {
             "namespace": project,
             "feed": feed,
@@ -282,7 +282,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
 
     # --- INSIGHTS --- #
 
-    async def _create_insight(
+    async def create_insight(
         self,
         project: str,
         title: str,
@@ -308,7 +308,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return insight_data
 
-    async def _fetch_insight(
+    async def fetch_insight(
         self,
         project: str,
         insight_id: str,
@@ -325,7 +325,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return insight_data
 
-    async def _fetch_insights(
+    async def fetch_insights(
         self,
         project: str,
     ):
@@ -340,7 +340,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )  # type: ignore
         return insights_data
 
-    async def _edit_insight(
+    async def edit_insight(
         self,
         project: str,
         insight_id: str,
@@ -368,7 +368,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         )
         return insight_data
 
-    async def _delete_insight(
+    async def delete_insight(
         self,
         project: str,
         insight_id: str,
