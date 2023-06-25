@@ -1,14 +1,22 @@
+"""lawg.py errors."""
+
+
 class LawgError(Exception):
-    """Base exception for all lawg exceptions."""
+    """Base error for all lawg errors."""
 
     message = "An error occurred."
 
     def __init__(self, message: str | None = None) -> None:
+        """Initialize the error.
+
+        Args:
+            message (str, optional): The message of the error.
+        """
         super().__init__(message or self.message)
 
 
 class LawgHTTPError(LawgError):
-    """Base exception for all lawg HTTP exceptions."""
+    """Base error for all lawg HTTP errors."""
 
     message = "An HTTP error occurred."
 
@@ -18,6 +26,12 @@ class LawgHTTPError(LawgError):
         status_code: int,
         message: str | None = None,
     ) -> None:
+        """Initialize HTTP error.
+
+        Args:
+            status_code (int): The status code of the http request.
+            message (str, optional): The message of the error.
+        """
         super().__init__(message or self.message)
         self.status_code: int = status_code
 
@@ -47,11 +61,16 @@ class LawgForbiddenError(LawgHTTPError):
 
 
 class LawgAlreadyDeletedError(LawgError):
-    """Exception raised when a log is already deleted and the user tries again."""
+    """Exception raised when a resource is already deleted and the user tries again."""
 
     message = "The {type} has already been deleted."
 
     def __init__(self, type: str = "log") -> None:
+        """Initialize the already deleted error.
+
+        Args:
+            type (str, optional): The type of resource that was already deleted.
+        """
         super().__init__(self.message.format(type=type))
 
 
@@ -67,4 +86,9 @@ class LawgEventUndefinedError(LawgError):
     message = "The event {event} is not defined."
 
     def __init__(self, event: str) -> None:
+        """Initialize the event undefined error.
+
+        Args:
+            event (str): The event that isn't defined.
+        """
         super().__init__(self.message.format(event=event))

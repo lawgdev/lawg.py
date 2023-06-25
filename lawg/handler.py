@@ -1,4 +1,7 @@
+"""lawg.py custom logging handler."""
+
 from __future__ import annotations
+
 from types import MappingProxyType
 
 import typing as t
@@ -14,12 +17,16 @@ from lawg.schemas import WebsocketEvent
 
 
 class Event(t.TypedDict):
+    """Event to be sent to lawg."""
+
     title: t.NotRequired[str]
     description: t.NotRequired[str]
     emoji: t.NotRequired[str]
 
 
 class LogRecord(logging.LogRecord):
+    """Log record with event, title, description, and emoji."""
+
     event: str | None
     title: str | None
     description: str | None
@@ -27,6 +34,8 @@ class LogRecord(logging.LogRecord):
 
 
 class Formatter(logging.Formatter):
+    """Log formatter that prepares events for lawg."""
+
     EMOJI_DEFAULT = "📝"
     EMOJI_MAP: MappingProxyType[int, str] = MappingProxyType(
         {
@@ -48,16 +57,36 @@ class Formatter(logging.Formatter):
         validate: bool = True,
         defaults: Mapping[str, t.Any] | None = None,
     ) -> None:
+        """Initialize the formatter.
+
+        Args:
+            handler (Handler): The handler that will be used to send the log.
+            fmt (str, optional): The format string. Defaults to None.
+            datefmt (str, optional): The date format string. Defaults to None.
+            style (str, optional): The format style. Defaults to "%".
+            validate (bool, optional): Whether to validate the log. Defaults to True.
+            defaults (Mapping[str, t.Any], optional): The default values for the log. Defaults to None.
+        """
         super().__init__(fmt, datefmt, style, validate, defaults=defaults)
         self.handler = handler
 
     def prepare(self, record: LogRecord) -> LogRecord:
+        """Prepare the log record.
+
+        Args:
+            record (LogRecord): The log record to prepare.
+        """
         record_dict = record.__dict__
         for attr in LogRecord.__annotations__:
             record_dict[attr] = record_dict.get(attr, None)
         return record
 
     def format(self, record: LogRecord) -> STR_DICT:
+        """Format the log record.
+
+        Args:
+            record (LogRecord): The log record to format.
+        """
         record = self.prepare(record)
 
         schema = WebsocketEvent()
@@ -74,8 +103,10 @@ class Formatter(logging.Formatter):
         return data
 
     def format_log(self, record: LogRecord) -> STR_DICT:
-        """
-        Format the lawg log request body.
+        """Format the lawg log request body.
+
+        Args:
+            record (LogRecord): The log record to format.
         """
         title: str | None = None
         description: str | None = None
@@ -112,9 +143,19 @@ class Formatter(logging.Formatter):
 
 
 class Handler(logging.Handler):
+    """Logging handler for lawg.py."""
+
     __slots__ = ("project", "feed", "events", "formatter")
 
     def __init__(self, *, project: str, feed: str, events: dict[str, Event], level: _Level = 0) -> None:
+        """Initialize the handler.
+
+        Args:
+            project (str): The project namespace.
+            feed (str): The feed name.
+            events (dict[str, Event]): Predefined events.
+            level (int, optional): The logging level. Defaults to 0.
+        """
         super().__init__(level)
         self.project = project
         self.feed = feed
@@ -122,10 +163,11 @@ class Handler(logging.Handler):
         self.formatter: Formatter = Formatter(handler=self)
 
     def emit(self, record: LogRecord) -> None:
-        """
-        Emit a log record.
-        """
+        """Emit a log record.
 
+        Args:
+            record (LogRecord): The log record to emit.
+        """
         formatted = self.format(record)
         print(formatted)
 

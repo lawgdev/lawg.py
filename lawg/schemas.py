@@ -1,3 +1,5 @@
+"""lawg.py schemas. Based on lawg API zod schemas."""
+
 from __future__ import annotations
 
 import functools
@@ -6,8 +8,7 @@ from marshmallow_union import Union
 
 
 class PikaId(validate.Validator):
-    """
-    Validator which succeeds if the ``value`` passed to it is
+    """Validator which succeeds if the ``value`` passed to it is
     a valid pika id with the given prefix.
 
     Args:
@@ -34,7 +35,7 @@ class PikaId(validate.Validator):
 # ----- REQUEST VALIDATION SCHEMAS ----- #
 
 # unfortunately marshmallow doesn't have a fields.Emoji() comparable to zod's string().emoji() :(
-# another thing is that JavaScript's emojis have variable length whereas (afaik) Python treats them all as a single character
+# additionally, JavaScript's emojis have variable length whereas (afaik) Python treats them all as a single character
 EmojiSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=32))
 
 
@@ -59,10 +60,6 @@ class ProjectBodySchema(Schema):
 
     name = ProjectNameSchema(required=True)
     namespace = ProjectNamespaceSchema(required=True)
-
-
-class ProjectUpgradeSchema(Schema):
-    """TODO"""
 
 
 class ProjectMemberSchema(Schema):
@@ -110,18 +107,14 @@ LogDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(mi
 
 
 class LogSlugSchema(Schema):
-    """
-    Used for creating and getting multiple logs.
-    """
+    """LogSlugSchema Used for creating and getting multiple logs."""
 
     namespace = ProjectNamespaceSchema(required=True)
     feed = FeedNameSchema(required=True)
 
 
 class LogWithIdSlugSchema(Schema):
-    """
-    Used for getting, patching, and deleting logs.
-    """
+    """LogWithIdSlugSchema Used for getting, patching, and deleting logs."""
 
     namespace = ProjectNamespaceSchema(required=True)
     feed = FeedNameSchema(required=True)
@@ -280,7 +273,3 @@ class WebsocketEvent(Schema):
     e = fields.Str(required=True, validate=validate.OneOf(("LOG_CREATE", "LOG_DELETE", "LOG_UPDATE")))
     # data
     d = fields.Nested(WebsocketEventData(), required=True)
-
-
-if __name__ == "__main__":
-    print((LogCreateBodySchema._declared_fields.keys()))

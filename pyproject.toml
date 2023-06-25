@@ -16,6 +16,7 @@ marshmallow-union = "^0.1.15.post1"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.275"
 mypy = "^1.4.0"
+pydocstyle = "^6.3.0"
 
 [tool.poetry.group.docs]
 optional = true
@@ -31,3 +32,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 select = ["TCH", "RUF", "SIM", "N", "S", "B", "A", "C4", "EM", "INP", "PIE", "SIM", "ERA", "TRY", "TD",  "TID", "F"]
 ignore = ["A002", "A003", "EM101", "TD003"]  
+
+[tool.pydocstyle]
+match-dir="lawg.*"
+convention="google"
