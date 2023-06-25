@@ -16,6 +16,12 @@ marshmallow-union = "^0.1.15.post1"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.275"
 
+[tool.poetry.group.docs]
+optional = true
+[tool.poetry.group.docs.dependencies]
+sphinx = ">=5,<8"
+sphinx-rtd-theme = "^1.2.2"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

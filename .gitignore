@@ -6,3 +6,4 @@ __pycache__
 .mypy_cache/
 .pytest_cache/
 MOCKUP.md
+docs/_build
