@@ -218,6 +218,7 @@ class LogCreateBodySchema(Schema):
 class LogDeleteSlugSchema(Schema):
     """Log delete slug validation schema."""
 
+    namespace = ProjectNamespaceSchema(required=True)
     feed = FeedNameSchema(required=True)
     log_id = PikaId(prefix="log", required=True)
 
