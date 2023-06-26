@@ -1,3 +1,5 @@
+"""lawg.py custom type definitions."""
+
 from __future__ import annotations
 
 import typing as t
@@ -46,5 +48,7 @@ ErrorCode: t.TypeAlias = (
 
 
 class DataWithSchema(t.NamedTuple):
+    """Data with schema."""
+
     data: STR_DICT
     schema: Schema
