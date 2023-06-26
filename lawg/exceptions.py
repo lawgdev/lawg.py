@@ -65,7 +65,7 @@ class LawgAlreadyDeletedError(LawgError):
 
     message = "The {type} has already been deleted."
 
-    def __init__(self, type: str = "log") -> None:
+    def __init__(self, type: str = "event") -> None:
         """Initialize the already deleted error.
 
         Args:

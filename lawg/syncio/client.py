@@ -6,11 +6,11 @@ from lawg.syncio.rest import Rest
 from lawg.typings import STR_DICT, UNDEFINED, Undefined
 
 from lawg.syncio.feed import Feed
-from lawg.syncio.log import Log
+from lawg.syncio.event import Event
 from lawg.syncio.insight import Insight
 
 
-class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
+class Client(BaseClient["Feed", "Event", "Insight", "Rest"]):
     """
     The syncio client for lawg.
     """
@@ -30,19 +30,19 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
         # TODO(<hexiro>): figure out why pylance is erroring here.
         return Feed(client=self, name=name)  # type: ignore
 
-    # --- LOGS --- #
+    # --- EVENTS --- #
 
-    def log(self, *, feed: str, title: str, description: str, emoji: str | None = None):
-        log_data = self.rest.create_log(
+    def event(self, *, feed: str, title: str, description: str, emoji: str | None = None):
+        event_data = self.rest.create_event(
             project=self.project,
             feed=feed,
             title=title,
             description=description,
             emoji=emoji,
         )
-        return self._construct_log(feed, log_data)
+        return self._construct_event(feed, event_data)
 
-    def edit_log(
+    def edit_event(
         self,
         *,
         feed: str,
@@ -51,36 +51,36 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
-        log_data = self.rest.edit_log(
+        event_data = self.rest.edit_event(
             project=self.project,
             feed=feed,
-            log_id=id,
+            event_id=id,
             title=title,
             description=description,
             emoji=emoji,
         )
-        return self._construct_log(feed, log_data)
+        return self._construct_event(feed, event_data)
 
-    def fetch_log(self, *, feed: str, id: str):
-        log_data = self.rest.fetch_log(
+    def fetch_event(self, *, feed: str, id: str):
+        event_data = self.rest.fetch_event(
             project=self.project,
             feed=feed,
-            log_id=id,
+            event_id=id,
         )
-        return self._construct_log(feed, log_data)
+        return self._construct_event(feed, event_data)
 
-    def fetch_logs(self, *, feed: str):
-        logs_data = self.rest.fetch_logs(
+    def fetch_events(self, *, feed: str):
+        events_data = self.rest.fetch_events(
             project=self.project,
             feed=feed,
         )
-        return self._construct_logs(feed, logs_data)
+        return self._construct_events(feed, events_data)
 
-    def delete_log(self, *, feed: str, id: str):
-        self.rest.delete_log(
+    def delete_event(self, *, feed: str, id: str):
+        self.rest.delete_event(
             project=self.project,
             feed=feed,
-            log_id=id,
+            event_id=id,
         )
 
     # --- INSIGHTS --- #
@@ -149,14 +149,14 @@ class Client(BaseClient["Feed", "Log", "Insight", "Rest"]):
 
     # --- MANAGER CONSTRUCTORS --- #
 
-    def _construct_log(self, feed: str, log_data: STR_DICT) -> Log:
-        id = log_data["id"]  # noqa: A001
-        project_id = log_data["project_id"]
-        feed_id = log_data["feed_id"]
-        title = log_data["title"]
-        description = log_data["description"]
-        emoji = log_data["emoji"]
-        return Log(
+    def _construct_event(self, feed: str, event_data: STR_DICT) -> Event:
+        id = event_data["id"]  # noqa: A001
+        project_id = event_data["project_id"]
+        feed_id = event_data["feed_id"]
+        title = event_data["title"]
+        description = event_data["description"]
+        emoji = event_data["emoji"]
+        return Event(
             self,
             feed=feed,
             id=id,
@@ -199,10 +199,10 @@ if __name__ == "__main__":
     assert token is not None  # noqa: S101
 
     client = Client(token=token, project="lawg-py")
-    log = client.log(
+    event = client.event(
         feed="handler-test",
         title="title",
         description="desc",
     )
-    log.edit(description="new_desc")
-    print(log)
+    event.edit(description="new_desc")
+    print(event)

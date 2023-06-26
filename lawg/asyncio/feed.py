@@ -5,10 +5,10 @@ from lawg.typings import UNDEFINED, Undefined
 
 if t.TYPE_CHECKING:
     from lawg.asyncio.client import AsyncClient
-    from lawg.asyncio.log import AsyncLog
+    from lawg.asyncio.event import AsyncEvent
 
 
-class AsyncFeed(BaseFeed["AsyncClient", "AsyncLog"]):
+class AsyncFeed(BaseFeed["AsyncClient", "AsyncEvent"]):
     """An async feed."""
 
     # --- ASYNCIO --- #
@@ -22,16 +22,16 @@ class AsyncFeed(BaseFeed["AsyncClient", "AsyncLog"]):
     async def close(self) -> None:
         await self.client.close()
 
-    # --- LOGS --- #
+    # --- EVENTS --- #
 
-    async def log(self, *, title: str, description: str):
-        return await self.client.log(
+    async def event(self, *, title: str, description: str):
+        return await self.client.event(
             feed=self.name,
             title=title,
             description=description,
         )
 
-    async def edit_log(
+    async def edit_event(
         self,
         *,
         id: str,
@@ -39,7 +39,7 @@ class AsyncFeed(BaseFeed["AsyncClient", "AsyncLog"]):
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
-        return await self.client.edit_log(
+        return await self.client.edit_event(
             feed=self.name,
             id=id,
             title=title,
@@ -47,11 +47,11 @@ class AsyncFeed(BaseFeed["AsyncClient", "AsyncLog"]):
             emoji=emoji,
         )
 
-    async def fetch_log(self, *, id: str):
-        return await self.client.fetch_log(feed=self.name, id=id)
+    async def fetch_event(self, *, id: str):
+        return await self.client.fetch_event(feed=self.name, id=id)
 
-    async def fetch_logs(self):
-        return await self.client.fetch_logs(feed=self.name)
+    async def fetch_events(self):
+        return await self.client.fetch_events(feed=self.name)
 
-    async def delete_log(self, *, id: str):
-        return await self.client.delete_log(feed=self.name, id=id)
+    async def delete_event(self, *, id: str):
+        return await self.client.delete_event(feed=self.name, id=id)

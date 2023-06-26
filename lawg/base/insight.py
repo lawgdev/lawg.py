@@ -7,7 +7,7 @@ from lawg.typings import C
 
 class BaseInsight(ABC, t.Generic[C]):
     """
-    A log.
+    An event.
     """
 
     __slots__ = (
@@ -47,9 +47,7 @@ class BaseInsight(ABC, t.Generic[C]):
         self.is_deleted = False
 
     def __repr__(self) -> str:
-        return (
-            f"<{self.__class__.__name__} title={self.title!r} value={self.value!r} project={self.client.project!r}>"
-        )
+        return f"<{self.__class__.__name__} title={self.title!r} value={self.value!r} project={self.client.project!r}>"
 
     @abstractmethod
     def set(self, value: float) -> None:

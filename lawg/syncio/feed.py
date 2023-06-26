@@ -1,27 +1,27 @@
 import typing as t
 
 from lawg.base.feed import BaseFeed
-from lawg.syncio.log import Log
+from lawg.syncio.event import Event
 from lawg.typings import UNDEFINED, Undefined
 
 if t.TYPE_CHECKING:
     from lawg.syncio.client import Client
-    from lawg.syncio.log import Log
+    from lawg.syncio.event import Event
 
 
-class Feed(BaseFeed["Client", "Log"]):
+class Feed(BaseFeed["Client", "Event"]):
     """A feed."""
 
-    # --- LOGS --- #
+    # --- EVENTS --- #
 
-    def log(self, *, title: str, description: str):
-        return self.client.log(
+    def event(self, *, title: str, description: str):
+        return self.client.event(
             feed=self.name,
             title=title,
             description=description,
         )
 
-    def edit_log(
+    def edit_event(
         self,
         *,
         id: str,
@@ -29,7 +29,7 @@ class Feed(BaseFeed["Client", "Log"]):
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
-        return self.client.edit_log(
+        return self.client.edit_event(
             feed=self.name,
             id=id,
             title=title,
@@ -37,11 +37,11 @@ class Feed(BaseFeed["Client", "Log"]):
             emoji=emoji,
         )
 
-    def fetch_log(self, *, id: str):
-        return self.client.fetch_log(feed=self.name, id=id)
+    def fetch_event(self, *, id: str):
+        return self.client.fetch_event(feed=self.name, id=id)
 
-    def fetch_logs(self):
-        return self.client.fetch_logs(feed=self.name)
+    def fetch_events(self):
+        return self.client.fetch_events(feed=self.name)
 
-    def delete_log(self, *, id: str):
-        return self.client.delete_log(feed=self.name, id=id)
+    def delete_event(self, *, id: str):
+        return self.client.delete_event(feed=self.name, id=id)

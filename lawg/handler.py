@@ -25,7 +25,7 @@ class Event(t.TypedDict):
 
 
 class LogRecord(logging.LogRecord):
-    """Log record with event, title, description, and emoji."""
+    """Event record with event, title, description, and emoji."""
 
     event: str | None
     title: str | None
@@ -34,7 +34,7 @@ class LogRecord(logging.LogRecord):
 
 
 class Formatter(logging.Formatter):
-    """Log formatter that prepares events for lawg."""
+    """Event formatter that prepares events for lawg."""
 
     EMOJI_DEFAULT = "📝"
     EMOJI_MAP: MappingProxyType[int, str] = MappingProxyType(
@@ -60,21 +60,21 @@ class Formatter(logging.Formatter):
         """Initialize the formatter.
 
         Args:
-            handler (Handler): The handler that will be used to send the log.
+            handler (Handler): The handler that will be used to send the event.
             fmt (str, optional): The format string. Defaults to None.
             datefmt (str, optional): The date format string. Defaults to None.
             style (str, optional): The format style. Defaults to "%".
-            validate (bool, optional): Whether to validate the log. Defaults to True.
-            defaults (Mapping[str, t.Any], optional): The default values for the log. Defaults to None.
+            validate (bool, optional): Whether to validate the event. Defaults to True.
+            defaults (Mapping[str, t.Any], optional): The default values for the event. Defaults to None.
         """
         super().__init__(fmt, datefmt, style, validate, defaults=defaults)
         self.handler = handler
 
     def prepare(self, record: LogRecord) -> LogRecord:
-        """Prepare the log record.
+        """Prepare the event record.
 
         Args:
-            record (LogRecord): The log record to prepare.
+            record (LogRecord): The event record to prepare.
         """
         record_dict = record.__dict__
         for attr in LogRecord.__annotations__:
@@ -82,10 +82,10 @@ class Formatter(logging.Formatter):
         return record
 
     def format(self, record: LogRecord) -> STR_DICT:
-        """Format the log record.
+        """Format the event record.
 
         Args:
-            record (LogRecord): The log record to format.
+            record (LogRecord): The event record to format.
         """
         record = self.prepare(record)
 
@@ -96,17 +96,17 @@ class Formatter(logging.Formatter):
                 "d": {
                     "project_namespace": self.handler.project,
                     "feed_name": self.handler.feed,
-                    "log": self.format_log(record),
+                    "event": self.format_log(record),
                 },
             }
         )  # type: ignore
         return data
 
     def format_log(self, record: LogRecord) -> STR_DICT:
-        """Format the lawg log request body.
+        """Format the lawg event request body.
 
         Args:
-            record (LogRecord): The log record to format.
+            record (LogRecord): The event record to format.
         """
         title: str | None = None
         description: str | None = None
@@ -163,10 +163,10 @@ class Handler(logging.Handler):
         self.formatter: Formatter = Formatter(handler=self)
 
     def emit(self, record: LogRecord) -> None:
-        """Emit a log record.
+        """Emit an event record.
 
         Args:
-            record (LogRecord): The log record to emit.
+            record (LogRecord): The event record to emit.
         """
         formatted = self.format(record)
         print(formatted)

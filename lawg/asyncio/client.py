@@ -4,13 +4,13 @@ from __future__ import annotations
 from lawg.base.client import BaseClient
 from lawg.asyncio.feed import AsyncFeed
 from lawg.asyncio.rest import AsyncRest
-from lawg.asyncio.log import AsyncLog
+from lawg.asyncio.event import AsyncEvent
 from lawg.asyncio.insight import AsyncInsight
 
 from lawg.typings import STR_DICT, UNDEFINED, Undefined
 
 
-class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest"]):
+class AsyncClient(BaseClient["AsyncFeed", "AsyncEvent", "AsyncInsight", "AsyncRest"]):
     """
     The syncio client for lawg.
     """
@@ -40,19 +40,19 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
     def feed(self, *, name: str):
         return AsyncFeed(self, name=name)
 
-    # --- LOGS --- #
+    # --- EVENTS --- #
 
-    async def log(self, *, feed: str, title: str, description: str, emoji: str | None = None):
-        log_data = await self.rest.create_log(
+    async def event(self, *, feed: str, title: str, description: str, emoji: str | None = None):
+        event_data = await self.rest.create_event(
             project=self.project,
             feed=feed,
             title=title,
             description=description,
             emoji=emoji,
         )
-        return self._construct_log(feed, log_data)
+        return self._construct_event(feed, event_data)
 
-    async def edit_log(
+    async def edit_event(
         self,
         *,
         feed: str,
@@ -61,36 +61,36 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
     ):
-        log_data = await self.rest.edit_log(
+        event_data = await self.rest.edit_event(
             project=self.project,
             feed=feed,
-            log_id=id,
+            event_id=id,
             title=title,
             description=description,
             emoji=emoji,
         )
-        return self._construct_log(feed, log_data)
+        return self._construct_event(feed, event_data)
 
-    async def fetch_log(self, *, feed: str, id: str):
-        log_data = await self.rest.fetch_log(
+    async def fetch_event(self, *, feed: str, id: str):
+        event_data = await self.rest.fetch_event(
             project=self.project,
             feed=feed,
-            log_id=id,
+            event_id=id,
         )
-        return self._construct_log(feed, log_data)
+        return self._construct_event(feed, event_data)
 
-    async def fetch_logs(self, *, feed: str):
-        logs_data = await self.rest.fetch_logs(
+    async def fetch_events(self, *, feed: str):
+        events_data = await self.rest.fetch_events(
             project=self.project,
             feed=feed,
         )
-        return self._construct_logs(feed, logs_data)
+        return self._construct_events(feed, events_data)
 
-    async def delete_log(self, *, feed: str, id: str):
-        await self.rest.delete_log(
+    async def delete_event(self, *, feed: str, id: str):
+        await self.rest.delete_event(
             project=self.project,
             feed=feed,
-            log_id=id,
+            event_id=id,
         )
 
     # --- INSIGHTS --- #
@@ -159,14 +159,14 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncLog", "AsyncInsight", "AsyncRest
 
     # --- MANAGER CONSTRUCTORS --- #
 
-    def _construct_log(self, feed: str, log_data: STR_DICT):
-        id = log_data["id"]  # noqa: A001
-        project_id = log_data["project_id"]
-        feed_id = log_data["feed_id"]
-        title = log_data["title"]
-        description = log_data["description"]
-        emoji = log_data["emoji"]
-        return AsyncLog(
+    def _construct_event(self, feed: str, event_data: STR_DICT):
+        id = event_data["id"]  # noqa: A001
+        project_id = event_data["project_id"]
+        feed_id = event_data["feed_id"]
+        title = event_data["title"]
+        description = event_data["description"]
+        emoji = event_data["emoji"]
+        return AsyncEvent(
             self,
             feed=feed,
             id=id,
@@ -210,20 +210,20 @@ if __name__ == "__main__":
 
     async def main():
         feed = AsyncClient(token=token, project="lawg-py").feed(name="test-feed")
-        tasks_1: list[asyncio.Task[AsyncLog]] = []
+        tasks_1: list[asyncio.Task[AsyncEvent]] = []
 
         for i in range(10):
-            coro = feed.log(title=str(i + 1), description="async log :)")
+            coro = feed.event(title=str(i + 1), description="async event :)")
             task = asyncio.create_task(coro)
             tasks_1.append(task)
 
-        logs: list[AsyncLog] = await asyncio.gather(*tasks_1)
+        events: list[AsyncEvent] = await asyncio.gather(*tasks_1)
         tasks_2: list[asyncio.Task[None]] = []
 
-        print(logs)
+        print(events)
 
-        for log in logs:
-            coro = log.delete()
+        for event in events:
+            coro = event.delete()
             task = asyncio.create_task(coro)
             tasks_2.append(task)
 

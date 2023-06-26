@@ -10,9 +10,9 @@ if t.TYPE_CHECKING:
     from lawg.typings import Undefined
 
 
-class BaseLog(ABC, t.Generic[C]):
+class BaseEvent(ABC, t.Generic[C]):
     """
-    A log.
+    An event.
     """
 
     __slots__ = (
@@ -54,7 +54,7 @@ class BaseLog(ABC, t.Generic[C]):
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} id={self.id!r} title={self.title!r} emoji={self.emoji!r} feed={self.feed!r} project={self.client.project!r}>"
 
-    # --- LOG --- #
+    # --- EVENT --- #
 
     @abstractmethod
     def edit(
@@ -64,11 +64,11 @@ class BaseLog(ABC, t.Generic[C]):
         emoji: str | None | Undefined = UNDEFINED,
     ) -> None:
         """
-        Edit the log.
+        Edit the event.
         """
 
     @abstractmethod
     def delete(self) -> None:
         """
-        Delete the log.
+        Delete the event.
         """

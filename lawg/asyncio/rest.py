@@ -19,21 +19,21 @@ from lawg.schemas import (
     InsightPatchBodySchema,
     InsightPatchSlugSchema,
     InsightValueSchema,
-    LogCreateBodySchema,
-    LogCreateSlugSchema,
-    LogDeleteSlugSchema,
-    LogGetMultipleBodySchema,
-    LogGetMultipleSlugSchema,
-    LogGetSlugSchema,
-    LogPatchBodySchema,
-    LogPatchSlugSchema,
+    EventCreateBodySchema,
+    EventCreateSlugSchema,
+    EventDeleteSlugSchema,
+    EventGetMultipleBodySchema,
+    EventGetMultipleSlugSchema,
+    EventGetSlugSchema,
+    EventPatchBodySchema,
+    EventPatchSlugSchema,
     ProjectDeleteSlugSchema,
     ProjectGetSlugSchema,
     ProjectPatchBodySchema,
     ProjectPatchSlugSchema,
     ProjectSchema,
     FeedSchema,
-    LogSchema,
+    EventSchema,
     InsightSchema,
     ProjectCreateBodySchema,
 )
@@ -186,9 +186,9 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             slugs_with_schema=DataWithSchema(slugs, FeedDeleteSlugSchema()),
         )
 
-    # --- LOGS --- #
+    # --- EVENTS --- #
 
-    async def create_log(
+    async def create_event(
         self,
         project: str,
         feed: str,
@@ -205,30 +205,30 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             "description": description,
             "emoji": emoji,
         }
-        log_data = await self.request(
-            url=self.API_CREATE_LOG,
+        event_data = await self.request(
+            url=self.API_CREATE_EVENT,
             method="POST",
-            body_with_schema=DataWithSchema(data, LogCreateBodySchema()),
-            slugs_with_schema=DataWithSchema(slugs, LogCreateSlugSchema()),
-            response_schema=LogSchema(),
+            body_with_schema=DataWithSchema(data, EventCreateBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, EventCreateSlugSchema()),
+            response_schema=EventSchema(),
         )
-        return log_data
+        return event_data
 
-    async def fetch_log(self, project: str, feed: str, log_id: str):
+    async def fetch_event(self, project: str, feed: str, event_id: str):
         slugs = {
             "namespace": project,
             "feed": feed,
-            "log_id": log_id,
+            "event_id": event_id,
         }
-        log_data = await self.request(
-            url=self.API_GET_LOG,
+        event_data = await self.request(
+            url=self.API_GET_EVENT,
             method="GET",
-            slugs_with_schema=DataWithSchema(slugs, LogGetSlugSchema()),
-            response_schema=LogSchema(),
+            slugs_with_schema=DataWithSchema(slugs, EventGetSlugSchema()),
+            response_schema=EventSchema(),
         )
-        return log_data
+        return event_data
 
-    async def fetch_logs(
+    async def fetch_events(
         self,
         project: str,
         feed: str,
@@ -243,20 +243,20 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             "limit": limit,
             "offset": offset,
         }
-        logs_data: list[STR_DICT] = await self.request(
-            url=self.API_GET_LOGS,
+        events_data: list[STR_DICT] = await self.request(
+            url=self.API_GET_EVENTS,
             method="GET",
-            body_with_schema=DataWithSchema(data, LogGetMultipleBodySchema()),
-            slugs_with_schema=DataWithSchema(slugs, LogGetMultipleSlugSchema()),
-            response_schema=LogSchema(many=True),
+            body_with_schema=DataWithSchema(data, EventGetMultipleBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, EventGetMultipleSlugSchema()),
+            response_schema=EventSchema(many=True),
         )  # type: ignore
-        return logs_data
+        return events_data
 
-    async def edit_log(
+    async def edit_event(
         self,
         project: str,
         feed: str,
-        log_id: str,
+        event_id: str,
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
@@ -264,32 +264,32 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         slugs = {
             "namespace": project,
             "feed": feed,
-            "log_id": log_id,
+            "event_id": event_id,
         }
         data = {
             "title": title,
             "description": description,
             "emoji": emoji,
         }
-        log_data = await self.request(
-            url=self.API_EDIT_LOG,
+        event_data = await self.request(
+            url=self.API_EDIT_EVENT,
             method="PATCH",
-            body_with_schema=DataWithSchema(data, LogPatchBodySchema()),
-            slugs_with_schema=DataWithSchema(slugs, LogPatchSlugSchema()),
-            response_schema=LogSchema(),
+            body_with_schema=DataWithSchema(data, EventPatchBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, EventPatchSlugSchema()),
+            response_schema=EventSchema(),
         )
-        return log_data
+        return event_data
 
-    async def delete_log(self, project: str, feed: str, log_id: str):
+    async def delete_event(self, project: str, feed: str, event_id: str):
         slugs = {
             "namespace": project,
             "feed": feed,
-            "log_id": log_id,
+            "event_id": event_id,
         }
         await self.request(
-            url=self.API_DELETE_LOG,
+            url=self.API_DELETE_EVENT,
             method="DELETE",
-            slugs_with_schema=DataWithSchema(slugs, LogDeleteSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, EventDeleteSlugSchema()),
         )
 
     # --- INSIGHTS --- #

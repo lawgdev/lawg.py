@@ -14,8 +14,8 @@ if t.TYPE_CHECKING:
     from lawg.asyncio.feed import AsyncFeed
     from lawg.syncio.rest import Rest
     from lawg.asyncio.rest import AsyncRest
-    from lawg.syncio.log import Log
-    from lawg.asyncio.log import AsyncLog
+    from lawg.syncio.event import Event
+    from lawg.asyncio.event import AsyncEvent
     from lawg.syncio.insight import Insight
     from lawg.asyncio.insight import AsyncInsight
 
@@ -30,7 +30,7 @@ C = t.TypeVar("C", "Client", "AsyncClient")
 F = t.TypeVar("F", "Feed", "AsyncFeed")
 R = t.TypeVar("R", "Rest", "AsyncRest")
 H = t.TypeVar("H", httpx.Client, httpx.AsyncClient)
-L = t.TypeVar("L", "Log", "AsyncLog")
+E = t.TypeVar("E", "Event", "AsyncEvent")
 I = t.TypeVar("I", "Insight", "AsyncInsight")
 
 

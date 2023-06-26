@@ -67,9 +67,9 @@ UsernameSchema = functools.partial(fields.Str, validate=validate.Length(min=1, m
 FeedNameSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=24))
 FeedDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=128))
 
-# --- LOGS --- #
-LogTitleSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=32))
-LogDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=4096))
+# --- EVENTS --- #
+EventTitleSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=32))
+EventDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=4096))
 
 # --- INSIGHTS --- #
 
@@ -189,21 +189,21 @@ class FeedReadSlugSchema(Schema):
     feed_name = FeedNameSchema(required=True)
 
 
-# --- LOGS --- #
+# --- EVENTS --- #
 
 
-class LogCreateSlugSchema(Schema):
-    """Log create slug validation schema."""
+class EventCreateSlugSchema(Schema):
+    """Event create slug validation schema."""
 
     namespace = ProjectNamespaceSchema(required=True)
     feed = FeedNameSchema(required=True)
 
 
-class LogCreateBodySchema(Schema):
-    """Log create body validation schema."""
+class EventCreateBodySchema(Schema):
+    """Event create body validation schema."""
 
-    title = LogTitleSchema(required=True)
-    description = LogDescriptionSchema(required=False, allow_none=True)
+    title = EventTitleSchema(required=True)
+    description = EventDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
     tags = fields.Dict(
         keys=fields.Str(validate=validate.Length(min=1, max=175)),
@@ -215,65 +215,65 @@ class LogCreateBodySchema(Schema):
     notify = fields.Bool(required=False, allow_none=True)
 
 
-class LogDeleteSlugSchema(Schema):
-    """Log delete slug validation schema."""
+class EventDeleteSlugSchema(Schema):
+    """Event delete slug validation schema."""
 
     namespace = ProjectNamespaceSchema(required=True)
     feed = FeedNameSchema(required=True)
-    log_id = PikaId(prefix="log", required=True)
+    event_id = PikaId(prefix="event", required=True)
 
 
-class LogDeleteMultipleBodySchema(Schema):
-    """Log delete multiple body validation schema."""
+class EventDeleteMultipleBodySchema(Schema):
+    """Event delete multiple body validation schema."""
 
-    log_ids = fields.List(PikaId(prefix="log"), required=False, allow_none=True)
+    event_ids = fields.List(PikaId(prefix="event"), required=False, allow_none=True)
     deleteAll = fields.Bool(required=False, allow_none=True)
 
 
-class LogDeleteMultipleSlugSchema(Schema):
-    """Log delete multiple slug validation schema."""
+class EventDeleteMultipleSlugSchema(Schema):
+    """Event delete multiple slug validation schema."""
 
     namespace = ProjectNamespaceSchema(required=True)
     feed_name = FeedNameSchema(required=True)
-    log_id = PikaId(prefix="log", required=True)
+    event_id = PikaId(prefix="event", required=True)
 
 
-class LogGetSlugSchema(Schema):
-    """Log get slug validation schema."""
+class EventGetSlugSchema(Schema):
+    """Event get slug validation schema."""
 
     namespace = ProjectNamespaceSchema(required=True)
     feed_name = FeedNameSchema(required=True)
-    log_id = PikaId(prefix="log", required=True)
+    event_id = PikaId(prefix="event", required=True)
 
 
-class LogGetMultipleBodySchema(Schema):
-    """Log get multiple body validation schema."""
+class EventGetMultipleBodySchema(Schema):
+    """Event get multiple body validation schema."""
 
     limit = fields.Integer(required=False, default=25, validate=validate.Range(min=1, max=100))
     offset = fields.Integer(required=False, default=0, validate=validate.Range(min=0))
 
 
-class LogGetMultipleSlugSchema(Schema):
-    """Log get multiple slug validation schema."""
+class EventGetMultipleSlugSchema(Schema):
+    """Event get multiple slug validation schema."""
 
     namespace = ProjectNamespaceSchema(required=True)
     feed_name = FeedNameSchema(required=True)
 
 
-class LogPatchBodySchema(Schema):
-    """Log patch body validation schema."""
+class EventPatchBodySchema(Schema):
+    """Event patch body validation schema."""
 
-    title = LogTitleSchema(required=False, allow_none=True)
-    description = LogDescriptionSchema(required=False, allow_none=True)
+    title = EventTitleSchema(required=False, allow_none=True)
+    description = EventDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
 
 
-class LogPatchSlugSchema(Schema):
-    """Log patch slug validation schema."""
+class EventPatchSlugSchema(Schema):
+    """Event patch slug validation schema."""
 
     namespace = ProjectNamespaceSchema(required=True)
     feed_name = FeedNameSchema(required=True)
-    log_id = PikaId(prefix="log", required=True)
+    event_id = PikaId(prefix="event", required=True)
 
 
 # --- INSIGHTS --- #
@@ -408,14 +408,14 @@ class ProjectSchema(Schema):
         unknown = EXCLUDE
 
 
-class LogSchema(Schema):
-    """Log validation schema."""
+class EventSchema(Schema):
+    """Event validation schema."""
 
-    id = PikaId(prefix="log", required=True)
+    id = PikaId(prefix="event", required=True)
     project_id = PikaId(prefix="project", required=True)
     feed_id = PikaId(prefix="feed", required=True)
-    title = LogTitleSchema(required=True)
-    description = LogDescriptionSchema(required=True, allow_none=True)
+    title = EventTitleSchema(required=True)
+    description = EventDescriptionSchema(required=True, allow_none=True)
     emoji = EmojiSchema(required=True, allow_none=True)
 
     class Meta:
@@ -449,13 +449,13 @@ class WebsocketEventData(Schema):
 
     project = fields.Str(required=True)
     feed = fields.Str(required=True)
-    log = fields.Nested(LogCreateBodySchema(), required=True)
+    event = fields.Nested(EventCreateBodySchema(), required=True)
 
 
 class WebsocketEvent(Schema):
     """Websocket event validation schema."""
 
     # event
-    e = fields.Str(required=True, validate=validate.OneOf(("LOG_CREATE", "LOG_DELETE", "LOG_UPDATE")))
+    e = fields.Str(required=True, validate=validate.OneOf(("EVENT_CREATE", "EVENT_DELETE", "EVENT_UPDATE")))
     # data
     d = fields.Nested(WebsocketEventData(), required=True)

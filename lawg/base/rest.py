@@ -53,12 +53,12 @@ class BaseRest(ABC, t.Generic[C, H]):
     API_EDIT_FEED = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}"
     API_DELETE_FEED = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}"
 
-    # --- LOGS --- #
-    API_CREATE_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/logs"
-    API_GET_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/logs/{{log_id}}"
-    API_GET_LOGS = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/logs"
-    API_EDIT_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/logs/{{log_id}}"
-    API_DELETE_LOG = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/logs/{{log_id}}"
+    # --- EVENTS --- #
+    API_CREATE_EVENT = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/events"
+    API_GET_EVENT = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/events/{{event_id}}"
+    API_GET_EVENTS = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/events"
+    API_EDIT_EVENT = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/events/{{event_id}}"
+    API_DELETE_EVENT = f"{API_V1_PROJECTS}/{{namespace}}/feeds/{{feed}}/events/{{event_id}}"
 
     # --- INSIGHTS --- #
     API_CREATE_INSIGHT = f"{API_V1_PROJECTS}/{{namespace}}/insights"
@@ -242,7 +242,7 @@ class BaseRest(ABC, t.Generic[C, H]):
         Fetch a project.
 
         Args:
-            namespace (str): namespace of log.
+            namespace (str): namespace of event.
         Returns:
             the fetched project data.
         """
@@ -331,10 +331,10 @@ class BaseRest(ABC, t.Generic[C, H]):
             None
         """
 
-    # --- LOGS --- #
+    # --- EVENTS --- #
 
     @abstractmethod
-    def create_log(
+    def create_event(
         self,
         project: str,
         feed: str,
@@ -343,38 +343,38 @@ class BaseRest(ABC, t.Generic[C, H]):
         emoji: str | None = None,
     ) -> STR_DICT:
         """
-        Create a log.
+        Create an event.
 
         Args:
             project (str): namespace of project.
             feed (str): name of feed.
-            title (str): title of log.
-            description (str | None, optional): description of log. Defaults to None.
-            emoji (str | None, optional): emoji of log. Defaults to None.
+            title (str): title of event.
+            description (str | None, optional): description of event. Defaults to None.
+            emoji (str | None, optional): emoji of event. Defaults to None.
         Returns:
-            the created log data.
+            the created event data.
         """
 
     @abstractmethod
-    def fetch_log(
+    def fetch_event(
         self,
         project: str,
         feed: str,
-        log_id: str,
+        event_id: str,
     ) -> STR_DICT:
         """
-        Fetch a log.
+        Fetch an event.
 
         Args:
             project (str): namespace of project.
             feed (str): name of feed.
-            log_id (str): id of log.
+            event_id (str): id of event.
         Returns:
-            the fetched log data.
+            the fetched event data.
         """
 
     @abstractmethod
-    def fetch_logs(
+    def fetch_events(
         self,
         project: str,
         feed: str,
@@ -382,55 +382,55 @@ class BaseRest(ABC, t.Generic[C, H]):
         offset: int | None = None,
     ) -> list[STR_DICT]:
         """
-        Fetch multiple logs.
+        Fetch multiple events.
 
         Args:
             project (str): namespace of project.
             feed (str): name of feed.
-            limit (int | None, optional): limit of logs. Defaults to None.
-            offset (int | None, optional): offset of logs. Defaults to None.
+            limit (int | None, optional): limit of events. Defaults to None.
+            offset (int | None, optional): offset of events. Defaults to None.
         Returns:
-            the fetched logs' data.
+            the fetched events' data.
         """
 
     @abstractmethod
-    def edit_log(
+    def edit_event(
         self,
         project: str,
         feed: str,
-        log_id: str,
+        event_id: str,
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
     ) -> STR_DICT:
         """
-        Edit a log.
+        Edit an event.
 
         Args:
             project (str): namespace of project.
             feed (str): name of feed.
-            log_id (str): id of log.
-            title (str | None, optional): new title of log. Defaults to keeping the existing value.
-            description (str | None, optional): new description of log. Defaults to keeping the existing value.
-            emoji (str | None, optional): new emoji of log. Defaults to keeping the existing value.
+            event_id (str): id of event.
+            title (str | None, optional): new title of event. Defaults to keeping the existing value.
+            description (str | None, optional): new description of event. Defaults to keeping the existing value.
+            emoji (str | None, optional): new emoji of event. Defaults to keeping the existing value.
         Returns:
-            the edited log data.
+            the edited event data.
         """
 
     @abstractmethod
-    def delete_log(
+    def delete_event(
         self,
         project: str,
         feed: str,
-        log_id: str,
+        event_id: str,
     ) -> None:
         """
-        Delete a log.
+        Delete an event.
 
         Args:
             project (str): namespace of project.
             feed (str): name of feed.
-            log_id (str): id of log.
+            event_id (str): id of event.
         Returns:
             None
         """

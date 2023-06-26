@@ -4,13 +4,13 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
-from lawg.typings import UNDEFINED, C, L
+from lawg.typings import UNDEFINED, C, E
 
 if t.TYPE_CHECKING:
     from lawg.typings import Undefined
 
 
-class BaseFeed(ABC, t.Generic[C, L]):
+class BaseFeed(ABC, t.Generic[C, E]):
     """
     A feed.
     """
@@ -33,65 +33,65 @@ class BaseFeed(ABC, t.Generic[C, L]):
     # --- FEED METHODS --- #
 
     @abstractmethod
-    def log(self, *, title: str, description: str) -> L:
+    def event(self, *, title: str, description: str) -> E:
         """
-        Create a log.
+        Create an event.
 
         Args:
-            title (str): The title of the log.
-            description (str): The description of the log.
+            title (str): The title of the event.
+            description (str): The description of the event.
         Returns:
-            The log.
+            The event.
         """
 
     @abstractmethod
-    def edit_log(
+    def edit_event(
         self,
         *,
         id: str,
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-    ) -> L:
+    ) -> E:
         """
-        Edit a log.
+        Edit an event.
 
         Args:
-            id (str): The id of the log.
-            title (str, optional): The new title of the log.
-            description (str, optional): The new description of the log.
-            emoji (str, optional): The new emoji of the log.
+            id (str): The id of the event.
+            title (str, optional): The new title of the event.
+            description (str, optional): The new description of the event.
+            emoji (str, optional): The new emoji of the event.
         Returns:
-            The log.
+            The event.
         """
 
     @abstractmethod
-    def fetch_log(self, *, id: str) -> L:
+    def fetch_event(self, *, id: str) -> E:
         """
-        Fetch a log.
+        Fetch an event.
 
         Args:
-            id (str): The id of the log.
+            id (str): The id of the event.
         Returns:
-            The log.
+            The event.
         """
 
     @abstractmethod
-    def fetch_logs(self) -> list[L]:
+    def fetch_events(self) -> list[E]:
         """
-        Fetch all logs.
+        Fetch all events.
 
         Returns:
-            A list of logs.
+            A list of events.
         """
 
     @abstractmethod
-    def delete_log(self, *, id: str) -> None:
+    def delete_event(self, *, id: str) -> None:
         """
-        Delete a log.
+        Delete an event.
 
         Args:
-            id (str): The id of the log.
+            id (str): The id of the event.
         Returns:
             None
         """

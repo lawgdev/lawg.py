@@ -5,10 +5,10 @@ import typing as t
 from abc import ABC, abstractmethod
 
 
-from lawg.typings import F, L, I, R, STR_DICT, UNDEFINED, Undefined
+from lawg.typings import F, E, I, R, STR_DICT, UNDEFINED, Undefined
 
 
-class BaseClient(ABC, t.Generic[F, L, I, R]):
+class BaseClient(ABC, t.Generic[F, E, I, R]):
     """
     The base client for lawg.
     """
@@ -37,21 +37,21 @@ class BaseClient(ABC, t.Generic[F, L, I, R]):
             The feed.
         """
 
-    # --- LOGS --- #
+    # --- EVENTS --- #
 
     @abstractmethod
-    def log(self, *, feed: str, title: str, description: str) -> L:
+    def event(self, *, feed: str, title: str, description: str) -> E:
         """
-        Create a log.
+        Create an event.
 
         Args:
             feed (str): The name of the feed.
-            title (str): The title of the log.
-            description (str): The description of the log.
+            title (str): The title of the event.
+            description (str): The description of the event.
         """
 
     @abstractmethod
-    def edit_log(
+    def edit_event(
         self,
         *,
         feed: str,
@@ -59,45 +59,45 @@ class BaseClient(ABC, t.Generic[F, L, I, R]):
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
-    ) -> L:
+    ) -> E:
         """
-        Edit a log.
+        Edit an event.
 
         Args:
             feed (str): The name of the feed.
-            id (str): The id of the log.
-            title (str, optional): The new title of the log.
-            description (str, optional): The new description of the log.
-            emoji (str, optional): The new emoji of the log.
+            id (str): The id of the event.
+            title (str, optional): The new title of the event.
+            description (str, optional): The new description of the event.
+            emoji (str, optional): The new emoji of the event.
         """
 
     @abstractmethod
-    def fetch_log(self, *, feed: str, id: str) -> L:
+    def fetch_event(self, *, feed: str, id: str) -> E:
         """
-        Fetch a log.
+        Fetch an event.
 
         Args:
             feed (str): The name of the feed.
-            id (str): The id of the log.
+            id (str): The id of the event.
         """
 
     @abstractmethod
-    def fetch_logs(self, *, feed: str) -> list[L]:
+    def fetch_events(self, *, feed: str) -> list[E]:
         """
-        Fetch all logs.
+        Fetch all events.
 
         Args:
             feed (str): The name of the feed.
         """
 
     @abstractmethod
-    def delete_log(self, *, feed: str, id: str) -> None:
+    def delete_event(self, *, feed: str, id: str) -> None:
         """
-        Delete a log.
+        Delete an event.
 
         Args:
             feed (str): The name of the feed.
-            id (str): The id of the log.
+            id (str): The id of the event.
         """
 
     # --- INSIGHTS --- #
@@ -185,13 +185,13 @@ class BaseClient(ABC, t.Generic[F, L, I, R]):
     # --- MANAGER CONSTRUCTORS --- #
 
     @abstractmethod
-    def _construct_log(self, feed: str, log_data: STR_DICT) -> L:
+    def _construct_event(self, feed: str, event_data: STR_DICT) -> E:
         """
-        Construct a log from API response data.
+        Construct an event from API response data.
         """
 
-    def _construct_logs(self, feed: str, logs_data: list[STR_DICT]) -> list[L]:
-        return [self._construct_log(feed, log_data) for log_data in logs_data]
+    def _construct_events(self, feed: str, events_data: list[STR_DICT]) -> list[E]:
+        return [self._construct_event(feed, event_data) for event_data in events_data]
 
     @abstractmethod
     def _construct_insight(self, insight_data: STR_DICT) -> I:
