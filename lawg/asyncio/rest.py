@@ -8,24 +8,34 @@ from lawg.typings import STR_DICT, UNDEFINED, DataWithSchema, Undefined
 
 from lawg.schemas import (
     FeedCreateBodySchema,
+    FeedCreateSlugSchema,
+    FeedDeleteSlugSchema,
     FeedPatchBodySchema,
-    FeedSchema,
-    FeedSlugSchema,
-    FeedWithNameSlugSchema,
+    FeedPatchSlugSchema,
     InsightCreateBodySchema,
     InsightCreateSlugSchema,
+    InsightGetMultipleBodySchema,
+    InsightGetSlugSchema,
     InsightPatchBodySchema,
-    InsightSchema,
-    InsightSlugSchema,
+    InsightPatchSlugSchema,
+    InsightValueSchema,
     LogCreateBodySchema,
+    LogCreateSlugSchema,
+    LogDeleteSlugSchema,
     LogGetMultipleBodySchema,
+    LogGetMultipleSlugSchema,
+    LogGetSlugSchema,
     LogPatchBodySchema,
-    LogSchema,
-    LogSlugSchema,
-    LogWithIdSlugSchema,
-    ProjectBodySchema,
+    LogPatchSlugSchema,
+    ProjectDeleteSlugSchema,
+    ProjectGetSlugSchema,
+    ProjectPatchBodySchema,
+    ProjectPatchSlugSchema,
     ProjectSchema,
-    ProjectSlugSchema,
+    FeedSchema,
+    LogSchema,
+    InsightSchema,
+    ProjectCreateBodySchema,
 )
 
 if t.TYPE_CHECKING:
@@ -62,7 +72,6 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         await self.http_client.aclose()
 
     # --- PROJECTS --- #
-
     async def create_project(self, project: str, project_name: str):
         body = {
             "namespace": project,
@@ -71,7 +80,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         project_data = await self.request(
             url=self.API_CREATE_PROJECT,
             method="POST",
-            body_with_schema=DataWithSchema(body, ProjectBodySchema()),
+            body_with_schema=DataWithSchema(body, ProjectCreateBodySchema()),
             response_schema=ProjectSchema(),
         )
         return project_data
@@ -83,20 +92,23 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         project_data = await self.request(
             url=self.API_GET_PROJECT,
             method="GET",
-            slugs_with_schema=DataWithSchema(slugs, ProjectSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, ProjectGetSlugSchema()),
             response_schema=ProjectSchema(),
         )
         return project_data
 
     async def edit_project(self, project: str, project_name: str):
-        body = {
+        slugs = {
             "namespace": project,
+        }
+        body = {
             "name": project_name,
         }
         project_data = await self.request(
             url=self.API_EDIT_PROJECT,
             method="PATCH",
-            body_with_schema=DataWithSchema(body, ProjectBodySchema()),
+            slugs_with_schema=DataWithSchema(slugs, ProjectPatchSlugSchema()),
+            body_with_schema=DataWithSchema(body, ProjectPatchBodySchema()),
             response_schema=ProjectSchema(),
         )
         return project_data
@@ -108,7 +120,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         await self.request(
             url=self.API_DELETE_PROJECT,
             method="DELETE",
-            slugs_with_schema=DataWithSchema(slugs, ProjectSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, ProjectDeleteSlugSchema()),
         )
 
     # --- FEEDS --- #
@@ -132,7 +144,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             url=self.API_CREATE_FEED,
             method="POST",
             body_with_schema=DataWithSchema(data, FeedCreateBodySchema()),
-            slugs_with_schema=DataWithSchema(slugs, FeedSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, FeedCreateSlugSchema()),
             response_schema=FeedSchema(),
         )
         return feed_data
@@ -158,7 +170,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             url=self.API_EDIT_FEED,
             method="PATCH",
             body_with_schema=DataWithSchema(data, FeedPatchBodySchema()),
-            slugs_with_schema=DataWithSchema(slugs, FeedWithNameSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, FeedPatchSlugSchema()),
             response_schema=FeedSchema(),
         )
         return feed_data
@@ -171,7 +183,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         await self.request(
             url=self.API_DELETE_FEED,
             method="DELETE",
-            slugs_with_schema=DataWithSchema(slugs, FeedWithNameSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, FeedDeleteSlugSchema()),
         )
 
     # --- LOGS --- #
@@ -197,7 +209,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             url=self.API_CREATE_LOG,
             method="POST",
             body_with_schema=DataWithSchema(data, LogCreateBodySchema()),
-            slugs_with_schema=DataWithSchema(slugs, LogSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, LogCreateSlugSchema()),
             response_schema=LogSchema(),
         )
         return log_data
@@ -211,7 +223,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         log_data = await self.request(
             url=self.API_GET_LOG,
             method="GET",
-            slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, LogGetSlugSchema()),
             response_schema=LogSchema(),
         )
         return log_data
@@ -235,7 +247,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             url=self.API_GET_LOGS,
             method="GET",
             body_with_schema=DataWithSchema(data, LogGetMultipleBodySchema()),
-            slugs_with_schema=DataWithSchema(slugs, LogSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, LogGetMultipleSlugSchema()),
             response_schema=LogSchema(many=True),
         )  # type: ignore
         return logs_data
@@ -263,7 +275,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             url=self.API_EDIT_LOG,
             method="PATCH",
             body_with_schema=DataWithSchema(data, LogPatchBodySchema()),
-            slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, LogPatchSlugSchema()),
             response_schema=LogSchema(),
         )
         return log_data
@@ -277,7 +289,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         await self.request(
             url=self.API_DELETE_LOG,
             method="DELETE",
-            slugs_with_schema=DataWithSchema(slugs, LogWithIdSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, LogDeleteSlugSchema()),
         )
 
     # --- INSIGHTS --- #
@@ -320,7 +332,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         insight_data = await self.request(
             url=self.API_GET_INSIGHTS,
             method="GET",
-            slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, InsightGetSlugSchema()),
             response_schema=InsightSchema(),
         )
         return insight_data
@@ -335,7 +347,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         insights_data: list[STR_DICT] = await self.request(
             url=self.API_GET_INSIGHTS,
             method="GET",
-            slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, InsightGetMultipleBodySchema()),
             response_schema=InsightSchema(many=True),
         )  # type: ignore
         return insights_data
@@ -363,7 +375,7 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             url=self.API_EDIT_INSIGHT,
             method="PATCH",
             body_with_schema=DataWithSchema(data, InsightPatchBodySchema()),
-            slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, InsightPatchSlugSchema()),
             response_schema=InsightSchema(),
         )
         return insight_data
@@ -380,5 +392,5 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         await self.request(
             url=self.API_DELETE_INSIGHT,
             method="DELETE",
-            slugs_with_schema=DataWithSchema(slugs, InsightSlugSchema()),
+            slugs_with_schema=DataWithSchema(slugs, InsightValueSchema()),
         )
