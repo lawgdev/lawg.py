@@ -21,8 +21,9 @@ from lawg.schemas import APIErrorSchema, APISuccessSchema
 from lawg.typings import C, H, UNDEFINED, DataWithSchema, Undefined
 
 if t.TYPE_CHECKING:
-    from lawg.typings import STR_DICT
+    import datetime
     from marshmallow import Schema
+    from lawg.typings import STR_DICT
 
 
 class BaseRest(ABC, t.Generic[C, H]):
@@ -341,6 +342,10 @@ class BaseRest(ABC, t.Generic[C, H]):
         title: str,
         description: str | None = None,
         emoji: str | None = None,
+        tags: dict[str, str | int | float | bool] | None = None,
+        timestamp: datetime.datetime | None = None,
+        notify: bool | None = None,
+        metadata: dict[str, str | int | float | bool] | None = None,
     ) -> STR_DICT:
         """
         Create an event.
@@ -351,6 +356,10 @@ class BaseRest(ABC, t.Generic[C, H]):
             title (str): title of event.
             description (str | None, optional): description of event. Defaults to None.
             emoji (str | None, optional): emoji of event. Defaults to None.
+            tags (dict[str, str | int | float | bool] | None, optional): tags of event. Defaults to None.
+            timestamp (datetime.datetime | None, optional): timestamp of event. Defaults to None.
+            notify (bool | None, optional): notify of event. Defaults to None.
+            metadata (dict[str, str | int | float | bool] | None, optional): metadata of event. Defaults to None.
         Returns:
             the created event data.
         """
@@ -402,6 +411,8 @@ class BaseRest(ABC, t.Generic[C, H]):
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
+        tags: dict[str, str | int | float | bool] | None | Undefined = UNDEFINED,
+        timestamp: datetime.datetime | None | Undefined = UNDEFINED,
     ) -> STR_DICT:
         """
         Edit an event.
@@ -413,6 +424,8 @@ class BaseRest(ABC, t.Generic[C, H]):
             title (str | None, optional): new title of event. Defaults to keeping the existing value.
             description (str | None, optional): new description of event. Defaults to keeping the existing value.
             emoji (str | None, optional): new emoji of event. Defaults to keeping the existing value.
+            tags (dict[str, str | int | float | bool] | None, optional): new tags of event. Defaults to keeping the existing value.
+            timestamp (datetime.datetime | None, optional): new timestamp of event. Defaults to keeping the existing value.
         Returns:
             the edited event data.
         """

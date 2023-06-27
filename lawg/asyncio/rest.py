@@ -39,6 +39,7 @@ from lawg.schemas import (
 )
 
 if t.TYPE_CHECKING:
+    import datetime
     from marshmallow import Schema
     from lawg.asyncio.client import AsyncClient
 
@@ -195,6 +196,10 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         title: str,
         description: str | None = None,
         emoji: str | None = None,
+        tags: dict[str, str | int | float | bool] | None = None,
+        timestamp: datetime.datetime | None = None,
+        notify: bool | None = None,
+        metadata: dict[str, str | int | float | bool] | None = None,
     ):
         slugs = {
             "namespace": project,
@@ -204,6 +209,10 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             "title": title,
             "description": description,
             "emoji": emoji,
+            "tags": tags,
+            "timestamp": timestamp,
+            "notify": notify,
+            "metadata": metadata,
         }
         event_data = await self.request(
             url=self.API_CREATE_EVENT,
@@ -260,6 +269,8 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
+        tags: dict[str, str | int | float | bool] | Undefined | None = UNDEFINED,
+        timestamp: datetime.datetime | Undefined | None = UNDEFINED,
     ):
         slugs = {
             "namespace": project,
@@ -270,6 +281,8 @@ class AsyncRest(BaseRest["AsyncClient", httpx.AsyncClient]):
             "title": title,
             "description": description,
             "emoji": emoji,
+            "tags": tags,
+            "timestamp": timestamp,
         }
         event_data = await self.request(
             url=self.API_EDIT_EVENT,

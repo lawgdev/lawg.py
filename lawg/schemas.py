@@ -70,6 +70,11 @@ FeedDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(m
 # --- EVENTS --- #
 EventTitleSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=32))
 EventDescriptionSchema = functools.partial(fields.Str, validate=validate.Length(min=1, max=4096))
+EventTagsSchema = functools.partial(
+    fields.Dict,
+    keys=fields.Str(validate=validate.Length(min=1, max=175)),
+    values=Union([fields.Str(), fields.Int(), fields.Float(), fields.Bool()]),
+)
 
 # --- INSIGHTS --- #
 
@@ -205,14 +210,9 @@ class EventCreateBodySchema(Schema):
     title = EventTitleSchema(required=True)
     description = EventDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
-    tags = fields.Dict(
-        keys=fields.Str(validate=validate.Length(min=1, max=175)),
-        values=Union([fields.Str(), fields.Int(), fields.Float(), fields.Bool()]),
-        required=False,
-        allow_none=True,
-    )
+    tags = EventTagsSchema(required=False, allow_none=True)
     timestamp = fields.DateTime(required=False, allow_none=True)
-    notify = fields.Bool(required=False, allow_none=True)
+    notify = fields.Boolean(required=False, allow_none=True)
 
 
 class EventDeleteSlugSchema(Schema):
@@ -227,7 +227,7 @@ class EventDeleteMultipleBodySchema(Schema):
     """Event delete multiple body validation schema."""
 
     event_ids = fields.List(PikaId(prefix="event"), required=False, allow_none=True)
-    deleteAll = fields.Bool(required=False, allow_none=True)
+    deleteAll = fields.Boolean(required=False, allow_none=True)
 
 
 class EventDeleteMultipleSlugSchema(Schema):
@@ -266,6 +266,8 @@ class EventPatchBodySchema(Schema):
     title = EventTitleSchema(required=False, allow_none=True)
     description = EventDescriptionSchema(required=False, allow_none=True)
     emoji = EmojiSchema(required=False, allow_none=True)
+    tags = EventTagsSchema(required=False, allow_none=True)
+    timestamp = fields.DateTime(required=False, allow_none=True)
 
 
 class EventPatchSlugSchema(Schema):

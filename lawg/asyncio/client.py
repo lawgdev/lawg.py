@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing as t
 
 from lawg.base.client import BaseClient
 from lawg.asyncio.feed import AsyncFeed
@@ -8,6 +9,9 @@ from lawg.asyncio.event import AsyncEvent
 from lawg.asyncio.insight import AsyncInsight
 
 from lawg.typings import STR_DICT, UNDEFINED, Undefined
+
+if t.TYPE_CHECKING:
+    import datetime
 
 
 class AsyncClient(BaseClient["AsyncFeed", "AsyncEvent", "AsyncInsight", "AsyncRest"]):
@@ -42,13 +46,28 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncEvent", "AsyncInsight", "AsyncRe
 
     # --- EVENTS --- #
 
-    async def event(self, *, feed: str, title: str, description: str, emoji: str | None = None):
+    async def event(
+        self,
+        *,
+        feed: str,
+        title: str,
+        description: str,
+        emoji: str | None = None,
+        tags: dict[str, str | int | float | bool] | None = None,
+        timestamp: datetime.datetime | None = None,
+        notify: bool | None = None,
+        metadata: dict[str, str | int | float | bool] | None = None,
+    ):
         event_data = await self.rest.create_event(
             project=self.project,
             feed=feed,
             title=title,
             description=description,
             emoji=emoji,
+            tags=tags,
+            timestamp=timestamp,
+            notify=notify,
+            metadata=metadata,
         )
         return self._construct_event(feed, event_data)
 
@@ -60,6 +79,8 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncEvent", "AsyncInsight", "AsyncRe
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
+        tags: dict[str, str | int | float | bool] | Undefined | None = UNDEFINED,
+        timestamp: datetime.datetime | Undefined | None = UNDEFINED,
     ):
         event_data = await self.rest.edit_event(
             project=self.project,
@@ -68,6 +89,8 @@ class AsyncClient(BaseClient["AsyncFeed", "AsyncEvent", "AsyncInsight", "AsyncRe
             title=title,
             description=description,
             emoji=emoji,
+            tags=tags,
+            timestamp=timestamp,
         )
         return self._construct_event(feed, event_data)
 

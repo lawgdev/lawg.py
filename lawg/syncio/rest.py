@@ -8,6 +8,7 @@ from lawg.base.rest import BaseRest
 from lawg.typings import STR_DICT, UNDEFINED, DataWithSchema, Undefined
 
 if t.TYPE_CHECKING:
+    import datetime
     from marshmallow import Schema
     from lawg.syncio.client import Client
 
@@ -193,6 +194,10 @@ class Rest(BaseRest["Client", httpx.Client]):
         title: str,
         description: str | None = None,
         emoji: str | None = None,
+        tags: dict[str, str | int | float | bool] | None = None,
+        timestamp: datetime.datetime | None = None,
+        notify: bool | None = None,
+        metadata: dict[str, str | int | float | bool] | None = None,
     ):
         slugs = {
             "namespace": project,
@@ -202,6 +207,10 @@ class Rest(BaseRest["Client", httpx.Client]):
             "title": title,
             "description": description,
             "emoji": emoji,
+            "tags": tags,
+            "timestamp": timestamp,
+            "notify": notify,
+            "metadata": metadata,
         }
         event_data = self.request(
             url=self.API_CREATE_EVENT,
@@ -258,6 +267,8 @@ class Rest(BaseRest["Client", httpx.Client]):
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
+        tags: dict[str, str | int | float | bool] | Undefined | None = UNDEFINED,
+        timestamp: datetime.datetime | Undefined | None = UNDEFINED,
     ):
         slugs = {
             "namespace": project,
@@ -268,6 +279,8 @@ class Rest(BaseRest["Client", httpx.Client]):
             "title": title,
             "description": description,
             "emoji": emoji,
+            "tags": tags,
+            "timestamp": timestamp,
         }
         event_data = self.request(
             url=self.API_EDIT_EVENT,

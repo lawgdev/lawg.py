@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 
+import typing as t
+
 from lawg.base.client import BaseClient
 from lawg.syncio.rest import Rest
 from lawg.typings import STR_DICT, UNDEFINED, Undefined
@@ -8,6 +10,9 @@ from lawg.typings import STR_DICT, UNDEFINED, Undefined
 from lawg.syncio.feed import Feed
 from lawg.syncio.event import Event
 from lawg.syncio.insight import Insight
+
+if t.TYPE_CHECKING:
+    import datetime
 
 
 class Client(BaseClient["Feed", "Event", "Insight", "Rest"]):
@@ -32,13 +37,28 @@ class Client(BaseClient["Feed", "Event", "Insight", "Rest"]):
 
     # --- EVENTS --- #
 
-    def event(self, *, feed: str, title: str, description: str, emoji: str | None = None):
+    def event(
+        self,
+        *,
+        feed: str,
+        title: str,
+        description: str,
+        emoji: str | None = None,
+        tags: dict[str, str | int | float | bool] | None = None,
+        timestamp: datetime.datetime | None = None,
+        notify: bool | None = None,
+        metadata: dict[str, str | int | float | bool] | None = None,
+    ):
         event_data = self.rest.create_event(
             project=self.project,
             feed=feed,
             title=title,
             description=description,
             emoji=emoji,
+            tags=tags,
+            timestamp=timestamp,
+            notify=notify,
+            metadata=metadata,
         )
         return self._construct_event(feed, event_data)
 
@@ -50,6 +70,8 @@ class Client(BaseClient["Feed", "Event", "Insight", "Rest"]):
         title: str | Undefined | None = UNDEFINED,
         description: str | Undefined | None = UNDEFINED,
         emoji: str | Undefined | None = UNDEFINED,
+        tags: dict[str, str | int | float | bool] | Undefined | None = UNDEFINED,
+        timestamp: datetime.datetime | Undefined | None = UNDEFINED,
     ):
         event_data = self.rest.edit_event(
             project=self.project,
@@ -58,6 +80,8 @@ class Client(BaseClient["Feed", "Event", "Insight", "Rest"]):
             title=title,
             description=description,
             emoji=emoji,
+            tags=tags,
+            timestamp=timestamp,
         )
         return self._construct_event(feed, event_data)
 

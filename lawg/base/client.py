@@ -4,8 +4,10 @@ import typing as t
 
 from abc import ABC, abstractmethod
 
-
 from lawg.typings import F, E, I, R, STR_DICT, UNDEFINED, Undefined
+
+if t.TYPE_CHECKING:
+    import datetime
 
 
 class BaseClient(ABC, t.Generic[F, E, I, R]):
@@ -40,7 +42,17 @@ class BaseClient(ABC, t.Generic[F, E, I, R]):
     # --- EVENTS --- #
 
     @abstractmethod
-    def event(self, *, feed: str, title: str, description: str) -> E:
+    def event(
+        self,
+        *,
+        feed: str,
+        title: str,
+        description: str,
+        tags: dict[str, str | int | float | bool] | None = None,
+        timestamp: datetime.datetime | None = None,
+        notify: bool | None = None,
+        metadata: dict[str, str | int | float | bool] | None = None,
+    ) -> E:
         """
         Create an event.
 
@@ -48,6 +60,9 @@ class BaseClient(ABC, t.Generic[F, E, I, R]):
             feed (str): The name of the feed.
             title (str): The title of the event.
             description (str): The description of the event.
+            tags (dict[str, str | int | float | bool], optional): The tags of the event.
+            timestamp (datetime.datetime, optional): The timestamp of the event.
+            notify (bool, optional): Whether to notify the event.
         """
 
     @abstractmethod
@@ -59,6 +74,8 @@ class BaseClient(ABC, t.Generic[F, E, I, R]):
         title: str | None | Undefined = UNDEFINED,
         description: str | None | Undefined = UNDEFINED,
         emoji: str | None | Undefined = UNDEFINED,
+        tags: dict[str, str | int | float | bool] | None | Undefined = UNDEFINED,
+        timestamp: datetime.datetime | None | Undefined = UNDEFINED,
     ) -> E:
         """
         Edit an event.
@@ -69,6 +86,8 @@ class BaseClient(ABC, t.Generic[F, E, I, R]):
             title (str, optional): The new title of the event.
             description (str, optional): The new description of the event.
             emoji (str, optional): The new emoji of the event.
+            tags (dict[str, str | int | float | bool], optional): The new tags of the event.
+            timestamp (datetime.datetime, optional): The new timestamp of the event.
         """
 
     @abstractmethod
